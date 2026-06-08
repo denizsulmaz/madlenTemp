@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Madlen Classroom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --cream:#FFF8F0;--cream2:#FFF2E4;--cream3:#FDE8CC;
+  --orange:#E8880A;--orange-l:#FDF0DC;--orange-d:#C46E00;
+  --ink:#1A1208;--ink2:#3D2E1A;--muted:#7A6A55;--muted2:#A8957D;
+  --border:#E8D9C4;--border2:#D4C0A8;--white:#FFFFFF;
+  --green:#1E8A4A;--green-bg:#EAF7EF;--green-bg2:#C5EDD5;
+  --red:#C43A3A;--red-bg:#FDEAEA;--red-bg2:#F5C5C5;
+  --a:#3B6FD4;--a-bg:#EEF3FD;--a-bg2:#D8E6FF;--a-dark:#1A3D8A;
+  --b:#7B3DB8;--b-bg:#F4EEF9;--b-bg2:#E5D5F5;--b-dark:#4A1A7A;
+  --c:#C45A20;--c-bg:#FDF0EA;--c-bg2:#FFE0CC;--c-dark:#7A3010;
+  --d:#1A8A8A;--d-bg:#EAF6F7;--d-bg2:#C8ECEE;--d-dark:#0A5050;
+  --serif:'Lora',Georgia,serif;--sans:'DM Sans',sans-serif;
+}
+html,body{height:100%;font-family:var(--sans);background:var(--cream);overflow:hidden}
+.app{width:100%;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.screen{display:none;width:100%;flex:1;flex-direction:column;min-height:0}
+.screen.active{display:flex}
+
+/* LANDING */
+#s-landing{background:var(--cream);align-items:center;justify-content:center;text-align:center;padding:2rem 1.5rem;position:relative;overflow:hidden}
+.lb1{position:absolute;top:-120px;right:-100px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,#FDDFA8 0%,transparent 65%);opacity:.5;pointer-events:none}
+.lb2{position:absolute;bottom:-100px;left:-100px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,#D4EEF8 0%,transparent 65%);opacity:.5;pointer-events:none}
+.lc{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;width:100%;max-width:540px;margin:0 auto;gap:.85rem}
+.session-badge{display:inline-flex;align-items:center;gap:7px;background:var(--orange-l);border:1.5px solid var(--cream3);border-radius:100px;padding:5px 14px}
+.sbdot{width:7px;height:7px;border-radius:50%;background:var(--orange);animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.78)}}
+.session-badge span{font-size:11px;font-weight:700;color:var(--orange-d);text-transform:uppercase;letter-spacing:.07em}
+#s-landing h1{font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--ink);line-height:1.25}
+#s-landing h1 em{font-style:italic;color:var(--orange)}
+.ldesc{font-size:13px;color:var(--muted);line-height:1.7;max-width:400px}
+.mpills{display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap}
+.mpill{display:flex;align-items:center;gap:5px;background:var(--white);border:1.5px solid var(--border);border-radius:100px;padding:5px 12px;font-size:12px;font-weight:500;color:var(--ink2)}
+.mpill .ti{font-size:13px;color:var(--orange)}
+
+/* Leaderboard toggle row on landing */
+.landing-toggle-row{display:flex;align-items:center;justify-content:space-between;background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:.85rem 1.1rem;width:100%;max-width:480px;gap:1rem}
+.ltrow-left{display:flex;align-items:center;gap:10px;text-align:left}
+.ltrow-icon{width:36px;height:36px;border-radius:10px;background:var(--orange-l);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--orange);flex-shrink:0}
+.ltrow-title{font-size:13px;font-weight:700;color:var(--ink2)}
+.ltrow-desc{font-size:11px;color:var(--muted);margin-top:2px}
+
+.btn-start{display:inline-flex;align-items:center;gap:10px;background:var(--orange);color:var(--white);font-family:var(--sans);font-size:15px;font-weight:700;padding:13px 34px;border-radius:100px;border:none;cursor:pointer;transition:all .15s;box-shadow:0 6px 20px rgba(232,136,10,.3)}
+.btn-start:hover{background:var(--orange-d);transform:translateY(-1px)}
+.shortcuts-row{display:flex;align-items:center;justify-content:center;gap:.45rem;flex-wrap:wrap}
+.skey{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted2)}
+.sk{background:var(--cream2);border:1px solid var(--border);border-radius:5px;padding:2px 6px;font-size:10px;font-weight:700;color:var(--ink2);font-family:monospace}
+.sdot{color:var(--border2);font-size:10px}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;background:var(--white);border-bottom:1.5px solid var(--border);padding:0 1rem;height:50px;position:relative;flex-shrink:0;z-index:20}
+.tbrand{font-family:var(--serif);font-size:15px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:7px}
+.bdot{width:8px;height:8px;border-radius:50%;background:var(--orange)}
+.tcenter{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px}
+.pttrack{width:90px;height:5px;background:#EDE1D0;border-radius:3px;overflow:hidden}
+.ptfill{height:100%;background:var(--orange);border-radius:3px;transition:width .3s}
+.qctr-lbl{font-size:13px;font-weight:600;color:var(--ink2)}
+.tright{display:flex;align-items:center;gap:4px}
+.ibt{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--muted);transition:all .15s}
+.ibt:hover{border-color:var(--orange);background:var(--orange-l);color:var(--orange)}
+.txt-zoom-wrap{display:flex;align-items:center;background:var(--cream2);border:1.5px solid var(--border);border-radius:8px;overflow:hidden;height:32px}
+.txt-zoom-wrap .ibt{border:none;border-radius:0;width:28px;height:100%;background:transparent;color:var(--muted);font-size:15px}
+.txt-zoom-wrap .ibt:hover{border:none;background:var(--orange-l);color:var(--orange)}
+.txt-zoom-lbl{font-size:11px;font-weight:700;color:var(--ink2);min-width:36px;text-align:center;padding:0 2px;border-left:1px solid var(--border);border-right:1px solid var(--border);line-height:30px}
+
+/* WAITING / QR */
+#s-waiting{background:var(--cream)}
+.waiting-body{flex:1;display:flex;gap:1rem;padding:1rem;overflow:hidden;min-height:0}
+.qr-panel{width:50%;max-width:640px;flex-shrink:0;background:var(--white);border:1.5px solid var(--border);border-radius:16px;display:flex;flex-direction:column;align-items:center;padding:1.5rem 1.25rem;gap:1rem}
+.qr-lbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em}
+.qr-box{width:80%;max-width:420px;aspect-ratio:1/1;border:2px solid var(--border);border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--cream2);position:relative;overflow:hidden}
+.qr-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;width:362px}
+.qr-cell{width:29px;height:29px;border-radius:2px}
+.qr-scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--orange),transparent);animation:scan 2s ease-in-out infinite}
+@keyframes scan{0%{top:16px}50%{top:192px}100%{top:16px}}
+.qr-code-big{font-family:monospace;font-size:2.2rem;font-weight:800;color:var(--ink);letter-spacing:.1em;text-align:center}
+.qr-url{font-size:13px;font-weight:600;color:var(--orange);text-align:center}
+.qr-method{display:flex;align-items:center;gap:6px;background:var(--cream2);border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:12px;color:var(--ink2);font-weight:500;width:100%}
+.qr-method .ti{font-size:14px;color:var(--orange)}
+.qr-note{font-size:11px;color:var(--muted2);text-align:center;line-height:1.5}
+.pax-panel{flex:1;background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:1.25rem;display:flex;flex-direction:column;gap:.85rem;overflow:hidden;min-height:0}
+.pax-top{display:flex;align-items:center;justify-content:space-between}
+.pax-title{font-family:var(--serif);font-size:1rem;font-weight:700;color:var(--ink)}
+.live-badge{display:flex;align-items:center;gap:5px;background:#FFF0F0;border:1px solid #FFCCCC;border-radius:100px;padding:3px 10px;font-size:10px;font-weight:700;color:#CC3333}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#CC3333;animation:pulse 1.2s ease-in-out infinite}
+.count-block{display:flex;align-items:baseline;gap:8px}
+.count-n{font-family:var(--serif);font-size:3rem;font-weight:700;color:var(--orange);line-height:1}
+.count-l{font-size:13px;color:var(--muted)}
+.pax-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;min-height:0}
+.pax-row{display:flex;align-items:center;gap:10px;padding:7px 10px;background:var(--cream);border-radius:10px;animation:si .3s ease;flex-shrink:0}
+@keyframes si{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.pax-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--white);flex-shrink:0}
+.pax-name{font-size:13px;color:var(--ink2);font-weight:500}
+.pax-m{font-size:10px;color:var(--muted2)}
+.wbottom{background:var(--white);border-top:1.5px solid var(--border);padding:10px 1.25rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.wnote{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.wnote .ti{font-size:14px;color:var(--orange)}
+.btn-launch{display:flex;align-items:center;gap:8px;background:var(--orange);color:var(--white);border:none;border-radius:10px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:all .15s;box-shadow:0 3px 12px rgba(232,136,10,.25)}
+.btn-launch:hover{background:var(--orange-d)}
+.btn-launch:disabled{background:#C8B89A;box-shadow:none;cursor:default}
+
+/* QUIZ */
+#s-quiz{background:var(--cream)}
+.quiz-rel{position:relative;flex-shrink:0}
+.quiz-split{flex:1;display:flex;overflow:hidden;min-height:0;position:relative}
+.img-col{width:48%;min-width:20%;max-width:75%;position:relative;background:#1A1208;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.img-col img{width:100%;height:100%;object-fit:cover}
+.img-placeholder-full{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:rgba(255,255,255,.2);width:100%;height:100%;background:linear-gradient(135deg,#2A1F0E 0%,#1A1208 100%)}
+.img-placeholder-full .ti{font-size:60px}
+.img-placeholder-full span{font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+.img-tag{position:absolute;top:12px;left:12px;background:rgba(26,18,8,.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:5px 11px;font-size:11px;font-weight:700;color:rgba(255,255,255,.8);letter-spacing:.04em;text-transform:uppercase;z-index:5}
+.resizer{width:6px;flex-shrink:0;background:var(--border);cursor:col-resize;position:relative;z-index:10;display:flex;align-items:center;justify-content:center;transition:background .15s;user-select:none}
+.resizer:hover,.resizer.dragging{background:var(--orange)}
+.resizer-handle{width:4px;height:40px;border-radius:2px;background:rgba(0,0,0,.15);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.resizer:hover .resizer-handle,.resizer.dragging .resizer-handle{background:rgba(255,255,255,.5)}
+.resizer-dot{width:3px;height:3px;border-radius:50%;background:currentColor;opacity:.6}
+.q-col{flex:1;display:flex;flex-direction:column;background:var(--cream);overflow-y:auto;padding:.85rem;gap:.75rem;min-width:25%}
+.q-card{background:var(--white);border-radius:14px;border:1.5px solid var(--border);padding:1rem 1.2rem}
+.qtag{display:inline-flex;align-items:center;background:var(--orange-l);color:var(--orange-d);font-size:10px;font-weight:700;border-radius:6px;padding:3px 9px;margin-bottom:7px;letter-spacing:.05em}
+.qstem{font-size:.85em;color:var(--muted);line-height:1.65;margin-bottom:.65rem;border-left:3px solid var(--cream3);padding-left:9px}
+.qmain{font-family:var(--serif);font-size:1em;font-weight:600;color:var(--ink);line-height:1.5}
+.choices{display:flex;flex-direction:column;gap:7px}
+.choice{display:flex;align-items:stretch;border-radius:12px;border:2px solid transparent;cursor:pointer;text-align:left;width:100%;overflow:hidden;transition:transform .12s,box-shadow .12s,border-color .15s;font-family:inherit;background:transparent}
+.choice:hover:not(:disabled){transform:translateX(3px);box-shadow:0 3px 14px rgba(0,0,0,.08)}
+.cletter{width:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9em;font-weight:800;color:var(--white);letter-spacing:.02em}
+.ctext-wrap{flex:1;padding:.7em .85em;font-size:.88em;line-height:1.4;font-weight:500;text-align:left}
+.cind{width:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1em}
+.choice[data-i="0"]{border-color:var(--a-bg2)}.choice[data-i="0"] .cletter{background:var(--a)}.choice[data-i="0"] .ctext-wrap,.choice[data-i="0"] .cind{background:var(--a-bg);color:var(--a-dark)}
+.choice[data-i="0"]:hover:not(:disabled){border-color:var(--a)}.choice[data-i="0"]:hover:not(:disabled) .ctext-wrap,.choice[data-i="0"]:hover:not(:disabled) .cind{background:var(--a-bg2)}
+.choice[data-i="0"].sel{border-color:var(--a);box-shadow:0 0 0 3px rgba(59,111,212,.15)}.choice[data-i="0"].sel .ctext-wrap,.choice[data-i="0"].sel .cind{background:var(--a-bg2)}
+.choice[data-i="0"].correct{border-color:var(--a);border-width:2.5px}
+.choice[data-i="1"]{border-color:var(--b-bg2)}.choice[data-i="1"] .cletter{background:var(--b)}.choice[data-i="1"] .ctext-wrap,.choice[data-i="1"] .cind{background:var(--b-bg);color:var(--b-dark)}
+.choice[data-i="1"]:hover:not(:disabled){border-color:var(--b)}.choice[data-i="1"]:hover:not(:disabled) .ctext-wrap,.choice[data-i="1"]:hover:not(:disabled) .cind{background:var(--b-bg2)}
+.choice[data-i="1"].sel{border-color:var(--b);box-shadow:0 0 0 3px rgba(123,61,184,.15)}.choice[data-i="1"].sel .ctext-wrap,.choice[data-i="1"].sel .cind{background:var(--b-bg2)}
+.choice[data-i="1"].correct{border-color:var(--b);border-width:2.5px}
+.choice[data-i="2"]{border-color:var(--c-bg2)}.choice[data-i="2"] .cletter{background:var(--c)}.choice[data-i="2"] .ctext-wrap,.choice[data-i="2"] .cind{background:var(--c-bg);color:var(--c-dark)}
+.choice[data-i="2"]:hover:not(:disabled){border-color:var(--c)}.choice[data-i="2"]:hover:not(:disabled) .ctext-wrap,.choice[data-i="2"]:hover:not(:disabled) .cind{background:var(--c-bg2)}
+.choice[data-i="2"].sel{border-color:var(--c);box-shadow:0 0 0 3px rgba(196,90,32,.15)}.choice[data-i="2"].sel .ctext-wrap,.choice[data-i="2"].sel .cind{background:var(--c-bg2)}
+.choice[data-i="2"].correct{border-color:var(--c);border-width:2.5px}
+.choice[data-i="3"]{border-color:var(--d-bg2)}.choice[data-i="3"] .cletter{background:var(--d)}.choice[data-i="3"] .ctext-wrap,.choice[data-i="3"] .cind{background:var(--d-bg);color:var(--d-dark)}
+.choice[data-i="3"]:hover:not(:disabled){border-color:var(--d)}.choice[data-i="3"]:hover:not(:disabled) .ctext-wrap,.choice[data-i="3"]:hover:not(:disabled) .cind{background:var(--d-bg2)}
+.choice[data-i="3"].sel{border-color:var(--d);box-shadow:0 0 0 3px rgba(26,138,138,.15)}.choice[data-i="3"].sel .ctext-wrap,.choice[data-i="3"].sel .cind{background:var(--d-bg2)}
+.choice[data-i="3"].correct{border-color:var(--d);border-width:2.5px}
+.choice.wrong{opacity:.45;filter:saturate(.2)}
+.reveal-banner{display:none;border-radius:10px;padding:9px 13px;font-size:.85em;font-weight:500;align-items:center;gap:8px}
+.reveal-banner.vis{display:flex}
+.reveal-banner.ok{background:var(--green-bg2);color:var(--green);border:1.5px solid var(--green)}
+.reveal-banner.fail{background:var(--cream2);color:var(--ink2);border:1.5px solid var(--border2)}
+
+/* Stats bar — green/red */
+.stats-bar{background:var(--white);border-top:1.5px solid var(--border);padding:9px 1.25rem;display:none;align-items:center;gap:.85rem;flex-shrink:0}
+.stats-bar.vis{display:flex}
+.slbl{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.sitem{display:flex;align-items:center;gap:6px;flex:1}
+.strack{flex:1;height:7px;background:var(--cream2);border-radius:4px;overflow:hidden}
+.sfill{height:100%;border-radius:4px;transition:width .55s ease}
+.sfill.correct{background:var(--green)}
+.sfill.wrong{background:var(--red)}
+.sfill.blank{background:var(--border2)}
+.sn{font-size:11px;font-weight:700;color:var(--ink2);min-width:20px;text-align:right}
+.snl{font-size:10px;color:var(--muted);white-space:nowrap}
+.sdivide{width:1px;height:18px;background:var(--border)}
+
+/* Bottom bar */
+.bbar{background:var(--white);border-top:1.5px solid var(--border);padding:9px 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}
+.nbtn{display:flex;align-items:center;gap:6px;background:transparent;border:1.5px solid var(--border);border-radius:10px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;font-family:var(--sans);transition:all .15s}
+.nbtn:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-l)}
+.nbtn:disabled{opacity:.35;pointer-events:none}
+.btn-reveal{display:flex;align-items:center;gap:8px;background:var(--orange);color:var(--white);border:none;border-radius:10px;padding:9px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:all .15s;box-shadow:0 3px 12px rgba(232,136,10,.25)}
+.btn-reveal:hover{background:var(--orange-d)}
+.btn-reveal.shown{background:var(--muted2);box-shadow:none}
+
+/* Sidebar */
+.sdrawer{position:absolute;left:0;top:0;bottom:0;width:210px;background:var(--white);border-right:1.5px solid var(--border);z-index:30;transform:translateX(-100%);transition:transform .25s ease;padding:.9rem;overflow-y:auto}
+.sdrawer.open{transform:translateX(0)}
+.sdtitle{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:9px}
+.sdq{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:8px;cursor:pointer;font-size:12px;color:var(--muted);transition:background .1s}
+.sdq:hover{background:var(--cream2)}
+.sdq.active{background:var(--orange-l);color:var(--orange-d);font-weight:700}
+.sdq.done{color:var(--a)}
+.sdnum{width:21px;height:21px;border-radius:6px;background:var(--cream2);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--muted);flex-shrink:0;border:1px solid var(--border)}
+.sdq.active .sdnum{background:var(--orange);color:var(--white);border-color:var(--orange)}
+.sdq.done .sdnum{background:var(--a);color:var(--white);border-color:var(--a)}
+
+/* SETTINGS MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(26,18,8,.45);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--white);border-radius:20px;border:1.5px solid var(--border);padding:1.5rem;width:380px;max-width:92vw;box-shadow:0 24px 60px rgba(26,18,8,.2);animation:modalIn .2s cubic-bezier(.34,1.4,.64,1)}
+@keyframes modalIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+.modal-title{font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--ink)}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;color:var(--muted);transition:all .15s}
+.modal-close:hover{border-color:var(--orange);background:var(--orange-l);color:var(--orange)}
+.setting-section{margin-bottom:1rem}
+.setting-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border-bottom:none}
+.setting-name{font-size:13px;color:var(--ink2);font-weight:500}
+.setting-desc{font-size:11px;color:var(--muted);margin-top:2px}
+.toggle{width:40px;height:22px;background:var(--border2);border-radius:11px;position:relative;cursor:pointer;transition:background .2s;flex-shrink:0}
+.toggle.on{background:var(--orange)}
+.toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:var(--white);top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.toggle.on::after{transform:translateX(18px)}
+.font-ctrl{display:flex;align-items:center;gap:8px}
+.fc-btn{width:28px;height:28px;border-radius:7px;border:1.5px solid var(--border);background:var(--cream2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--muted);transition:all .15s}
+.fc-btn:hover{border-color:var(--orange);color:var(--orange)}
+.fc-val{font-size:13px;font-weight:700;color:var(--ink2);min-width:32px;text-align:center}
+.font-sel{display:flex;gap:6px}
+.fs-opt{padding:5px 10px;border-radius:7px;border:1.5px solid var(--border);font-size:12px;color:var(--muted);cursor:pointer;transition:all .15s;background:transparent}
+.fs-opt.active{border-color:var(--orange);background:var(--orange-l);color:var(--orange-d);font-weight:600}
+.modal-footer{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;gap:8px}
+.modal-save{flex:1;background:var(--orange);color:var(--white);border:none;border-radius:10px;padding:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);transition:background .15s}
+.modal-save:hover{background:var(--orange-d)}
+.modal-cancel{background:var(--cream2);border:1.5px solid var(--border);color:var(--ink2);border-radius:10px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);transition:all .15s}
+.modal-cancel:hover{border-color:var(--orange);color:var(--orange)}
+
+/* RANKING */
+#s-ranking{background:var(--cream);align-items:center;justify-content:center;padding:2rem 1.5rem;position:relative;overflow:hidden}
+.rkblob{position:absolute;top:-100px;right:-80px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,#FDDFA8 0%,transparent 68%);opacity:.5;pointer-events:none}
+.rk-card{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:1.75rem 1.5rem;max-width:420px;width:100%;position:relative;z-index:1}
+.rk-top{text-align:center;margin-bottom:1.25rem}
+.rk-emoji{font-size:2.5rem;animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.rk-title{font-family:var(--serif);font-size:1.4rem;font-weight:700;color:var(--ink);margin-top:.35rem}
+.rk-sub{font-size:12px;color:var(--muted);margin-top:.2rem}
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:.4rem;margin-bottom:1.5rem;height:110px}
+.pitem{display:flex;flex-direction:column;align-items:center;gap:4px}
+.pav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--white)}
+.pname{font-size:10px;font-weight:600;color:var(--ink2);max-width:60px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}
+.pscore{font-size:10px;color:var(--muted)}
+.pbar{border-radius:6px 6px 0 0;display:flex;align-items:center;justify-content:center;width:52px}
+.prank{font-size:15px}
+.rk-list{display:flex;flex-direction:column;gap:5px;margin-bottom:1.5rem}
+.rk-row{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--cream);border-radius:10px;font-size:13px}
+.rk-n{width:18px;font-weight:700;color:var(--muted2);text-align:center;font-size:11px}
+.rk-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--white);flex-shrink:0}
+.rk-name{flex:1;color:var(--ink2);font-weight:500}
+.rk-score{font-weight:700;color:var(--orange)}
+.btn-row{display:flex;gap:8px}
+.btn-sec{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--cream2);border:1.5px solid var(--border);color:var(--ink2);font-size:13px;font-weight:600;padding:10px;border-radius:10px;cursor:pointer;font-family:var(--sans);transition:all .15s}
+.btn-sec:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-l)}
+.btn-pri{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--orange);color:var(--white);font-size:13px;font-weight:700;padding:10px;border-radius:10px;border:none;cursor:pointer;font-family:var(--sans);transition:background .15s}
+.btn-pri:hover{background:var(--orange-d)}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- SETTINGS MODAL -->
+<div class="modal-backdrop" id="modal-settings">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Ayarlar</div>
+      <button class="modal-close" onclick="closeSettings()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="setting-section">
+      <div class="setting-label">Görünüm</div>
+      <div class="setting-row">
+        <div><div class="setting-name">Görsel genişliği</div><div class="setting-desc">Quiz ekranı başlangıç oranı</div></div>
+        <div class="font-ctrl">
+          <button class="fc-btn" onclick="changeImgWidth(-5)"><i class="ti ti-minus"></i></button>
+          <span class="fc-val" id="img-width-val">48%</span>
+          <button class="fc-btn" onclick="changeImgWidth(5)"><i class="ti ti-plus"></i></button>
+        </div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-name">Yazı tipi</div></div>
+        <div class="font-sel">
+          <div class="fs-opt active" id="font-sans" onclick="setFont('sans')" style="font-family:var(--sans)">Sans</div>
+          <div class="fs-opt" id="font-serif" onclick="setFont('serif')" style="font-family:var(--serif)">Serif</div>
+        </div>
+      </div>
+    </div>
+    <div class="setting-section">
+      <div class="setting-label">Oturum</div>
+      <div class="setting-row">
+        <div><div class="setting-name">Leaderboard</div><div class="setting-desc">Quiz sonunda sıralama ekranı göster</div></div>
+        <div class="toggle on" id="toggle-leaderboard" onclick="toggleSetting('leaderboard')"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-name">Anlık istatistikleri göster</div><div class="setting-desc">Cevap sonrası katılımcı dağılımı</div></div>
+        <div class="toggle on" id="toggle-stats" onclick="toggleSetting('stats')"></div>
+      </div>
+      <div class="setting-row">
+        <div><div class="setting-name">Klavye kısayolları</div></div>
+        <div class="toggle on" id="toggle-kb" onclick="toggleSetting('kb')"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-cancel" onclick="closeSettings()">Vazgeç</button>
+      <button class="modal-save" onclick="saveSettings()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- 1. LANDING -->
+<div class="screen active" id="s-landing">
+  <div class="lb1"></div><div class="lb2"></div>
+  <div class="lc">
+    <div class="session-badge"><div class="sbdot"></div><span>Interactive Session</span></div>
+    <h1><em>Felsefenin Anlamı</em> ve Tarihsel Gelişimi</h1>
+    <p class="ldesc">Bilgelik arayışı ve felsefi düşüncenin tarihsel evrimi incelenmektedir.</p>
+    <div class="mpills">
+      <span class="mpill"><i class="ti ti-help-circle"></i>10 Soru</span>
+      <span class="mpill"><i class="ti ti-school"></i>11. Sınıf</span>
+      <span class="mpill"><i class="ti ti-book"></i>Felsefe</span>
+    </div>
+
+    <div id="landing-leaderboard-toggle" style="display:none"></div>
+    <button class="btn-start" onclick="goWaiting()"><i class="ti ti-player-play"></i> Oturumu Başlat</button>
+    <div class="shortcuts-row">
+      <span class="skey"><span class="sk">← →</span>Sorular</span>
+      <span class="sdot">·</span>
+      <span class="skey"><span class="sk">A</span>Cevap</span>
+      <span class="sdot">·</span>
+      <span class="skey"><span class="sk">L</span>Liste</span>
+      <span class="sdot">·</span>
+      <span class="skey"><span class="sk">[ ]</span>Metin zoom</span>
+    </div>
+  </div>
+</div>
+
+<!-- 2. BEKLEME / QR -->
+<div class="screen" id="s-waiting">
+  <div class="topbar">
+    <div class="tbrand"><div class="bdot"></div>madlen</div>
+    <div class="tcenter"><span style="font-size:13px;font-weight:600;color:var(--ink2)">Öğrenci Bekleniyor</span></div>
+    <div class="tright" style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:12px;font-weight:600;color:var(--muted)">Leaderboard</span>
+      <div class="toggle on" id="waiting-leaderboard-toggle" onclick="toggleWaitingLeaderboard()" style="cursor:pointer"></div>
+    </div>
+  </div>
+  <div class="waiting-body">
+    <div class="qr-panel">
+      <div class="qr-lbl">QR Kodu Okutun</div>
+      <div class="qr-box"><div class="qr-grid" id="qr-grid"></div><div class="qr-scan"></div></div>
+      <div class="qr-code-big" id="s-code">—</div>
+      <div class="qr-url">madlen.io/join/<span id="s-code-url">—</span></div>
+      <div class="qr-method"><i class="ti ti-user-check"></i><span>Madlen Okul hesabı</span></div>
+      <div class="qr-note">Oturum başladıktan sonra yeni katılım kabul edilmez.</div>
+    </div>
+    <div class="pax-panel">
+      <div class="pax-top"><div class="pax-title">Katılımcılar</div><div class="live-badge"><div class="live-dot"></div>CANLI</div></div>
+      <div class="count-block"><div class="count-n" id="pax-count">0</div><div class="count-l">öğrenci katıldı</div></div>
+      <div class="pax-list" id="pax-list"></div>
+    </div>
+  </div>
+  <div class="wbottom">
+    <div class="wnote"><i class="ti ti-info-circle"></i>Oturum başlayınca yeni katılım kapatılır.</div>
+    <button class="btn-launch" id="btn-launch" disabled onclick="goQuiz()">
+      <i class="ti ti-player-play"></i><span id="launch-txt">Katılım Bekleniyor...</span>
+    </button>
+  </div>
+</div>
+
+<!-- 3. QUIZ -->
+<div class="screen" id="s-quiz">
+  <div class="quiz-rel">
+    <div class="topbar">
+      <div class="tbrand"><div class="bdot"></div>madlen</div>
+      <div class="tcenter">
+        <span class="qctr-lbl" id="qcounter">Soru 1 / 10</span>
+        <div class="pttrack"><div class="ptfill" id="ptfill" style="width:10%"></div></div>
+      </div>
+      <div class="tright">
+        <div class="txt-zoom-wrap" title="Soru metni boyutunu değiştir · [ ] kısayolları">
+          <button class="ibt" onclick="textZoom(-1)" title="Küçült ["><i class="ti ti-zoom-out"></i></button>
+          <span class="txt-zoom-lbl" id="txt-zoom-lbl">100%</span>
+          <button class="ibt" onclick="textZoom(1)" title="Büyüt ]"><i class="ti ti-zoom-in"></i></button>
+        </div>
+        <button class="ibt" onclick="togSidebar()" title="Soru listesi · L"><i class="ti ti-layout-sidebar"></i></button>
+        <button class="ibt" onclick="openSettings()" title="Ayarlar"><i class="ti ti-settings"></i></button>
+      </div>
+    </div>
+    <div class="sdrawer" id="sidebar">
+      <div class="sdtitle">Sorular</div>
+      <div id="sdlist"></div>
+    </div>
+  </div>
+
+  <div class="quiz-split" id="quiz-split">
+    <div class="img-col" id="img-col">
+      <div class="img-placeholder-full" id="img-ph">
+        <i class="ti ti-photo"></i>
+        <span>Görsel buraya eklenecek</span>
+      </div>
+      <div class="img-tag" id="img-tag">Felsefe · 11. Sınıf</div>
+    </div>
+    <div class="resizer" id="resizer">
+      <div class="resizer-handle">
+        <div class="resizer-dot"></div><div class="resizer-dot"></div>
+        <div class="resizer-dot"></div><div class="resizer-dot"></div>
+        <div class="resizer-dot"></div>
+      </div>
+    </div>
+    <div class="q-col" id="q-col">
+      <div class="q-card">
+        <div class="qtag" id="qtag">SORU 1</div>
+        <p class="qstem" id="qstem"></p>
+        <p class="qmain" id="qmain"></p>
+      </div>
+      <div class="choices" id="choices"></div>
+      <div class="reveal-banner" id="rbanner"><i class="ti ti-check"></i><span id="rtext"></span></div>
+    </div>
+  </div>
+
+  <div class="stats-bar" id="stats-bar">
+    <span class="slbl">Anlık</span>
+    <div class="sitem"><i class="ti ti-check" style="font-size:13px;color:var(--green)"></i><div class="strack"><div class="sfill correct" id="sb-c" style="width:0%"></div></div><span class="sn" id="sn-c">0</span><span class="snl">doğru</span></div>
+    <div class="sdivide"></div>
+    <div class="sitem"><i class="ti ti-x" style="font-size:13px;color:var(--red)"></i><div class="strack"><div class="sfill wrong" id="sb-w" style="width:0%"></div></div><span class="sn" id="sn-w">0</span><span class="snl">yanlış</span></div>
+    <div class="sdivide"></div>
+    <div class="sitem"><i class="ti ti-minus" style="font-size:13px;color:var(--muted2)"></i><div class="strack"><div class="sfill blank" id="sb-b" style="width:0%"></div></div><span class="sn" id="sn-b">0</span><span class="snl">boş</span></div>
+  </div>
+
+  <div class="bbar">
+    <button class="nbtn" id="btn-prev" onclick="nav(-1)"><i class="ti ti-arrow-left"></i> Önceki</button>
+    <button class="btn-reveal" id="btn-reveal" onclick="doReveal()"><i class="ti ti-eye"></i> Cevabı Göster</button>
+    <button class="nbtn" id="btn-next" onclick="nav(1)">Sonraki <i class="ti ti-arrow-right"></i></button>
+  </div>
+</div>
+
+<!-- 4. SIRALAMA -->
+<div class="screen" id="s-ranking">
+  <div class="rkblob"></div>
+  <div class="rk-card">
+    <div class="rk-top">
+      <div class="rk-emoji" id="rk-emoji">🏆</div>
+      <div class="rk-title">Oturum Tamamlandı</div>
+      <div class="rk-sub" id="rk-sub">— öğrenci · 10 soru</div>
+    </div>
+    <div class="podium" id="podium"></div>
+    <div class="rk-list" id="rk-list"></div>
+    <div class="btn-row">
+      <button class="btn-sec" onclick="restart()"><i class="ti ti-refresh"></i> Yeni Oturum</button>
+      <button class="btn-pri"><i class="ti ti-chart-bar"></i> Analiz Görünümü</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const QS=[
+  {stem:"Görselde sembolize edilen felsefi bakış açısı, yaşamın her alanında bilgileri ve değerleri sorgulama sanatıdır. Eleştirel düşünce bu sorgulayıcı tavırla beslenir.",q:"Felsefenin günlük yaşamda eleştirel düşünceyi geliştirmesi en net şekilde hangisiyle örneklendirilebilir?",ch:["Farklı görüşlerin reddedilerek kişisel deneyimlere odaklanılması","Sadece bilimsel verilerin mutlak doğru kabul edilmesi","Toplumsal kurallara soru sormadan tam uyum gösterilmesi","Ön kabulleri sorgulayarak daha derin analiz yapılması"],c:3,img:true},
+  {stem:null,q:"Antik Yunan'da 'philosophia' kavramı ne anlama gelmektedir?",ch:["Bilgelik sevgisi","Evrenin yasaları","Akıl yürütme sanatı","Doğa bilimi"],c:0,img:false},
+  {stem:"Sokrates, 'Bildiğim tek şey hiçbir şey bilmediğimdir' demiştir.",q:"Bu söz hangi felsefi tutumu en iyi ifade eder?",ch:["Dogmatizm","Nihilizm","Entelektüel alçakgönüllülük ve sorgulama","Ampirizm"],c:2,img:false},
+  {stem:null,q:"Felsefede 'ontoloji' neyi inceler?",ch:["Bilginin kaynağını ve sınırlarını","Varlığın doğasını ve gerçekliği","Ahlaki değerleri ve normları","Güzelin doğasını"],c:1,img:false},
+  {stem:"Platon'un Mağara Alegorisi gerçeklik algısını sorgulamak için kullanılır.",q:"Bu alegoriye göre filozofun asıl görevi nedir?",ch:["Mağarada kalmak","Gölgeleri yorumlamak","Mağaradan çıkıp gerçek ışığa ulaşmak ve aydınlatmak","Mağarayı yıkmak"],c:2,img:false},
+  {stem:null,q:"Epistemoloji felsefenin hangi alanıyla ilgilenir?",ch:["Siyasi yönetim biçimleri","Bilginin doğası, kaynağı ve sınırları","Sanat ve güzellik teorisi","Evrenin yapısı"],c:1,img:false},
+  {stem:null,q:"Aristoteles insan doğasını nasıl tanımlar?",ch:["Yalnız bir varlık","Siyasi hayvan","Rasyonel varlık","Duygusal varlık"],c:1,img:false},
+  {stem:null,q:"Rasyonalizmi bilginin temel kaynağı kabul eden filozof kimdir?",ch:["John Locke","David Hume","René Descartes","Francis Bacon"],c:2,img:false},
+  {stem:null,q:"Felsefede 'etik' dalı neyi inceler?",ch:["Evrenin yapısı","Güzel ve çirkin","İyi, kötü, doğru ve yanlış gibi ahlaki kavramlar","Bilginin güvenilirliği"],c:2,img:false},
+  {stem:"Pragmatizm, düşüncelerin değerini pratik sonuçlarıyla ölçer.",q:"Pragmatiste göre bir düşüncenin 'doğru' olması ne anlama gelir?",ch:["Mantıksal tutarlılık","Evrensel gerçeği yansıtması","Pratikte işe yaraması ve faydalı sonuçlar doğurması","Ahlak normlarına uygunluk"],c:2,img:false}
+];
+const AVCOLORS=['#3B6FD4','#7B3DB8','#C45A20','#1A8A8A','#C4893A','#3A8A5A','#C43A7B','#5A4AD4','#3A8A6A','#8A3A2A'];
+const NAMES=['Ahmet K.','Elif S.','Mehmet D.','Zeynep A.','Can B.','Selin T.','Emre Y.','Ayşe C.','Burak Ö.','Deniz M.'];
+
+let cQ=0, ans=new Array(QS.length).fill(null), revealed=false;
+let sidebarOpen=false, participants=[], pTimer=null;
+let settings={imgWidth:48,fontFamily:'sans',showStats:true,kbEnabled:true,leaderboard:true};
+const TEXT_STEPS=[0.75,0.85,1.0,1.15,1.3,1.5,1.75,2.0];
+let textScaleIdx=2;
+
+function syncLeaderboardToggles(){const v=settings.leaderboard;document.getElementById('landing-leaderboard-toggle').classList.toggle('on',v);document.getElementById('waiting-leaderboard-toggle').classList.toggle('on',v);const tl=document.getElementById('toggle-leaderboard');if(tl)tl.classList.toggle('on',v);}
+function toggleLandingLeaderboard(){settings.leaderboard=!settings.leaderboard;syncLeaderboardToggles();}
+function toggleWaitingLeaderboard(){settings.leaderboard=!settings.leaderboard;syncLeaderboardToggles();}
+
+function textZoom(dir){textScaleIdx=Math.max(0,Math.min(TEXT_STEPS.length-1,textScaleIdx+dir));applyTextZoom();}
+function applyTextZoom(){
+  const qcard=document.querySelector('#s-quiz .q-card');
+  if(qcard)qcard.style.fontSize=(TEXT_STEPS[textScaleIdx]*100)+'%';
+  const lbl=document.getElementById('txt-zoom-lbl');
+  if(lbl)lbl.textContent=Math.round(TEXT_STEPS[textScaleIdx]*100)+'%';
+}
+
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+function buildQR(){
+  const g=document.getElementById('qr-grid');if(!g)return;
+  const p=[1,1,1,1,1,1,1,0,1,1,0,0,0,1,0,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,1,0,1,1,1,0,1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,1,0,1,0,0,1,1,0,0,1,1,0,0,1,0,1,0,1,0,1,0,1];
+  g.innerHTML='';
+  p.forEach(v=>{const c=document.createElement('div');c.className='qr-cell';c.style.background=v?'#1A1208':'transparent';g.appendChild(c);});
+}
+
+function goWaiting(){
+  const code=Math.random().toString(36).substr(2,4).toUpperCase();
+  document.getElementById('s-code').textContent=code;
+  document.getElementById('s-code-url').textContent=code;
+  participants=[];
+  document.getElementById('pax-count').textContent='0';
+  document.getElementById('pax-list').innerHTML='';
+  document.getElementById('btn-launch').disabled=true;
+  document.getElementById('launch-txt').textContent='Katılım Bekleniyor...';
+  show('s-waiting');buildQR();
+  let added=0;
+  pTimer=setInterval(()=>{
+    if(added>=NAMES.length){clearInterval(pTimer);return;}
+    const n=NAMES[added],cl=AVCOLORS[added];
+    participants.push({name:n,color:cl});added++;
+    document.getElementById('pax-count').textContent=participants.length;
+    const row=document.createElement('div');row.className='pax-row';
+    const ini=n.split(' ').map(w=>w[0]).join('');
+    row.innerHTML=`<div class="pax-av" style="background:${cl}">${ini}</div><div><div class="pax-name">${n}</div><div class="pax-m">Madlen Okul</div></div>`;
+    const list=document.getElementById('pax-list');list.insertBefore(row,list.firstChild);
+    if(participants.length>=2){document.getElementById('btn-launch').disabled=false;document.getElementById('launch-txt').textContent=`Oturumu Başlat (${participants.length})`;}
+  },1300);
+}
+
+function goQuiz(){
+  if(pTimer)clearInterval(pTimer);
+  cQ=0;ans=new Array(QS.length).fill(null);revealed=false;textScaleIdx=2;
+  show('s-quiz');applyTextZoom();applySettings();setupResizer();renderQ();
+}
+
+function renderQ(){
+  revealed=false;
+  const q=QS[cQ];
+  document.getElementById('qcounter').textContent=`Soru ${cQ+1} / ${QS.length}`;
+  document.getElementById('ptfill').style.width=((cQ+1)/QS.length*100)+'%';
+  document.getElementById('qtag').textContent=`SORU ${cQ+1}`;
+  buildSD();
+  const imgCol=document.getElementById('img-col');
+  const resizer=document.getElementById('resizer');
+  imgCol.style.display=q.img?'flex':'none';
+  resizer.style.display=q.img?'flex':'none';
+  const stem=document.getElementById('qstem');
+  if(q.stem){stem.textContent=q.stem;stem.style.display='';}else{stem.style.display='none';}
+  document.getElementById('qmain').textContent=q.q;
+  const cEl=document.getElementById('choices');cEl.innerHTML='';
+  q.ch.forEach((c,i)=>{
+    const btn=document.createElement('button');
+    btn.className='choice'+(ans[cQ]===i?' sel':'');
+    btn.setAttribute('data-i',i);
+    btn.innerHTML=`<div class="cletter">${String.fromCharCode(65+i)}</div><div class="ctext-wrap">${c}</div><div class="cind" id="ci${i}"></div>`;
+    btn.onclick=()=>pickAns(i);
+    cEl.appendChild(btn);
+  });
+  document.getElementById('rbanner').className='reveal-banner';
+  const rb=document.getElementById('btn-reveal');
+  rb.innerHTML='<i class="ti ti-eye"></i> Cevabı Göster';rb.classList.remove('shown');
+  document.getElementById('stats-bar').classList.remove('vis');
+  document.getElementById('btn-prev').disabled=cQ===0;
+  document.getElementById('btn-next').innerHTML=cQ===QS.length-1?'<i class="ti ti-flag"></i> Oturumu Bitir':'Sonraki <i class="ti ti-arrow-right"></i>';
+}
+
+function pickAns(i){
+  if(revealed)return;
+  ans[cQ]=i;
+  document.querySelectorAll('.choice').forEach((b,idx)=>b.classList.toggle('sel',idx===i));
+}
+
+function doReveal(){
+  if(revealed)return;revealed=true;
+  const q=QS[cQ];
+  document.querySelectorAll('.choice').forEach((b,i)=>{
+    b.disabled=true;
+    if(i===q.c){b.classList.add('correct');b.querySelector('.cind').innerHTML='<i class="ti ti-check" style="font-size:16px"></i>';}
+    else if(ans[cQ]===i){b.classList.add('wrong');b.querySelector('.cind').innerHTML='<i class="ti ti-x" style="font-size:16px"></i>';}
+  });
+  const ok=ans[cQ]===q.c;
+  const rb=document.getElementById('rbanner');
+  rb.className='reveal-banner vis '+(ok?'ok':'fail');
+  rb.querySelector('i').className='ti '+(ok?'ti-check':'ti-x');
+  document.getElementById('rtext').textContent=ok?`Doğru! "${q.ch[q.c]}"`:`Doğru cevap: "${q.ch[q.c]}"`;
+  document.getElementById('btn-reveal').innerHTML='<i class="ti ti-eye-off"></i> Gösterildi';
+  document.getElementById('btn-reveal').classList.add('shown');
+  if(settings.showStats)showStats();
+}
+
+function showStats(){
+  const total=Math.max(participants.length,1);
+  const c=Math.floor(total*(.35+Math.random()*.4));
+  const w=Math.floor((total-c)*(.55+Math.random()*.3));
+  const b=Math.max(0,total-c-w);
+  document.getElementById('sn-c').textContent=c;
+  document.getElementById('sn-w').textContent=w;
+  document.getElementById('sn-b').textContent=b;
+  document.getElementById('stats-bar').classList.add('vis');
+  setTimeout(()=>{
+    document.getElementById('sb-c').style.width=(c/total*100)+'%';
+    document.getElementById('sb-w').style.width=(w/total*100)+'%';
+    document.getElementById('sb-b').style.width=(b/total*100)+'%';
+  },80);
+}
+
+function buildSD(){
+  const el=document.getElementById('sdlist');if(!el)return;el.innerHTML='';
+  QS.forEach((q,i)=>{
+    const d=document.createElement('div');
+    d.className='sdq'+(i===cQ?' active':ans[i]!==null?' done':'');
+    d.innerHTML=`<div class="sdnum">${i+1}</div><span>${q.q.substring(0,30)}…</span>`;
+    d.onclick=()=>{cQ=i;renderQ();if(sidebarOpen)togSidebar();};
+    el.appendChild(d);
+  });
+}
+
+function nav(d){
+  if(d===1&&cQ===QS.length-1){showRanking();return;}
+  cQ=Math.max(0,Math.min(QS.length-1,cQ+d));renderQ();
+}
+
+function setupResizer(){
+  const resizer=document.getElementById('resizer');
+  const imgCol=document.getElementById('img-col');
+  const split=document.getElementById('quiz-split');
+  if(!resizer||!imgCol||!split)return;
+  let dragging=false,startX=0,startW=0;
+  resizer.onmousedown=e=>{dragging=true;startX=e.clientX;startW=imgCol.offsetWidth;resizer.classList.add('dragging');document.body.style.cursor='col-resize';document.body.style.userSelect='none';e.preventDefault();};
+  document.addEventListener('mousemove',e=>{if(!dragging)return;const sw=split.offsetWidth,delta=e.clientX-startX;let nw=Math.max(sw*.2,Math.min(sw*.75,startW+delta));imgCol.style.width=nw+'px';settings.imgWidth=Math.round(nw/sw*100);const v=document.getElementById('img-width-val');if(v)v.textContent=settings.imgWidth+'%';});
+  document.addEventListener('mouseup',()=>{if(!dragging)return;dragging=false;resizer.classList.remove('dragging');document.body.style.cursor='';document.body.style.userSelect='';});
+  resizer.ontouchstart=e=>{dragging=true;startX=e.touches[0].clientX;startW=imgCol.offsetWidth;resizer.classList.add('dragging');e.preventDefault();};
+  document.addEventListener('touchmove',e=>{if(!dragging)return;const sw=split.offsetWidth,delta=e.touches[0].clientX-startX;let nw=Math.max(sw*.2,Math.min(sw*.75,startW+delta));imgCol.style.width=nw+'px';},{passive:true});
+  document.addEventListener('touchend',()=>{if(!dragging)return;dragging=false;resizer.classList.remove('dragging');});
+}
+
+function openSettings(){
+  document.getElementById('modal-settings').classList.add('open');
+  document.getElementById('img-width-val').textContent=settings.imgWidth+'%';
+  document.getElementById('font-sans').classList.toggle('active',settings.fontFamily==='sans');
+  document.getElementById('font-serif').classList.toggle('active',settings.fontFamily==='serif');
+  document.getElementById('toggle-leaderboard').classList.toggle('on',settings.leaderboard);
+  document.getElementById('toggle-stats').classList.toggle('on',settings.showStats);
+  document.getElementById('toggle-kb').classList.toggle('on',settings.kbEnabled);
+}
+function closeSettings(){document.getElementById('modal-settings').classList.remove('open');}
+function saveSettings(){applySettings();closeSettings();}
+function applySettings(){
+  const qcol=document.getElementById('q-col');
+  if(qcol)qcol.style.fontFamily=settings.fontFamily==='serif'?'var(--serif)':'var(--sans)';
+  const imgCol=document.getElementById('img-col');
+  const split=document.getElementById('quiz-split');
+  if(imgCol&&split)imgCol.style.width=settings.imgWidth+'%';
+  syncLeaderboardToggles();
+}
+function changeImgWidth(d){settings.imgWidth=Math.max(20,Math.min(75,settings.imgWidth+d));document.getElementById('img-width-val').textContent=settings.imgWidth+'%';}
+function setFont(f){settings.fontFamily=f;document.getElementById('font-sans').classList.toggle('active',f==='sans');document.getElementById('font-serif').classList.toggle('active',f==='serif');}
+function toggleSetting(k){
+  const m={stats:'showStats',kb:'kbEnabled',leaderboard:'leaderboard'};
+  settings[m[k]]=!settings[m[k]];
+  document.getElementById('toggle-'+k).classList.toggle('on',settings[m[k]]);
+  if(k==='leaderboard')syncLeaderboardToggles();
+}
+function togSidebar(){sidebarOpen=!sidebarOpen;document.getElementById('sidebar').classList.toggle('open',sidebarOpen);}
+
+function showRanking(){
+  if(!settings.leaderboard){restart();return;}
+  const scores=participants.map(p=>({...p,score:Math.floor(Math.random()*7)+3})).sort((a,b)=>b.score-a.score);
+  document.getElementById('rk-sub').textContent=`${participants.length} öğrenci · ${QS.length} soru`;
+  const pod=document.getElementById('podium');pod.innerHTML='';
+  [[1,80,'🥈'],[0,110,'🥇'],[2,55,'🥉']].forEach(([idx,h,medal])=>{
+    if(!scores[idx])return;
+    const p=scores[idx];const d=document.createElement('div');d.className='pitem';
+    const ini=p.name.split(' ').map(w=>w[0]).join('');
+    d.innerHTML=`<div class="pav" style="background:${p.color}">${ini}</div><div class="pname">${p.name}</div><div class="pscore">${p.score}/${QS.length}</div><div class="pbar" style="height:${h}px;background:${p.color}"><span class="prank">${medal}</span></div>`;
+    pod.appendChild(d);
+  });
+  const list=document.getElementById('rk-list');list.innerHTML='';
+  scores.slice(0,6).forEach((p,i)=>{
+    const row=document.createElement('div');row.className='rk-row';
+    const ini=p.name.split(' ').map(w=>w[0]).join('');
+    row.innerHTML=`<div class="rk-n">${i+1}</div><div class="rk-av" style="background:${p.color}">${ini}</div><div class="rk-name">${p.name}</div><div class="rk-score">${p.score}/${QS.length}</div>`;
+    list.appendChild(row);
+  });
+  document.getElementById('rk-emoji').textContent=scores[0]&&scores[0].score>=8?'🏆':scores[0]&&scores[0].score>=5?'🎉':'💪';
+  show('s-ranking');
+}
+
+function restart(){if(pTimer)clearInterval(pTimer);participants=[];cQ=0;ans=new Array(QS.length).fill(null);show('s-landing');}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeSettings();return;}
+  if(!settings.kbEnabled)return;
+  if(!document.getElementById('s-quiz').classList.contains('active'))return;
+  if(document.getElementById('modal-settings').classList.contains('open'))return;
+  if(e.key==='ArrowRight')nav(1);
+  else if(e.key==='ArrowLeft')nav(-1);
+  else if(e.key==='a'||e.key==='A')doReveal();
+  else if(e.key==='l'||e.key==='L')togSidebar();
+  else if(e.key===']')textZoom(1);
+  else if(e.key==='[')textZoom(-1);
+});
+document.getElementById('modal-settings').addEventListener('click',function(e){if(e.target===this)closeSettings();});
+</script>
+</body>
+</html>

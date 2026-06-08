@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Müfredat ve Ders Seçim Paneli</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAF9F5; /* Orijinal görsel arka plan rengi */
+        }
+        /* Custom scrollbar styling */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #E4E4E7;
+            border-radius: 10px;
+        }
+        /* Soft transitions */
+        .transition-all-300 {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 md:p-8">
+
+    <!-- Dış Kapsayıcı -->
+    <div class="w-full max-w-4xl flex flex-col gap-5">
+        
+        <!-- Üst Başlık / Breadcrumb (image_a88e80.png ile birebir uyumlu) -->
+        <div class="flex items-center gap-2 text-sm text-slate-500 px-2 select-none">
+            <span class="cursor-pointer hover:text-slate-800 transition-colors flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                Sınav Oluştur
+            </span>
+            <span class="text-slate-300">/</span>
+            <span class="italic font-semibold text-slate-800" id="main-breadcrumb-title">MEB Öğrenme Çıktıları</span>
+        </div>
+
+        <!-- Ana Kart (Görseldeki beyaz, yuvarlatılmış premium kart) -->
+        <div class="bg-white rounded-[28px] border border-[#EBEAE4] shadow-sm p-6 md:p-8 flex flex-col gap-6 relative">
+            
+            <!-- Form Grid: Sınıf, Müfredat ve Ders Alanı -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- 1. SINIF SEÇİCİ -->
+                <div class="flex flex-col gap-2 relative">
+                    <span class="text-[10px] font-bold text-[#94A3B8] tracking-wider uppercase">Sınıf</span>
+                    
+                    <button id="btn-grade-dropdown" onclick="toggleDropdown('grade')" class="w-full bg-white border border-[#E5E5E0] hover:border-slate-300 text-slate-800 py-3.5 px-4 rounded-2xl shadow-sm text-left font-medium text-sm transition-all-300 flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-[#D17A3B]/15">
+                        <span id="selected-grade-display" class="flex items-center gap-2">
+                            <!-- JS ile dinamik doldurulacak -->
+                        </span>
+                        <svg class="w-4 h-4 text-slate-400 transition-transform duration-300" id="arrow-grade" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <!-- Sınıf Dropdown Menüsü -->
+                    <div id="dropdown-grade" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-[#E5E5E0] rounded-2xl shadow-xl max-h-60 overflow-y-auto z-50 custom-scrollbar transform transition-all duration-300 scale-95 opacity-0 origin-top">
+                        <div id="grade-options" class="py-1.5">
+                            <!-- JS ile doldurulacak -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. MÜFREDAT SEÇİCİ (MEB + Uluslararası Programlar Hepsi Bir Arada) -->
+                <div class="flex flex-col gap-2 relative">
+                    <span class="text-[10px] font-bold text-[#94A3B8] tracking-wider uppercase">Müfredat</span>
+                    
+                    <button id="btn-curriculum-dropdown" onclick="toggleDropdown('curriculum')" class="w-full bg-white border border-[#E5E5E0] hover:border-slate-300 text-slate-800 py-3.5 px-4 rounded-2xl shadow-sm text-left font-medium text-sm transition-all-300 flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-[#D17A3B]/15">
+                        <span id="selected-curriculum-display" class="flex items-center gap-2">
+                            <!-- JS ile dinamik doldurulacak -->
+                        </span>
+                        <svg class="w-4 h-4 text-slate-400 transition-transform duration-300" id="arrow-curriculum" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <!-- Müfredat Dropdown Menüsü -->
+                    <div id="dropdown-curriculum" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-[#E5E5E0] rounded-2xl shadow-xl max-h-60 overflow-y-auto z-50 custom-scrollbar transform transition-all duration-300 scale-95 opacity-0 origin-top">
+                        <div id="curriculum-options" class="py-1.5">
+                            <!-- JS ile doldurulacak -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. DERS SEÇİCİ (Müfredata göre dinamik olarak filtrelenir) -->
+                <div class="flex flex-col gap-2 relative">
+                    <span class="text-[10px] font-bold text-[#94A3B8] tracking-wider uppercase">Ders</span>
+                    
+                    <button id="btn-course-dropdown" onclick="toggleDropdown('course')" class="w-full bg-white border border-[#E5E5E0] hover:border-slate-300 text-slate-800 py-3.5 px-4 rounded-2xl shadow-sm text-left font-medium text-sm transition-all-300 flex justify-between items-center focus:outline-none focus:ring-2 focus:ring-[#D17A3B]/15">
+                        <span id="selected-course-display" class="flex items-center gap-2">
+                            <!-- JS ile dinamik doldurulacak -->
+                        </span>
+                        <svg class="w-4 h-4 text-slate-400 transition-transform duration-300" id="arrow-course" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+
+                    <!-- Ders Dropdown Menüsü -->
+                    <div id="dropdown-course" class="hidden absolute top-full left-0 right-0 mt-2 bg-white border border-[#E5E5E0] rounded-2xl shadow-xl max-h-60 overflow-y-auto z-50 custom-scrollbar transform transition-all duration-300 scale-95 opacity-0 origin-top">
+                        <div class="p-2 border-b border-slate-100">
+                            <input type="text" id="course-search" placeholder="Ders listesinde ara..." class="w-full bg-slate-50 border border-slate-200 text-slate-800 py-2 px-3 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-[#D17A3B]/15 focus:border-[#D17A3B]" oninput="filterCourses(event)">
+                        </div>
+                        <div id="course-options" class="py-1.5">
+                            <!-- JS ile doldurulacak -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- İnce Ayırıcı Çizgi (image_a88e80.png ile birebir aynı) -->
+            <hr class="border-slate-100 my-1">
+
+            <!-- Alt Satır: Çıktı Dili ve TYMM (image_a88e80.png ile birebir aynı) -->
+            <div class="flex items-center justify-between">
+                
+                <!-- Çıktı Dili (Başlıksız, doğrudan inline butonsu yapı) -->
+                <div class="flex items-center gap-3">
+                    <span class="text-xs font-semibold text-slate-500">Çıktı Dili</span>
+                    <div class="relative">
+                        <select id="lang-select" class="bg-white border border-[#E5E5E0] hover:border-slate-300 text-slate-800 py-1.5 pl-3 pr-8 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-[#D17A3B]/20 focus:border-[#D17A3B] appearance-none cursor-pointer font-semibold text-xs transition-all-300">
+                            <option value="TR" selected>🇹🇷 TR</option>
+                            <option value="EN">🇬🇧 EN</option>
+                            <option value="DE">🇩🇪 DE</option>
+                            <option value="FR">🇫🇷 FR</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-slate-400">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TYMM Toggle Switch (Sadece MEB seçildiğinde görünür olur) -->
+                <div id="tymm-toggle-container" class="flex items-center gap-3 select-none transition-all duration-300 opacity-100">
+                    <span class="text-xs font-semibold text-slate-500">TYMM</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="tymm-checkbox" class="sr-only peer" checked onchange="toggleTYMM()">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D17A3B]"></div>
+                    </label>
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    <!-- DINAMIK BILGILENDIRME MODALI (Ünite ve Kitap Konuları Çıktısı) -->
+    <div id="summary-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl max-w-2xl w-full shadow-2xl overflow-hidden border border-slate-100 flex flex-col max-h-[85vh] scale-95 transition-transform duration-300" id="modal-card">
+            
+            <!-- Modal Header -->
+            <div class="p-6 bg-[#FCFBF8] border-b border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="p-2 rounded-xl bg-[#D17A3B]/10 text-[#D17A3B]">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.246.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    </span>
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800">Müfredat Ünite ve Kitap Detayları</h2>
+                        <p class="text-xs text-slate-500">Seçtiğiniz kriterlere göre oluşturulmuş akademik plan</p>
+                    </div>
+                </div>
+                <button onclick="closeModal()" class="p-1.5 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Modal Body (Scrollable) -->
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-grow space-y-6">
+                
+                <!-- Aktif Konfigürasyon Özet Kartı -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-[#FAF9F5] p-4 rounded-2xl border border-[#EBEAE4]">
+                    <div class="flex flex-col gap-0.5">
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Sınıf Seviyesi</span>
+                        <span id="sum-grade" class="text-sm font-bold text-slate-700">-</span>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Dil</span>
+                        <span id="sum-lang" class="text-sm font-bold text-slate-700">-</span>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Müfredat</span>
+                        <span id="sum-mufredat" class="text-sm font-bold text-[#D17A3B]">-</span>
+                    </div>
+                    <div class="flex flex-col gap-0.5">
+                        <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">TYMM Durumu</span>
+                        <span id="sum-tymm" class="text-sm font-bold text-slate-700">-</span>
+                    </div>
+                </div>
+
+                <!-- Kitap / Konu Listesi -->
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-800 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Oluşturulan Ünite ve Kitap Konuları
+                    </h3>
+                    <div id="dynamic-summary-list" class="space-y-3">
+                        <!-- JS ile ünite listesi oluşturulur -->
+                    </div>
+                </div>
+
+                <!-- Özel Prompt Notu -->
+                <div id="sum-prompt-container" class="bg-indigo-50/50 border border-indigo-100 p-4 rounded-2xl hidden">
+                    <span class="text-xs font-semibold text-indigo-700 block mb-1">Ekli Kullanıcı İstekleri & Prompt:</span>
+                    <p id="sum-prompt" class="text-sm text-indigo-900 italic"></p>
+                </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-xs text-slate-500 flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Ders bazında detaylı konu dağılımları hazırlanmıştır.
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <button onclick="closeModal()" class="w-full sm:w-auto bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs px-5 py-3 rounded-xl transition-colors">
+                        Kapat
+                    </button>
+                    <button onclick="mockSave()" class="w-full sm:w-auto bg-[#D17A3B] hover:bg-[#B7642B] text-white font-bold text-xs px-5 py-3 rounded-xl shadow-md transition-colors flex items-center justify-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        Müfredatı Kaydet
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TOAST BİLDİRİM KUTUSU (Uygulama İçi Bildirim) -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white text-sm px-5 py-3.5 rounded-2xl shadow-2xl z-50 flex items-center gap-3 opacity-0 pointer-events-none transform translate-y-2 transition-all duration-300">
+        <span id="toast-icon"></span>
+        <span id="toast-text">İşlem başarıyla tamamlandı.</span>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC & STATE MANAGEMENT -->
+    <script>
+        // --- DATA DICTIONARY ---
+        const GRADES = [
+            { id: "Okul Öncesi", name: "Okul Öncesi", label: "OÖ" },
+            { id: "1", name: "1. Sınıf", label: "1" },
+            { id: "2", name: "2. Sınıf", label: "2" },
+            { id: "3", name: "3. Sınıf", label: "3" },
+            { id: "4", name: "4. Sınıf", label: "4" },
+            { id: "5", name: "5. Sınıf", label: "5" },
+            { id: "6", name: "6. Sınıf", label: "6" },
+            { id: "7", name: "7. Sınıf", label: "7" },
+            { id: "8", name: "8. Sınıf", label: "8" },
+            { id: "Hazırlık", name: "Hazırlık Sınıfı", label: "HZ" },
+            { id: "9", name: "9. Sınıf", label: "9" },
+            { id: "10", name: "10. Sınıf", label: "10" },
+            { id: "11", name: "11. Sınıf", label: "11" },
+            { id: "12", name: "12. Sınıf", label: "12" }
+        ];
+
+        // Müfredat Listesi (Tek bir dropdown içinde birleşti!)
+        const CURRICULUMS = [
+            { id: "MEB", name: "Milli Eğitim (MEB)", label: "MEB", icon: `<svg class="w-4 h-4 text-[#D17A3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.246.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>` },
+            { id: "AP", name: "Advanced Placement (AP)", label: "AP", icon: `<svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>` },
+            { id: "IGCSE", name: "IGCSE (Cambridge)", label: "IGCSE", icon: `<svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14"></path></svg>` },
+            { id: "IB", name: "International Baccalaureate (IB)", label: "IB", icon: `<svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9m0 18h18"></path></svg>` },
+            { id: "ALEVEL", name: "A-Level (UK)", label: "A-Level", icon: `<svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13"></path></svg>` },
+            { id: "COMMON CORE", name: "Common Core (US)", label: "Common Core", icon: `<svg class="w-4 h-4 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>` },
+            { id: "OXF", name: "Oxford AQA", label: "Oxford AQA", icon: `<svg class="w-4 h-4 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path></svg>` }
+        ];
+
+        // MEB Dersleri (image_a88e80.png ile tam uyumlu)
+        const MEB_COURSES = [
+            { id: 'tarih', name: 'Tarih', textColor: 'text-[#92400E]', icon: `<svg class="w-4 h-4 text-[#D17A3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>` },
+            { id: 'tde', name: 'Türk Dili ve Edebiyatı', textColor: 'text-[#9B1C1C]', icon: `<svg class="w-4 h-4 text-[#9B1C1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.246.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>` },
+            { id: 'cografya', name: 'Coğrafya', textColor: 'text-[#075985]', icon: `<svg class="w-4 h-4 text-[#075985]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 002 2h2a2 2 0 012 2v1.5a3 3 0 01-3 3h-2.144a1.185 1.185 0 01-.44-.086L10.5 19.5"></path></svg>` },
+            { id: 'kimya', name: 'Kimya', textColor: 'text-[#3730A3]', icon: `<svg class="w-4 h-4 text-[#3730A3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>` },
+            { id: 'fizik', name: 'Fizik', textColor: 'text-[#065F46]', icon: `<svg class="w-4 h-4 text-[#065F46]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path></svg>` },
+            { id: 'matematik', name: 'Matematik', textColor: 'text-[#9A3412]', icon: `<svg class="w-4 h-4 text-[#9A3412]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>` },
+            { id: 'biyoloji', name: 'Biyoloji', textColor: 'text-[#166534]', icon: `<svg class="w-4 h-4 text-[#166534]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>` },
+            { id: 'dkab', name: 'Din Kültürü ve Ahlak Bilgisi', textColor: 'text-[#6B21A8]', icon: `<svg class="w-4 h-4 text-[#6B21A8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.246.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>` },
+            { id: 'english', name: 'English', textColor: 'text-[#075985]', icon: `<svg class="w-4 h-4 text-[#075985]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222 4 2.222V20"></path></svg>` },
+            { id: 'meb_diger', name: 'Diğer', textColor: 'text-[#475569]', icon: `<svg class="w-4 h-4 text-[#475569]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path></svg>` }
+        ];
+
+        // Uluslararası Müfredat Dersleri (Program bazlı)
+        const INTL_COURSES = {
+            AP: [
+                { id: 'ap_phys1', name: 'Physics 1', textColor: 'text-[#047857]', icon: `<svg class="w-4 h-4 text-[#047857]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>` },
+                { id: 'ap_bio', name: 'Biology', textColor: 'text-[#15803D]', icon: `<svg class="w-4 h-4 text-[#15803D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>` },
+                { id: 'ap_csa', name: 'CS A', textColor: 'text-[#1D4ED8]', icon: `<svg class="w-4 h-4 text-[#1D4ED8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>` },
+                { id: 'ap_phys2', name: 'Physics 2', textColor: 'text-[#047857]', icon: `<svg class="w-4 h-4 text-[#047857]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>` },
+                { id: 'ap_physc_em', name: 'Physics C: E&M', textColor: 'text-[#065F46]', icon: `<svg class="w-4 h-4 text-[#065F46]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>` },
+                { id: 'ap_human', name: 'Human Geography', textColor: 'text-[#166534]', icon: `<svg class="w-4 h-4 text-[#166534]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>` },
+                { id: 'ap_calc_ab', name: 'Calculus AB & BC', textColor: 'text-[#9B1C1C]', icon: `<svg class="w-4 h-4 text-[#9B1C1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10"></path></svg>` },
+                { id: 'ap_chem', name: 'Chemistry', textColor: 'text-[#3730A3]', icon: `<svg class="w-4 h-4 text-[#3730A3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547"></path></svg>` }
+            ],
+            IGCSE: [
+                { id: 'ig_math', name: 'IGCSE Mathematics', textColor: 'text-[#9A3412]', icon: `<svg class="w-4 h-4 text-[#9A3412]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>` },
+                { id: 'ig_phys', name: 'IGCSE Physics', textColor: 'text-[#065F46]', icon: `<svg class="w-4 h-4 text-[#065F46]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>` },
+                { id: 'ig_chem', name: 'IGCSE Chemistry', textColor: 'text-[#3730A3]', icon: `<svg class="w-4 h-4 text-[#3730A3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547"></path></svg>` },
+                { id: 'ig_bio', name: 'IGCSE Biology', textColor: 'text-[#166534]', icon: `<svg class="w-4 h-4 text-[#166534]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>` }
+            ],
+            IB: [
+                { id: 'ib_hl_math', name: 'IB Math HL', textColor: 'text-[#9A3412]', icon: `<svg class="w-4 h-4 text-[#9A3412]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>` },
+                { id: 'ib_hl_phys', name: 'IB Physics HL', textColor: 'text-[#065F46]', icon: `<svg class="w-4 h-4 text-[#065F46]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>` },
+                { id: 'ib_hl_chem', name: 'IB Chemistry HL', textColor: 'text-[#3730A3]', icon: `<svg class="w-4 h-4 text-[#3730A3]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547"></path></svg>` },
+                { id: 'ib_tok', name: 'Theory of Knowledge', textColor: 'text-[#6B21A8]', icon: `<svg class="w-4 h-4 text-[#6B21A8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9.663 17h4.673M12 3v1l6.364.364l-.707.707"></path></svg>` }
+            ],
+            ALEVEL: [
+                { id: 'al_math', name: 'A-Level Pure Math', textColor: 'text-[#9A3412]', icon: `<svg class="w-4 h-4 text-[#9A3412]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>` },
+                { id: 'al_physics', name: 'A-Level Physics', textColor: 'text-[#065F46]', icon: `<svg class="w-4 h-4 text-[#065F46]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>` }
+            ],
+            'COMMON CORE': [
+                { id: 'cc_grade12_math', name: 'Core Grade 12 Math', textColor: 'text-[#9A3412]', icon: `<svg class="w-4 h-4 text-[#9A3412]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>` },
+                { id: 'cc_ela', name: 'Core ELA Grade 12', textColor: 'text-[#9B1C1C]', icon: `<svg class="w-4 h-4 text-[#9B1C1C]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.246.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>` }
+            ],
+            OXF: [
+                { id: 'ox_oxf_math', name: 'Oxford AQA Math', textColor: 'text-[#9A3412]', icon: `<svg class="w-4 h-4 text-[#9A3412]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>` }
+            ]
+        };
+
+        // --- GLOBAL STATE ---
+        let selectedGradeId = '10'; // Default grade (image_a88e80.png ile uyumlu)
+        let selectedCurriculumId = 'MEB'; // Default curriculum (image_a88e80.png ile uyumlu)
+        let selectedCourseId = 'tarih'; // Default course (image_a88e80.png ile uyumlu)
+        let isTYMMActive = true; // Default TYMM
+        let uploadedFile = null;
+
+        // --- ON INITIAL LOAD ---
+        window.addEventListener('DOMContentLoaded', () => {
+            initGradeDropdown();
+            initCurriculumDropdown();
+            initCourseDropdown();
+            updateTymmVisibility();
+            
+            // Dropdown dışına tıklanınca kapatma mantığı
+            document.addEventListener('click', (e) => {
+                const dropGrade = document.getElementById('dropdown-grade');
+                const btnGrade = document.getElementById('btn-grade-dropdown');
+                const dropCurriculum = document.getElementById('dropdown-curriculum');
+                const btnCurriculum = document.getElementById('btn-curriculum-dropdown');
+                const dropCourse = document.getElementById('dropdown-course');
+                const btnCourse = document.getElementById('btn-course-dropdown');
+
+                if (dropGrade && btnGrade && !btnGrade.contains(e.target) && !dropGrade.contains(e.target)) {
+                    closeDropdown('grade');
+                }
+                if (dropCurriculum && btnCurriculum && !btnCurriculum.contains(e.target) && !dropCurriculum.contains(e.target)) {
+                    closeDropdown('curriculum');
+                }
+                if (dropCourse && btnCourse && !btnCourse.contains(e.target) && !dropCourse.contains(e.target)) {
+                    closeDropdown('course');
+                }
+            });
+        });
+
+        // --- DROPDOWN CONTROL LOGIC ---
+        function toggleDropdown(type) {
+            const dropdown = document.getElementById(`dropdown-${type}`);
+            const arrow = document.getElementById(`arrow-${type}`);
+            const isHidden = dropdown.classList.contains('hidden');
+
+            // Hepsini önce kapat
+            closeDropdown('grade');
+            closeDropdown('curriculum');
+            closeDropdown('course');
+
+            if (isHidden) {
+                dropdown.classList.remove('hidden');
+                setTimeout(() => {
+                    dropdown.classList.remove('scale-95', 'opacity-0');
+                    dropdown.classList.add('scale-100', 'opacity-100');
+                }, 10);
+                arrow.classList.add('rotate-180');
+                
+                if (type === 'course') {
+                    document.getElementById('course-search').focus();
+                }
+            }
+        }
+
+        function closeDropdown(type) {
+            const dropdown = document.getElementById(`dropdown-${type}`);
+            const arrow = document.getElementById(`arrow-${type}`);
+            if (dropdown && !dropdown.classList.contains('hidden')) {
+                dropdown.classList.add('scale-95', 'opacity-0');
+                dropdown.classList.remove('scale-100', 'opacity-100');
+                arrow.classList.remove('rotate-180');
+                setTimeout(() => {
+                    dropdown.classList.add('hidden');
+                }, 200);
+            }
+        }
+
+        // --- GRADE DROPDOWN BUILDER ---
+        function initGradeDropdown() {
+            const optionsContainer = document.getElementById('grade-options');
+            optionsContainer.innerHTML = '';
+
+            GRADES.forEach(grade => {
+                const isSelected = selectedGradeId === grade.id;
+                const option = document.createElement('div');
+                option.className = `flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 cursor-pointer transition-colors text-xs font-semibold ${isSelected ? 'text-[#D17A3B] bg-[#FFF7ED]' : 'text-slate-700'}`;
+                
+                option.onclick = () => {
+                    selectedGradeId = grade.id;
+                    updateGradeSelectorDisplay();
+                    closeDropdown('grade');
+                };
+
+                option.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-100 text-slate-500 text-[10px] font-bold ${isSelected ? 'bg-[#D17A3B]/10 text-[#D17A3B]' : ''}">
+                            ${grade.label}
+                        </span>
+                        <span>${grade.name}</span>
+                    </div>
+                    ${isSelected ? `<svg class="w-4 h-4 text-[#D17A3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>` : ''}
+                `;
+                optionsContainer.appendChild(option);
+            });
+
+            updateGradeSelectorDisplay();
+        }
+
+        function updateGradeSelectorDisplay() {
+            const activeGrade = GRADES.find(g => g.id === selectedGradeId) || GRADES[11];
+            const display = document.getElementById('selected-grade-display');
+            display.innerHTML = `
+                <span class="w-6 h-6 flex items-center justify-center rounded-lg bg-[#FFF7ED] text-[#D17A3B] text-[10px] font-bold shrink-0">
+                    ${activeGrade.label}
+                </span>
+                <span class="font-semibold text-sm text-slate-800">${activeGrade.name}</span>
+            `;
+        }
+
+        // --- CURRICULUM DROPDOWN BUILDER ---
+        function initCurriculumDropdown() {
+            const optionsContainer = document.getElementById('curriculum-options');
+            optionsContainer.innerHTML = '';
+
+            CURRICULUMS.forEach(curr => {
+                const isSelected = selectedCurriculumId === curr.id;
+                const option = document.createElement('div');
+                option.className = `flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 cursor-pointer transition-colors text-xs font-semibold ${isSelected ? 'text-[#D17A3B] bg-[#FFF7ED]' : 'text-slate-700'}`;
+                
+                option.onclick = () => {
+                    selectedCurriculumId = curr.id;
+                    
+                    // Müfredat değiştikçe varsayılan branşı akıllıca ata
+                    if (curr.id === 'MEB') {
+                        selectedCourseId = 'tarih';
+                    } else {
+                        selectedCourseId = INTL_COURSES[curr.id] ? INTL_COURSES[curr.id][0].id : '';
+                    }
+
+                    updateCurriculumSelectorDisplay();
+                    initCourseDropdown();
+                    updateTymmVisibility();
+                    closeDropdown('curriculum');
+                    
+                    // Breadcrumb güncelle
+                    document.getElementById('main-breadcrumb-title').innerText = `${curr.label} Öğrenme Çıktıları`;
+                    showToast('info', `${curr.name} müfredatına geçiş yapıldı.`);
+                };
+
+                option.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-50 shrink-0">
+                            ${curr.icon}
+                        </span>
+                        <span>${curr.name}</span>
+                    </div>
+                    ${isSelected ? `<svg class="w-4 h-4 text-[#D17A3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>` : ''}
+                `;
+                optionsContainer.appendChild(option);
+            });
+
+            updateCurriculumSelectorDisplay();
+        }
+
+        function updateCurriculumSelectorDisplay() {
+            const activeCurr = CURRICULUMS.find(c => c.id === selectedCurriculumId) || CURRICULUMS[0];
+            const display = document.getElementById('selected-curriculum-display');
+            display.innerHTML = `
+                <span class="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-50 shrink-0">
+                    ${activeCurr.icon}
+                </span>
+                <span class="font-semibold text-sm text-slate-800">${activeCurr.label}</span>
+            `;
+        }
+
+        // --- COURSE DROPDOWN BUILDER ---
+        function initCourseDropdown(searchTerm = '') {
+            const optionsContainer = document.getElementById('course-options');
+            optionsContainer.innerHTML = '';
+
+            let courses = selectedCurriculumId === 'MEB' ? MEB_COURSES : (INTL_COURSES[selectedCurriculumId] || []);
+            
+            if (searchTerm.trim() !== '') {
+                courses = courses.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()));
+            }
+
+            if (courses.length === 0) {
+                optionsContainer.innerHTML = `<div class="p-4 text-xs text-slate-400 text-center select-none">Eşleşen ders bulunamadı.</div>`;
+                return;
+            }
+
+            courses.forEach(course => {
+                const isSelected = selectedCourseId === course.id;
+                const option = document.createElement('div');
+                option.className = `flex items-center justify-between px-4 py-2.5 hover:bg-slate-50 cursor-pointer transition-colors text-xs font-semibold ${isSelected ? 'text-[#D17A3B] bg-[#FFF7ED]' : 'text-slate-700'}`;
+                
+                option.onclick = () => {
+                    selectedCourseId = course.id;
+                    updateCourseSelectorDisplay();
+                    closeDropdown('course');
+                };
+
+                option.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-6 h-6 flex items-center justify-center rounded-lg bg-slate-50 shrink-0">
+                            ${course.icon}
+                        </span>
+                        <span>${course.name}</span>
+                    </div>
+                    ${isSelected ? `<svg class="w-4 h-4 text-[#D17A3B]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>` : ''}
+                `;
+                optionsContainer.appendChild(option);
+            });
+
+            updateCourseSelectorDisplay();
+        }
+
+        function updateCourseSelectorDisplay() {
+            let courses = selectedCurriculumId === 'MEB' ? MEB_COURSES : (INTL_COURSES[selectedCurriculumId] || []);
+            let activeCourse = courses.find(c => c.id === selectedCourseId);
+            
+            // Eğer ders bulunamadıysa ilkini seç
+            if (!activeCourse && courses.length > 0) {
+                activeCourse = courses[0];
+                selectedCourseId = activeCourse.id;
+            }
+
+            const display = document.getElementById('selected-course-display');
+            if (activeCourse) {
+                display.innerHTML = `
+                    <span class="w-6 h-6 flex items-center justify-center rounded-lg bg-[#FFF7ED] text-[#D17A3B] shrink-0">
+                        ${activeCourse.icon}
+                    </span>
+                    <span class="font-semibold text-sm text-slate-800">${activeCourse.name}</span>
+                `;
+            } else {
+                display.innerHTML = `<span class="text-slate-400 text-sm font-medium">Ders Seçiniz</span>`;
+            }
+        }
+
+        // Arama kutusuna göre filtreleme
+        function filterCourses(e) {
+            initCourseDropdown(e.target.value);
+        }
+
+        // TYMM görünürlük kontrolü
+        function updateTymmVisibility() {
+            const container = document.getElementById('tymm-toggle-container');
+            if (selectedCurriculumId === 'MEB') {
+                container.classList.remove('opacity-0', 'pointer-events-none');
+                container.classList.add('opacity-100');
+            } else {
+                container.classList.add('opacity-0', 'pointer-events-none');
+                container.classList.remove('opacity-100');
+            }
+        }
+
+        // TYMM durum değişikliği
+        function toggleTYMM() {
+            const checkbox = document.getElementById('tymm-checkbox');
+            isTYMMActive = checkbox.checked;
+            showToast('success', `TYMM Sistemi ${isTYMMActive ? 'Aktif' : 'Pasif'} yapıldı.`);
+        }
+
+        // --- FILE UPLOADER ---
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                uploadedFile = file;
+                document.getElementById('upload-btn-text').innerText = file.name;
+                showToast('success', `"${file.name}" yüklendi.`);
+            }
+        }
+
+        // --- SUBMIT CONFIGURATION & MODAL GENERATION ---
+        function submitConfiguration() {
+            const activeGrade = GRADES.find(g => g.id === selectedGradeId) || GRADES[11];
+            const activeCurriculum = CURRICULUMS.find(c => c.id === selectedCurriculumId) || CURRICULUMS[0];
+            const lang = document.getElementById('lang-select').value;
+            const promptVal = document.getElementById('prompt-input').value;
+
+            // Modal ayarlarını doldur
+            document.getElementById('sum-grade').innerText = activeGrade.name;
+            document.getElementById('sum-lang').innerText = lang === 'TR' ? 'Türkçe (🇹🇷)' : lang === 'EN' ? 'İngilizce (🇬🇧)' : lang;
+            document.getElementById('sum-mufredat').innerText = activeCurriculum.name;
+            document.getElementById('sum-tymm').innerText = selectedCurriculumId === 'MEB' ? (isTYMMActive ? 'Aktif' : 'Pasif') : 'Uygulanamaz';
+
+            let courses = selectedCurriculumId === 'MEB' ? MEB_COURSES : (INTL_COURSES[selectedCurriculumId] || []);
+            let activeCourse = courses.find(c => c.id === selectedCourseId) || courses[0];
+
+            const listContainer = document.getElementById('dynamic-summary-list');
+            listContainer.innerHTML = '';
+
+            if (activeCourse) {
+                const mockChapters = [
+                    `Ünite 1: Giriş, Temel Kavramlar ve İlk Yaklaşımlar (${activeGrade.name} - ${activeCurriculum.label})`,
+                    `Ünite 2: İleri Seviye Metodolojiler ve Teorik Yapı (${activeCourse.name})`,
+                    `Ünite 3: Pratik Uygulamalar, Ölçme ve Akademik Değerlendirme Analizi`
+                ];
+
+                const item = document.createElement('div');
+                item.className = "bg-slate-50 border border-slate-200/60 rounded-2xl p-4.5";
+                item.innerHTML = `
+                    <div class="flex items-center gap-2.5 mb-2.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#D17A3B]"></span>
+                        <span class="font-bold text-sm text-slate-800">${activeCourse.name}</span>
+                    </div>
+                    <ul class="space-y-2 pl-5 text-xs text-slate-600 list-disc font-medium">
+                        ${mockChapters.map(ch => `<li>${ch}</li>`).join('')}
+                    </ul>
+                `;
+                listContainer.appendChild(item);
+            }
+
+            // Prompt Alanı
+            const promptBox = document.getElementById('sum-prompt-container');
+            if (promptVal.trim() !== '') {
+                document.getElementById('sum-prompt').innerText = `"${promptVal}"`;
+                promptBox.classList.remove('hidden');
+            } else {
+                promptBox.classList.add('hidden');
+            }
+
+            // Modalı aç
+            const modal = document.getElementById('summary-modal');
+            const card = document.getElementById('modal-card');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('scale-95');
+            }, 50);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('summary-modal');
+            const card = document.getElementById('modal-card');
+            modal.classList.add('opacity-0');
+            card.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function mockSave() {
+            closeModal();
+            showToast('success', 'Akademik plan başarıyla sisteme kaydedildi!');
+        }
+
+        // --- TOAST NOTIFICATIONS ---
+        function showToast(type, text) {
+            const toast = document.getElementById('toast');
+            const iconSpan = document.getElementById('toast-icon');
+            const textSpan = document.getElementById('toast-text');
+
+            let icon = '';
+            switch (type) {
+                case 'success':
+                    icon = `<svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                    break;
+                case 'warning':
+                    icon = `<svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+                    break;
+                case 'info':
+                    icon = `<svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                    break;
+            }
+
+            iconSpan.innerHTML = icon;
+            textSpan.innerText = text;
+
+            toast.className = `fixed bottom-5 right-5 bg-slate-800 text-white text-sm px-5 py-3.5 rounded-2xl shadow-2xl z-50 flex items-center gap-3 transform translate-y-0 transition-all duration-300 opacity-100`;
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
