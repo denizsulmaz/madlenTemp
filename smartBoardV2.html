@@ -411,6 +411,7 @@ h1.big em{font-style:italic;color:var(--orange)}
               <div class="team-opt" data-n="1"><div class="to-n">1</div><div class="to-l">Tek skor</div></div>
               <div class="team-opt sel" data-n="2"><div class="to-n">2</div><div class="to-l">İki takım</div></div>
               <div class="team-opt" data-n="3"><div class="to-n">3</div><div class="to-l">Üç takım</div></div>
+              <div class="team-opt" data-n="4"><div class="to-n">4</div><div class="to-l">Dört takım</div></div>
             </div>
             <div class="team-names" id="team-names"></div>
           </div>
@@ -521,14 +522,15 @@ const TEAM_PALETTE = [
   {dot:'#3B6FD4', emoji:'🦁'},
   {dot:'#C45A20', emoji:'🦊'},
   {dot:'#1A8A8A', emoji:'🐢'},
+  {dot:'#7B3DB8', emoji:'🦉'},
 ];
 const TARGET_WORD = 'ÜÇGEN';
 
 /* ============ STATE ============ */
 let state = {
   mode:'team', teamCount:2,
-  teamNames:['Aslanlar','Tilkiler','Kaplumbağalar'],
-  qIndex:0, scores:[0,0,0], turn:0, revealed:[], missionProg:0, answered:false,
+  teamNames:['Aslanlar','Tilkiler','Kaplumbağalar','Baykuşlar'],
+  qIndex:0, scores:[0,0,0,0], turn:0, revealed:[], missionProg:0, answered:false,
 };
 
 /* ============ NAV ============ */
@@ -549,7 +551,7 @@ document.querySelectorAll('.step').forEach(el=>el.addEventListener('click',()=>g
 
 function resetAll(){
   clearInterval(speedTimer);
-  state={mode:'team',teamCount:2,teamNames:['Aslanlar','Tilkiler','Kaplumbağalar'],qIndex:0,scores:[0,0,0],turn:0,revealed:[],missionProg:0,answered:false};
+  state={mode:'team',teamCount:2,teamNames:['Aslanlar','Tilkiler','Kaplumbağalar','Baykuşlar'],qIndex:0,scores:[0,0,0,0],turn:0,revealed:[],missionProg:0,answered:false};
   renderModes();renderTeamOpts();renderQList();
   go('entry');
 }
@@ -616,7 +618,7 @@ function renderTeamOpts(){
 /* ============ STEP 5 · GAME ============ */
 function startGame(){
   clearInterval(speedTimer);
-  state.qIndex=0;state.scores=[0,0,0];state.turn=0;state.revealed=[];state.missionProg=0;state.answered=false;
+  state.qIndex=0;state.scores=[0,0,0,0];state.turn=0;state.revealed=[];state.missionProg=0;state.answered=false;
   const m=MODES.find(x=>x.id===state.mode);
   document.getElementById('game-mode-tag').innerHTML=`<i class="ti ${m.icon}"></i>${m.name}`;
   go('game');renderGame();
@@ -653,7 +655,7 @@ function renderGame(){
 
   let header='';
   if(state.mode==='team'){
-    header=state.teamCount>1?`<div class="turn-banner" style="--turn-c:${turnColor};--turn-bg:${turnColor}1C;--turn-glow:${turnColor}33"><span class="tb-dot"></span>Sıra: <b>${state.teamNames[state.turn]}</b> · temsilci tahtaya gelsin</div>`:'';
+    header=state.teamCount>1?`<div class="turn-banner" style="--turn-c:${turnColor};--turn-bg:${turnColor}1C;--turn-glow:${turnColor}33"><span class="tb-dot"></span>Sıra: <b>${state.teamNames[state.turn]}</b></div>`:'';
   }else if(state.mode==='speed'){
     header=`<div class="speed-timer"><div class="speed-fill" id="speed-fill"></div></div>`;
   }else if(state.mode==='word'){
@@ -781,8 +783,10 @@ function renderReport(){
   }else{
     const n=teamsActive();
     const ranked=Array.from({length:n}).map((_,i)=>({i,score:state.scores[i],name:state.teamCount===1?'Skor':state.teamNames[i]})).sort((a,b)=>b.score-a.score);
-    const heights=[150,110,86];const medals=['🥇','🥈','🥉'];
-    const visual=n>=3?[ranked[1],ranked[0],ranked[2]]:n===2?[ranked[1],ranked[0]]:[ranked[0]];
+    const heights=[150,118,94,78];const medals=['🥇','🥈','🥉',''];
+    const visual=n===4?[ranked[1],ranked[0],ranked[2],ranked[3]]
+      :n===3?[ranked[1],ranked[0],ranked[2]]
+      :n===2?[ranked[1],ranked[0]]:[ranked[0]];
     sb.innerHTML=`${confetti}<div class="sb-title">🏆 ${ranked[0].name} Kazandı!</div>
       <div class="podium">
         ${visual.map(r=>{const rank=ranked.indexOf(r);return `
