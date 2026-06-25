@@ -267,17 +267,23 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;ba
 .msg.ai{align-self:flex-start;background:var(--lilac-l);color:var(--text);border-bottom-left-radius:5px}
 .msg.me{align-self:flex-end;background:var(--lilac);color:#fff;border-bottom-right-radius:5px}
 .msg-who{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--lilac-d);margin-bottom:5px}
-.chat-input{display:flex;gap:9px;align-items:center;padding:6px 6px 6px 16px;border:2px solid var(--border);border-radius:100px;background:var(--s2)}
-.chat-input input{flex:1;border:none;background:none;font-size:14px;font-family:inherit;font-weight:500;color:var(--text)}
+.chat-input{display:flex;gap:8px;align-items:center;padding:6px;border:2px solid var(--border);border-radius:100px;background:var(--s2)}
+.chat-input input{flex:1;border:none;background:none;font-size:14px;font-family:inherit;font-weight:500;color:var(--text);padding:0 2px;min-width:0}
 .chat-input input:focus{outline:none}
 .chat-send{width:40px;height:40px;border-radius:50%;background:var(--lilac);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .15s}
 .chat-send:active{transform:scale(.9)}
 .scenario{background:var(--lilac-l);border-radius:14px;padding:14px 15px;margin-bottom:16px}
 .scenario-tag{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--lilac-d);display:flex;align-items:center;gap:6px;margin-bottom:6px}
 .scenario-txt{font-size:13.5px;font-weight:600;color:var(--text);line-height:1.5}
-.qr-row{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
-.qr{background:#fff;color:var(--lilac-d);border:1.5px solid var(--lilac-m);border-radius:100px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s}
-.qr:active{transform:scale(.96)}
+.goals{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
+.goal{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--muted);background:var(--s2);border:1.4px solid var(--border);border-radius:100px;padding:6px 13px 6px 7px;transition:all .25s}
+.goal .gck{width:18px;height:18px;border-radius:50%;border:1.6px solid var(--border);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:all .25s}
+.goal.done{color:var(--green-d);border-color:var(--green);background:var(--green-l)}
+.goal.done .gck{background:var(--green);border-color:var(--green)}
+.chat-mic{width:40px;height:40px;border-radius:50%;background:var(--lilac-l);color:var(--lilac-d);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .15s}
+.chat-mic:active{transform:scale(.9)}
+.chat-mic.live{background:var(--coral);color:#fff;animation:micPulse 1s ease-in-out infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(251,113,133,.5)}50%{box-shadow:0 0 0 9px rgba(251,113,133,0)}}
 .eval-card{border:1.6px solid var(--border);border-radius:14px;padding:16px;background:#fff;margin-bottom:6px}
 .eval-head{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--lilac-d);margin-bottom:13px}
 .eval-overall{display:flex;align-items:baseline;gap:8px;margin-bottom:15px}
@@ -309,6 +315,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;ba
 .xp-burst.show{transform:translate(-50%,-170%) scale(1)}
 .xp-burst.gone{transform:translate(-50%,-220%) scale(.8);opacity:0}
 #confetti{position:absolute;inset:0;pointer-events:none;z-index:150;border-radius:calc(var(--pr) - 9px)}
+
+/* Milestone / journey celebration */
+#s-milestone{background:var(--s2)}
+.mile{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 28px;overflow-y:auto}
+.mile-seal{width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;margin-bottom:22px;position:relative;animation:sealPop .55s cubic-bezier(.34,1.56,.64,1)}
+.mile-seal::after{content:'';position:absolute;inset:-11px;border-radius:50%;border:3px solid currentColor;opacity:.22}
+@keyframes sealPop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.mile-tag{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.13em;margin-bottom:9px}
+.mile-title{font-size:26px;font-weight:800;letter-spacing:-.6px;color:var(--text);line-height:1.14;text-wrap:balance}
+.mile-sub{font-size:14px;color:var(--muted);font-weight:600;margin-top:11px;line-height:1.5;max-width:290px}
+.mile-stats{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap;justify-content:center}
+.mile-stat{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px 14px;min-width:82px;box-shadow:0 2px 10px rgba(80,60,170,.04)}
+.mile-stat b{font-size:20px;font-weight:800;color:var(--text);display:block;letter-spacing:-.4px}
+.mile-stat span{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-top:4px;display:block}
+.mile-mini{margin-top:24px;width:100%;border:2px solid var(--tier);border-radius:13px;padding:18px;background:linear-gradient(160deg,#FFFEFA,#FAF7FF);box-shadow:0 14px 32px -16px rgba(80,60,170,.4)}
+.mile-mini .mm-word{font-size:10px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--lilac-d)}
+.mile-mini .mm-name{font-family:Georgia,serif;font-size:18px;font-weight:700;color:var(--text);margin-top:8px}
+.mile-mini .mm-tier{display:inline-block;margin-top:9px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:4px 12px;border-radius:100px;border:1.5px solid var(--tier);color:var(--tier)}
 
 /* grounded high-school */
 body[data-band="pathfinder"]{--r:18px;--r2:14px}
@@ -393,6 +417,12 @@ body[data-band="pathfinder"] .chk-btn{box-shadow:0 3px 0 var(--lilac-d);border-r
           <div class="cert-detail-scroll" id="cert-detail"></div>
         </div>
 
+        <div class="screen" id="s-milestone">
+          <div class="sb"><span class="sb-time">9:41</span><div class="sb-icons"><svg width="25" height="12" fill="currentColor"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity=".35" fill="none"/><rect x="2" y="2" width="16" height="8" rx="2"/><path d="M23 4v4a2 2 0 000-4z" opacity=".4"/></svg></div></div>
+          <div class="mile" id="mile-body"></div>
+          <button class="chk-btn" id="mile-cta">Continue</button>
+        </div>
+
       </div>
       <div class="toast" id="toast"></div>
     </div>
@@ -414,6 +444,15 @@ body[data-band="pathfinder"] .chk-btn{box-shadow:0 3px 0 var(--lilac-d);border-r
     <div class="dev-grp">
       <button class="dev-btn" onclick="setBand(currentBand)">Catalog</button>
       <button class="dev-btn" onclick="devCourse()">Course Path</button>
+      <button class="dev-btn" onclick="openCerts()">Certificates</button>
+    </div>
+  </div>
+  <div class="dev-card">
+    <div class="dev-ttl">Journey · Milestones</div>
+    <div class="dev-grp">
+      <button class="dev-btn" onclick="openMile('lesson')"><span class="dev-dot" style="background:#34D399"></span>Lesson Complete</button>
+      <button class="dev-btn" onclick="openMile('course')"><span class="dev-dot" style="background:#9B87F5"></span>Course Complete</button>
+      <button class="dev-btn" onclick="openMile('cert')"><span class="dev-dot" style="background:#E8B23A"></span>Certificate Earned</button>
     </div>
   </div>
   <div class="dev-card">
@@ -450,6 +489,7 @@ const ICONS={
   x:'<path d="M18 6L6 18M6 6l12 12"/>',
   app:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
   grip:'<path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/>',
   default:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10h8M8 14h5"/>'
 };
 function icon(id,color,size,sw){ size=size||26; sw=sw||2; return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${ICONS[id]||ICONS.default}</svg>`; }
@@ -683,6 +723,31 @@ function renderCertDetail(cert){
 let toastT=null;
 function showToast(m){ const el=document.getElementById('toast'); el.textContent=m; el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),1800); }
 
+// ── Journey milestones (completion + certification moments) ──
+function shade(hex){ const n=parseInt(hex.replace('#',''),16); let r=(n>>16)&255,g=(n>>8)&255,b=n&255,f=.72;
+  return '#'+((1<<24)+((r*f|0)<<16)+((g*f|0)<<8)+(b*f|0)).toString(16).slice(1); }
+const MILE={
+  lesson:{seal:'check',color:'#34D399',tag:'Lesson Complete',title:'Nice work!',sub:'You finished “What I Like” and kept your streak alive.',stats:[['+100','XP earned'],['100%','Accuracy'],['6 / 12','Modules']],cta:'Continue learning',next:'back'},
+  course:{seal:'star',color:'#9B87F5',tag:'Course Complete',title:'You finished the course!',sub:'Every module in “Learning How to Learn” is done.',stats:[['600','Course XP'],['91%','Avg score'],['6 / 6','Modules']],cta:'Claim your certificate',next:'cert'},
+  cert:{seal:'award',color:'#E8B23A',tag:'Certificate Earned',title:'Gold Certificate unlocked',sub:'You scored in the top tier — it’s been added to your collection.',stats:[['Gold','Tier'],['91%','Success rate']],cta:'View certificate',next:'viewcert',mini:{name:'Learning How to Learn',tier:'gold'}}
+};
+function renderMile(key){
+  const m=MILE[key];
+  const seal=`<div class="mile-seal" style="background:${m.color}">${m.seal==='award'?icon('award','#fff',44,2.2):m.seal==='star'?iconFill('star','#fff',46):icon('check','#fff',46,3)}</div>`;
+  const stats=`<div class="mile-stats">`+m.stats.map(s=>`<div class="mile-stat"><b>${s[0]}</b><span>${s[1]}</span></div>`).join('')+`</div>`;
+  let mini=''; if(m.mini){ const tm=TIER[m.mini.tier]; mini=`<div class="mile-mini" style="--tier:${tm.c}"><div class="mm-word">Okul Madlen · Certificate</div><div class="mm-name">${m.mini.name}</div><div class="mm-tier">${tm.l} Tier</div></div>`; }
+  document.getElementById('mile-body').innerHTML=`${seal}<div class="mile-tag" style="color:${m.color}">${m.tag}</div><div class="mile-title">${m.title}</div><div class="mile-sub">${m.sub}</div>${stats}${mini}`;
+  const btn=document.getElementById('mile-cta');
+  btn.textContent=m.cta; btn.className='chk-btn'; btn.disabled=false; btn.style.background=m.color; btn.style.boxShadow='0 5px 0 '+shade(m.color);
+  btn.onclick=()=>mileNext(m.next);
+}
+function mileNext(n){
+  if(n==='cert'){ openMile('cert'); }
+  else if(n==='viewcert'){ if(!curCerts.length) renderCatalog(currentBand); const c=curCerts.find(x=>x.tier==='gold')||curCerts[0]; if(c){ renderCertDetail(c); nav('s-cert-detail'); } else goBack(); }
+  else goBack();
+}
+function openMile(key){ renderMile(key); nav('s-milestone'); setTimeout(fireConfetti,260); }
+
 function openCourse(id){ curCourse=id; renderCourse(id); nav('s-course'); }
 
 // ── Course path ──
@@ -795,10 +860,10 @@ const DEF={
 // Role-play conversation: AI stays in character and drives it; quick replies keep it fast; whole chat is evaluated.
 const CHAT={
   tag:'Role-play · Café in London',
-  setup:'You\'re the customer. Madlen AI is the barista. Order a drink, ask a question, and pay — reply in your own words or tap a suggestion.',
+  setup:'You\'re the customer. Madlen AI is the barista. Reply in your own words — type or speak. Madlen AI reviews the whole conversation at the end.',
   open:'Morning! Welcome in. What can I get for you today?',
   aiTurns:['Great choice. Would you like anything to eat with that?','Lovely — that comes to £4.50 altogether. Card or cash?','Perfect, all set. Have a great day!'],
-  replies:[['A flat white, please.','What do you recommend?'],['Just a croissant, thanks.','No, just the drink.'],['Card, please.','Cash is fine.']],
+  goals:['Order a drink','Answer the barista','Pay & close politely'],
   eval:{overall:88,lines:[['Task completion','Ordered, asked, and paid successfully.','92'],['Language use','Natural phrasing with minor slips.','84'],['Politeness & tone','Greeted and thanked appropriately.','90']]}
 };
 
@@ -869,23 +934,23 @@ const TYPES={
   game:{ html:()=>timedHTML('Speed round'), init:()=>timedInit() },
 
   chat:{ html:()=>`<div class="scenario"><div class="scenario-tag">${icon('sparkles',THEME[currentBand].d,13)} ${CHAT.tag}</div><div class="scenario-txt">${CHAT.setup}</div></div>
-    <div class="chat-thread" id="chat"></div><div class="qr-row" id="qr"></div>
-    <div class="chat-input" id="chatbar"><input id="chat-in" placeholder="Type your reply…"><button class="chat-send" id="chat-send">${icon('send','#fff',18)}</button></div>`,
+    <div class="goals" id="goals"></div>
+    <div class="chat-thread" id="chat"></div>
+    <div class="chat-input" id="chatbar"><button class="chat-mic" id="chat-mic">${icon('mic','currentColor',18)}</button><input id="chat-in" placeholder="Type or speak your reply…"><button class="chat-send" id="chat-send">${icon('send','#fff',18)}</button></div>`,
     init:()=>{ MQ.turn=0; const c=document.getElementById('chat');
-      pushMsg(c,'ai',CHAT.open); renderQR();
+      pushMsg(c,'ai',CHAT.open); renderGoals();
       document.getElementById('chat-send').onclick=()=>chatSend();
       document.getElementById('chat-in').onkeydown=e=>{ if(e.key==='Enter')chatSend(); };
+      document.getElementById('chat-mic').onclick=()=>{ const m=document.getElementById('chat-mic'); m.classList.add('live'); showToast('Listening… (voice input mocked)'); setTimeout(()=>m.classList.remove('live'),1400); };
       armCheck('Finish & Evaluate',false);
       validateFn=()=>{ endChatEval(); return {skip:true,title:'Conversation evaluated',sub:'Madlen AI scored your whole chat — see the breakdown above.'}; }; } }
 };
-function renderQR(){ const qr=document.getElementById('qr'); if(!qr)return; const set=CHAT.replies[MQ.turn]||[];
-  qr.innerHTML=set.map(r=>`<span class="qr">${r}</span>`).join('');
-  qr.querySelectorAll('.qr').forEach((el,i)=>el.onclick=()=>chatSend(set[i])); }
+function renderGoals(){ const g=document.getElementById('goals'); if(!g)return;
+  g.innerHTML=CHAT.goals.map((t,i)=>`<div class="goal ${i<MQ.turn?'done':''}"><span class="gck">${i<MQ.turn?icon('check','#fff',12,3.2):''}</span>${t}</div>`).join(''); }
 function chatSend(txt){ if(MQ.done)return; const c=document.getElementById('chat'); const inp=document.getElementById('chat-in');
   const v=txt||(inp?inp.value.trim():''); if(!v)return; if(inp)inp.value='';
-  pushMsg(c,'me',v); const ai=CHAT.aiTurns[MQ.turn]; MQ.turn++; armCheck('Finish & Evaluate',true);
-  document.getElementById('qr').innerHTML='';
-  setTimeout(()=>{ if(ai)pushMsg(c,'ai',ai); if(MQ.turn>=CHAT.aiTurns.length) endChatEval(); else renderQR(); },340); }
+  pushMsg(c,'me',v); const ai=CHAT.aiTurns[MQ.turn]; MQ.turn++; armCheck('Finish & Evaluate',true); renderGoals();
+  setTimeout(()=>{ if(ai)pushMsg(c,'ai',ai); if(MQ.turn>=CHAT.aiTurns.length) endChatEval(); },340); }
 function endChatEval(){ const c=document.getElementById('chat'); const qr=document.getElementById('qr'); if(qr)qr.innerHTML='';
   const bar=document.getElementById('chatbar'); if(bar)bar.style.display='none';
   if(document.getElementById('eval-card')){ armCheck('Finish & Evaluate',true); return; }
