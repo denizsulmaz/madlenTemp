@@ -172,6 +172,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;ba
 .uc-t{font-size:14px;font-weight:800;color:var(--text)}
 .uc-s{font-size:12px;color:var(--muted);margin-top:1px}
 
+/* CEFR level headers + placement node */
+.lvl-head{position:absolute;left:0;right:0;height:54px;display:flex;align-items:center;gap:11px;padding:0 12px;background:var(--s2);z-index:3}
+.lvl-badge{width:42px;height:42px;border-radius:12px;background:var(--lilac);color:#fff;font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;letter-spacing:-.5px}
+.lvl-head.done .lvl-badge{background:var(--green)}
+.lvl-head.locked .lvl-badge{background:#E4E1F0;color:#AAA3C2}
+.lvl-info{flex:1}
+.lvl-name{font-size:15px;font-weight:800;color:var(--text)}
+.lvl-head.locked .lvl-name{color:var(--muted)}
+.lvl-sub{font-size:11px;font-weight:700;color:var(--muted);margin-top:1px;text-transform:uppercase;letter-spacing:.04em}
+.lvl-end{display:flex;flex-shrink:0}
+.node.placement{background:linear-gradient(135deg,#A78BFA,#7C66E6);box-shadow:0 6px 0 #5840C9}
+body[data-band="pathfinder"] .node.placement{box-shadow:0 4px 14px rgba(60,55,128,.32)}
+
+/* Speaking + placement components */
+.speak-target{font-family:Georgia,serif;font-size:20px;font-weight:700;color:var(--text);background:var(--lilac-l);border-radius:14px;padding:18px;text-align:center;margin-bottom:24px;line-height:1.4}
+.speak-rec{display:flex;flex-direction:column;align-items:center;gap:14px}
+.rec-btn{width:76px;height:76px;border-radius:50%;background:var(--lilac);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 22px rgba(80,60,170,.38);transition:transform .15s;-webkit-tap-highlight-color:transparent}
+.rec-btn:active{transform:scale(.94)}
+.rec-btn.live{background:var(--coral);animation:micPulse 1s ease-in-out infinite}
+.rec-wave{height:30px;display:flex;align-items:center;gap:3px;width:62%}
+.rec-hint{font-size:12.5px;font-weight:700;color:var(--muted)}
+.placement-intro{display:flex;gap:12px;background:var(--lilac-l);border-radius:14px;padding:14px;margin-bottom:20px;align-items:flex-start}
+.pi-icon{width:40px;height:40px;border-radius:11px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pi-t{font-size:14px;font-weight:800;color:var(--text)}
+.pi-s{font-size:12.5px;color:var(--muted);font-weight:600;line-height:1.5;margin-top:3px}
+
 /* ── Module screen ── */
 #s-module{background:var(--surface)}
 .mod-hdr{padding:0 20px 14px;flex-shrink:0}
@@ -492,6 +518,7 @@ const ICONS={
   app:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
   grip:'<path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01"/>',
   mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0"/><path d="M12 18v3"/>',
+  headphones:'<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="2.5" y="13.5" width="4.5" height="7" rx="2"/><rect x="17" y="13.5" width="4.5" height="7" rx="2"/>',
   default:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10h8M8 14h5"/>'
 };
 function icon(id,color,size,sw){ size=size||26; sw=sw||2; return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${ICONS[id]||ICONS.default}</svg>`; }
@@ -610,6 +637,39 @@ const MODS={
 const PASSAGE={
   reading_3:'The expedition was plagued by <b>inclement</b> weather: relentless rain, a biting wind, and fog so dense the guides could barely make out the path a few metres ahead.',
   critreading_3:'"Our city should ban e-scooters. Scooter-related ER visits rose 40% last year. Besides, a friend of mine sprained her wrist riding one downtown last week."'
+};
+
+// English structured by CEFR levels; starts with a placement test. Locked levels collapse to a header.
+const ENGLISH={
+  placement:{level:'A2',name:'Elementary'},
+  levels:[
+    {cefr:'A1',name:'Beginner',units:[
+      {t:'Greetings & Introductions',type:'Multiple Choice',st:'done',score:96},
+      {t:'Numbers & Time',type:'Listening',st:'done',score:90},
+      {t:'First Words Aloud',type:'Speaking',st:'done',score:88},
+    ]},
+    {cefr:'A2',name:'Elementary',units:[
+      {t:'Daily Routines',type:'Fill in Blank',st:'done',score:84},
+      {t:'Listening: At the Café',type:'Listening',st:'active'},
+      {t:'Speaking: Describe Your Day',type:'Speaking',st:'locked'},
+      {t:'Shops & Prices',type:'Multiple Choice',st:'locked'},
+      {t:'Level Review',type:'Multiple Select',st:'bonus'},
+    ]},
+    {cefr:'B1',name:'Intermediate',units:[
+      {t:'Past Experiences',type:'Sequence'},{t:'Listening: News Clip',type:'Listening'},
+      {t:'Speaking: Tell a Story',type:'Speaking'},{t:'Opinions & Reasons',type:'MC + AI Justify'},
+    ]},
+    {cefr:'B2',name:'Upper-Intermediate',units:[
+      {t:'Abstract Topics',type:'Multiple Choice'},{t:'Listening: Debate',type:'Listening'},
+      {t:'Speaking: Argue a Point',type:'Speaking'},{t:'Role-play: Job Interview',type:'Chat with AI'},
+    ]},
+    {cefr:'C1',name:'Advanced',units:[
+      {t:'Nuance & Idiom',type:'Multiple Select'},{t:'Listening: Lecture',type:'Listening'},{t:'Speaking: Present an Idea',type:'Speaking'},
+    ]},
+    {cefr:'C2',name:'Proficiency',units:[
+      {t:'Mastery Review',type:'Multiple Choice'},{t:'Speaking: Spontaneous Debate',type:'Speaking'},
+    ]},
+  ]
 };
 
 // ── State ──
@@ -772,6 +832,8 @@ function renderCourse(id){
       </div>
     </div>`;
 
+  if(id==='english'){ renderEnglishPath(c); return; }
+
   const wrap=document.getElementById('cd-scroll');
   const cw=wrap.clientWidth||326, cx=cw/2, U=Math.min(58,cw*0.19);
   const NODE=pf?60:66, GAP=112, TOP=82, BOT=110;
@@ -806,6 +868,53 @@ function pathD(arr){ if(arr.length<2) return arr.length?`M${arr[0].x} ${arr[0].y
   for(let i=1;i<arr.length;i++){ const a=arr[i-1],b=arr[i],my=(a.y+b.y)/2; d+=` C ${a.x} ${my}, ${b.x} ${my}, ${b.x} ${b.y}`; } return d; }
 function shakeEl(el){ el.style.animation='none'; el.offsetHeight; el.style.animation='nodeShake .4s ease'; }
 
+// ── English CEFR-sectioned path ──
+const ENG_AMP=[0,-1,-1.35,-1,0,1,1.35,1];
+function engGlyph(u){ if(u.st==='done') return icon('check','#fff',24,2.8); if(u.st==='locked') return icon('lock','#AAA3C2',20); if(u.st==='bonus') return iconFill('star','#fff',22);
+  const ti={'Speaking':'mic','Listening':'headphones'}[u.type]||'english'; return icon(ti,'#fff',24); }
+function renderEnglishPath(c){
+  const wrap=document.getElementById('cd-scroll'), t=THEME[currentBand];
+  const cw=wrap.clientWidth||326, cx=cw/2, U=Math.min(54,cw*0.17);
+  const NODE=60, GAP=100, HEAD=70, TOP=74, BOT=120;
+  let y=TOP, ai=0; const pts=[]; let heads='';
+  pts.push({x:cx,y,placement:true}); y+=GAP+4;
+  ENGLISH.levels.forEach(lv=>{
+    const state=lv.units.every(u=>u.st==='done')?'done':(lv.units.some(u=>u.st==='active'||u.st==='done')?'current':'locked');
+    heads+=`<div class="lvl-head ${state}" style="top:${(y-27).toFixed(0)}px"><div class="lvl-badge">${lv.cefr}</div><div class="lvl-info"><div class="lvl-name">${lv.name}</div><div class="lvl-sub">${lv.units.length} units${state==='locked'?' · locked':state==='done'?' · complete':''}</div></div><span class="lvl-end">${state==='done'?icon('check',t.d,18,2.6):state==='locked'?icon('lock','#AAA3C2',18):''}</span></div>`;
+    y+=HEAD;
+    if(state!=='locked'){ lv.units.forEach((u,ui)=>{ pts.push({x:cx+ENG_AMP[ai%8]*U,y,unit:u,cefr:lv.cefr,ui}); ai++; y+=GAP; }); }
+    y+=8;
+  });
+  const H=y+BOT;
+  let prog=0; pts.forEach((p,i)=>{ if(p.placement||(p.unit&&(p.unit.st==='done'||p.unit.st==='active'))) prog=i; });
+  const line=pts.map(p=>({x:p.x,y:p.y}));
+  const fullD=pathD(line), accD=pathD(line.slice(0,prog+1));
+  let nodes='';
+  pts.forEach(p=>{ const left=p.x-NODE/2, top=p.y-NODE/2;
+    if(p.placement){
+      nodes+=`<div class="node placement" style="left:${left}px;top:${top}px;width:${NODE}px;height:${NODE}px" onclick="openEng('PLACEMENT',0)">${icon('award','#fff',26,2.2)}</div>`;
+      nodes+=`<div class="node-lbl" style="left:${p.x}px;top:${(top+NODE+7).toFixed(0)}px"><span class="nl-step">START HERE</span> · Level Assessment<span class="nl-type">Placed · ${ENGLISH.placement.level}</span></div>`;
+      return; }
+    const u=p.unit, cls=u.st==='bonus'?'bonus':u.st;
+    if(u.st==='active') nodes+=`<div class="start-bubble" style="left:${p.x}px;top:${(top-30).toFixed(0)}px">START</div>`;
+    const click=u.st==='locked'?'shakeEl(this)':`openEng('${p.cefr}',${p.ui})`;
+    nodes+=`<div class="node ${cls} ${u.st==='active'?'pulse':''}" style="left:${left}px;top:${top}px;width:${NODE}px;height:${NODE}px" onclick="${click}">${engGlyph(u)}</div>`;
+    const lc=u.st==='locked'?'node-lbl locked-lbl':'node-lbl';
+    nodes+=`<div class="${lc}" style="left:${p.x}px;top:${(top+NODE+7).toFixed(0)}px">${u.t}<span class="nl-type">${u.type}</span></div>`;
+  });
+  wrap.innerHTML=`<div class="path" style="height:${H}px;width:${cw}px">
+    <svg class="path-svg" viewBox="0 0 ${cw} ${H}" preserveAspectRatio="none">
+      <path d="${fullD}" fill="none" stroke="#E2DEF1" stroke-width="7" stroke-linecap="round"/>
+      ${accD?`<path d="${accD}" fill="none" stroke="${t.accent}" stroke-width="7" stroke-linecap="round" opacity=".85"/>`:''}
+    </svg>${heads}${nodes}</div><div style="height:20px"></div>`;
+  setTimeout(()=>{ wrap.scrollTop=Math.max(0,line[prog].y-220); },30);
+}
+function openEng(cefr,ui){
+  if(cefr==='PLACEMENT'){ curModInfo={cid:'english',title:'Level Assessment',type:'Placement'}; renderQuestion('Placement','Level Assessment','Adaptive · finds your CEFR level',null); nav('s-module'); return; }
+  const lv=ENGLISH.levels.find(l=>l.cefr===cefr), u=lv.units[ui];
+  curModInfo={cid:'english',title:u.t,type:u.type}; renderQuestion(u.type,u.t,`${cefr} · ${u.type}`,null); nav('s-module');
+}
+
 function openMod(cid,mid){ const mods=MODS[cid]||MODS.english; const m=mods.find(x=>x.id===mid)||mods[0];
   curModInfo={cid,mid,type:m.type,title:m.title}; renderQuestion(m.type,m.title,'Step 3 of 5 · '+m.type,PASSAGE[cid+'_'+mid]); nav('s-module'); }
 
@@ -832,7 +941,8 @@ function renderQuestion(typeLabel,title,sub,passage){
 function typeKey(l){ return ({
   'Multiple Choice':'mc','Multiple Select':'ms','True / False':'tf','Fill in Blank':'fb','Sequence':'seq',
   'Drag & Match':'match','Image Tap':'tap','Free Text':'free','AI Free Text':'free','MC + AI Justify':'mcj',
-  'Timed Read':'read','Timed Game':'game','Chat with AI':'chat'})[l]||'mc'; }
+  'Timed Read':'read','Timed Game':'game','Chat with AI':'chat',
+  'Listening':'listen','Speaking':'speak','Placement':'placement'})[l]||'mc'; }
 
 // ── Shared check / result ──
 function armCheck(label,enabled){ const b=document.getElementById('chk-btn'); b.textContent=label; b.disabled=!enabled; b.className='chk-btn'; b.onclick=doCheck; }
@@ -857,7 +967,10 @@ const DEF={
   tap:{text:'Tap the everyday product that uses AI.',tiles:[{ic:'app',t:'TV remote'},{ic:'ai',t:'Recommendation app'},{ic:'finance',t:'Calculator'},{ic:'safety',t:'Door lock'}],correct:1},
   free:{text:'In one sentence, summarise the passage in your own words.'},
   mcj:{text:'Which conclusion does the evidence best support?',opts:[{l:'A',t:'The trend will certainly continue.'},{l:'B',t:'The trend is likely but not guaranteed.'},{l:'C',t:'There is no real trend.'},{l:'D',t:'The data is irrelevant.'}],correct:1},
-  timed:{passage:'Across the last decade, urban cycling has shifted from a fringe activity to a mainstream commute option. City investment in protected lanes, alongside cheaper e-bikes, widened access — though uptake still varies sharply by neighbourhood and climate.',text:'According to the passage, what most widened access to cycling?',opts:[{l:'A',t:'Stricter traffic laws.'},{l:'B',t:'Protected lanes and cheaper e-bikes.'},{l:'C',t:'Higher fuel prices.'},{l:'D',t:'Population growth.'}],correct:1}
+  timed:{passage:'Across the last decade, urban cycling has shifted from a fringe activity to a mainstream commute option. City investment in protected lanes, alongside cheaper e-bikes, widened access — though uptake still varies sharply by neighbourhood and climate.',text:'According to the passage, what most widened access to cycling?',opts:[{l:'A',t:'Stricter traffic laws.'},{l:'B',t:'Protected lanes and cheaper e-bikes.'},{l:'C',t:'Higher fuel prices.'},{l:'D',t:'Population growth.'}],correct:1},
+  listen:{prompt:'Listen to the dialogue, then answer.',text:'Where is the conversation taking place?',opts:[{l:'A',t:'At a train station'},{l:'B',t:'In a café'},{l:'C',t:'At school'},{l:'D',t:'In a shop'}],correct:1},
+  speak:{prompt:'Tap the mic and say this sentence:',target:'I would like a flat white, please.'},
+  placement:{note:'A short adaptive test finds your CEFR level — questions get harder or easier based on your answers.',text:'Choose the correct sentence:',opts:[{l:'A',t:"She don't like coffee."},{l:'B',t:"She doesn't like coffee."},{l:'C',t:'She not like coffee.'},{l:'D',t:'She no like coffee.'}],correct:1,level:'A2',levelName:'Elementary'}
 };
 // Role-play conversation: AI stays in character and drives it; quick replies keep it fast; whole chat is evaluated.
 const CHAT={
@@ -934,6 +1047,31 @@ const TYPES={
 
   read:{ html:()=>timedHTML('Reading timer'), init:()=>timedInit() },
   game:{ html:()=>timedHTML('Speed round'), init:()=>timedInit() },
+
+  listen:{ html:()=>{ const q=DEF.listen; const bh=[40,65,28,80,50,72,35,62,45,78,55,38,82,60,32]; const bars=bh.map((h,i)=>`<div class="wb" style="--h:${h}%;--dur:${.58+i*.07}s;animation-delay:${i*.04}s"></div>`).join('');
+      return `<div class="q-text">${q.prompt}</div>
+        <div class="audio-pl" onclick="togAudio(this)"><div class="apl-btn"><svg id="apl-icon" width="14" height="16" viewBox="0 0 14 16" fill="white"><path d="M1 1.5L13 8L1 14.5V1.5Z"/></svg></div><div class="apl-wave">${bars}</div><div class="apl-dur">0:12</div></div>
+        <div class="q-instruct">Tap play to listen — you can replay as many times as you like.</div>
+        <div class="q-text" style="font-size:17px">${q.text}</div>`+q.opts.map((o,i)=>`<div class="opt" data-i="${i}"><div class="opt-ltr">${o.l}</div><div class="opt-txt">${o.t}</div></div>`).join(''); },
+    init:()=>{ const q=DEF.listen; armCheck('Check',false);
+      document.querySelectorAll('.opt').forEach(el=>el.onclick=()=>{ if(MQ.done)return; document.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); MQ.sel=+el.dataset.i; armCheck('Check',true); });
+      validateFn=()=>{ const ok=MQ.sel===q.correct; lockOpts(q.correct,MQ.sel); return {ok,sub:ok?'Correct — good listening.':'Replay and listen for the key detail.'}; }; } },
+
+  speak:{ html:()=>{ const q=DEF.speak; const bh=[35,60,30,75,45,68,38,72,42,66,50]; const bars=bh.map((h,i)=>`<div class="wb" style="--h:${h}%;--dur:${.5+i*.06}s;animation-delay:${i*.05}s"></div>`).join('');
+      return `<div class="q-text">${q.prompt}</div><div class="speak-target">“${q.target}”</div>
+        <div class="speak-rec"><button class="rec-btn" id="rec-btn">${icon('mic','#fff',30)}</button><div class="rec-wave">${bars}</div><div class="rec-hint" id="rec-hint">Tap to record</div></div><div id="speak-fb"></div>`; },
+    init:()=>{ armCheck('Submit recording',false); MQ.rec=false;
+      const btn=document.getElementById('rec-btn'),hint=document.getElementById('rec-hint'),waves=document.querySelectorAll('.speak-rec .wb');
+      btn.onclick=()=>{ if(MQ.done)return; MQ.rec=!MQ.rec; btn.classList.toggle('live',MQ.rec); waves.forEach(w=>w.style.animationPlayState=MQ.rec?'running':'paused');
+        hint.textContent=MQ.rec?'Listening… tap to stop':'Recording ready'; if(!MQ.rec) armCheck('Submit recording',true); };
+      validateFn=()=>{ document.getElementById('speak-fb').innerHTML=`<div class="ai-feedback show"><div class="ai-ic">${icon('sparkles','#fff',18)}</div><div><div class="ai-name">Madlen AI · Pronunciation</div><div class="ai-body">Clear and natural. Watch the “th” sound in “the”.<span class="ai-score">88% match</span></div></div></div>`;
+        return {skip:true,title:'Pronunciation scored',sub:'Madlen AI reviewed your speech — see feedback above.'}; }; } },
+
+  placement:{ html:()=>{ const q=DEF.placement; return `<div class="placement-intro"><div class="pi-icon">${icon('award',THEME[currentBand].d,22)}</div><div><div class="pi-t">Level Assessment</div><div class="pi-s">${q.note}</div></div></div>
+      <div class="q-text">${q.text}</div>`+q.opts.map((o,i)=>`<div class="opt" data-i="${i}"><div class="opt-ltr">${o.l}</div><div class="opt-txt">${o.t}</div></div>`).join(''); },
+    init:()=>{ const q=DEF.placement; armCheck('Submit answer',false);
+      document.querySelectorAll('.opt').forEach(el=>el.onclick=()=>{ if(MQ.done)return; document.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); MQ.sel=+el.dataset.i; armCheck('Submit answer',true); });
+      validateFn=()=>{ lockOpts(q.correct,MQ.sel); return {skip:true,title:`Placed at ${q.level} · ${q.levelName}`,sub:'Your path starts here — earlier levels are marked complete.'}; }; } },
 
   chat:{ html:()=>`<div class="scenario"><div class="scenario-tag">${icon('sparkles',THEME[currentBand].d,13)} ${CHAT.tag}</div><div class="scenario-txt">${CHAT.setup}</div></div>
     <div class="goals" id="goals"></div>
@@ -1021,7 +1159,7 @@ function setBand(band){ currentBand=band; stack=['s-catalog']; curCourse=null; c
 function devCourse(){ const c=BANDS[currentBand].courses.find(x=>x.active)||BANDS[currentBand].courses[0]; openCourse(c.id); }
 function resetProto(){ MQ={}; curCerts=[]; curCourse=null; curModInfo=null; setBand('explorer'); }
 
-const TYPE_LIST=[['mc','Multiple Choice'],['ms','Multiple Select'],['tf','True / False'],['fb','Fill in Blank'],['seq','Sequence'],['match','Drag & Match'],['tap','Image Tap'],['free','AI Free Text'],['mcj','MC + Justify'],['read','Timed Read'],['game','Timed Game'],['chat','Chat with AI']];
+const TYPE_LIST=[['mc','Multiple Choice'],['ms','Multiple Select'],['tf','True / False'],['fb','Fill in Blank'],['seq','Sequence'],['match','Drag & Match'],['tap','Image Tap'],['listen','Listening'],['speak','Speaking'],['free','AI Free Text'],['mcj','MC + Justify'],['read','Timed Read'],['game','Timed Game'],['chat','Chat with AI'],['placement','Placement']];
 function buildDevTypes(){ document.getElementById('dev-types').innerHTML=TYPE_LIST.map(([k,l])=>`<button class="dev-btn" onclick="devType('${k}','${l}')">${l}</button>`).join(''); }
 function devType(key,label){ curModInfo={cid:'_demo',mid:key,type:label,title:label}; MQ.passage=null;
   const onMod=stack[stack.length-1]==='s-module';
