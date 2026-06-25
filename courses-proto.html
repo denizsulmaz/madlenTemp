@@ -73,18 +73,66 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;ba
 @keyframes slideUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .stag{animation:slideUp .42s cubic-bezier(.22,.8,.3,1) forwards;opacity:0}
 
-/* Certifications (glassmorphism over gradient) */
-.cert-strip{border-radius:var(--r);padding:16px 4px 16px 16px;background:var(--grad);position:relative;overflow:hidden;box-shadow:0 14px 30px -14px rgba(90,65,190,.55)}
-.cert-strip .blob{position:absolute;border-radius:50%;background:rgba(255,255,255,.08);pointer-events:none}
-.cert-head{display:flex;align-items:center;gap:8px;color:#fff;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:13px;position:relative;z-index:1}
-.cert-row{display:flex;gap:11px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;position:relative;z-index:1}
+/* Certificates (compact, expandable; glass icon over gradient) */
+.cert-mini{margin-top:4px;background:var(--grad);border-radius:var(--r2);padding:13px 15px;display:flex;align-items:center;gap:12px;color:#fff;cursor:pointer;box-shadow:0 10px 22px -13px rgba(90,65,190,.55);-webkit-tap-highlight-color:transparent;transition:transform .15s}
+.cert-mini:active{transform:scale(.99)}
+.cert-mini-ic{width:40px;height:40px;border-radius:11px;background:rgba(255,255,255,.18);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.26);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cert-mini-txt{flex:1;min-width:0}
+.cert-mini-t{font-size:14.5px;font-weight:800;letter-spacing:-.2px}
+.cert-mini-s{font-size:11.5px;font-weight:600;opacity:.82;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cert-mini-chev{flex-shrink:0;opacity:.9;transition:transform .25s;display:flex}
+.cert-mini.open .cert-mini-chev{transform:rotate(90deg)}
+.cert-expand{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.cert-expand.open{max-height:260px;margin-top:11px}
+.cert-row{display:flex;gap:11px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}
 .cert-row::-webkit-scrollbar{display:none}
-.cert-card{flex-shrink:0;width:150px;background:rgba(255,255,255,.16);backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px);border:1px solid rgba(255,255,255,.28);border-radius:16px;padding:14px;color:#fff}
-.cert-medal{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.22);margin-bottom:10px}
-.cert-tier{font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
-.cert-name{font-size:14px;font-weight:800;letter-spacing:-.2px;line-height:1.2;margin:3px 0 8px}
-.cert-date{font-size:11px;font-weight:600;opacity:.8}
-.cert-empty{color:rgba(255,255,255,.92);font-size:13px;font-weight:600;line-height:1.5;background:rgba(255,255,255,.13);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:13px 15px}
+.cert-card-lite{flex-shrink:0;width:152px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px;box-shadow:0 2px 10px rgba(80,60,170,.05)}
+.cclt-medal{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:9px}
+.cclt-tier{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.cclt-name{font-size:13.5px;font-weight:800;color:var(--text);margin:4px 0 7px;line-height:1.2}
+.cclt-date{font-size:11px;color:var(--muted);font-weight:600}
+
+/* Certificates page */
+#s-certs,#s-cert-detail{background:var(--s2)}
+.page-hdr{flex-shrink:0;padding:0 18px 8px}
+.page-title{font-size:24px;font-weight:800;letter-spacing:-.5px;color:var(--text);margin-top:4px}
+.page-sub{font-size:12.5px;color:var(--muted);font-weight:600;margin-top:2px}
+.certs-scroll{flex:1;overflow-y:auto;padding:8px 18px 32px}
+.certs-scroll::-webkit-scrollbar{display:none}
+.cert-list-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:11px;display:flex;align-items:center;gap:13px;cursor:pointer;box-shadow:0 2px 10px rgba(80,60,170,.04);transition:transform .15s;-webkit-tap-highlight-color:transparent}
+.cert-list-card:active{transform:scale(.98)}
+.clc-seal{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.clc-info{flex:1;min-width:0}
+.clc-tier{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.clc-name{font-size:15px;font-weight:800;color:var(--text);margin-top:2px;letter-spacing:-.2px}
+.clc-meta{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:3px}
+.clc-chev{flex-shrink:0;opacity:.5;color:var(--muted)}
+
+/* Certificate detail */
+.cert-detail-scroll{flex:1;overflow-y:auto;padding:8px 18px 28px}
+.cert-detail-scroll::-webkit-scrollbar{display:none}
+.certificate{background:linear-gradient(160deg,#FFFEFA,#FAF7FF);border-radius:14px;padding:28px 22px 22px;position:relative;border:2px solid var(--tier);box-shadow:0 18px 42px -16px rgba(80,60,170,.4);text-align:center;overflow:hidden;margin-top:6px}
+.certificate::before{content:'';position:absolute;inset:8px;border:1px solid var(--tier);opacity:.38;border-radius:8px;pointer-events:none}
+.cert-wordmark{font-size:11px;font-weight:800;letter-spacing:.24em;color:var(--lilac-d);text-transform:uppercase;position:relative}
+.cert-seal{width:58px;height:58px;border-radius:50%;background:var(--tier);display:flex;align-items:center;justify-content:center;margin:16px auto 14px;box-shadow:0 7px 18px rgba(0,0,0,.16);position:relative}
+.cert-h{font-family:Georgia,'Times New Roman',serif;font-size:21px;font-weight:700;color:var(--text);letter-spacing:.01em;position:relative}
+.cert-small{font-size:12px;color:var(--muted);margin:15px 0 4px;position:relative}
+.cert-recipient{font-family:Georgia,serif;font-size:25px;font-weight:700;color:var(--lilac-d);margin:2px 0;border-bottom:1px solid var(--border);display:inline-block;padding:0 20px 7px;position:relative}
+.cert-course{font-size:17px;font-weight:800;color:var(--text);margin-top:11px;position:relative;letter-spacing:-.2px}
+.cert-tier-lbl{display:inline-block;margin-top:13px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;padding:5px 15px;border-radius:100px;border:1.5px solid;position:relative}
+.cert-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:24px;font-size:11px;color:var(--muted);font-weight:600;position:relative}
+.cert-sign{font-family:Georgia,serif;font-style:italic;font-size:16px;color:var(--text);border-top:1px solid var(--border);padding-top:5px;font-weight:400}
+.cert-stat{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 17px;margin-top:16px}
+.cert-stat-l{font-size:13px;font-weight:700;color:var(--muted)}
+.cert-stat-v{font-size:23px;font-weight:800;color:var(--green-d);font-variant-numeric:tabular-nums}
+.cert-actions{display:flex;gap:11px;margin-top:14px}
+.cert-act{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:15px;border-radius:14px;font-size:14.5px;font-weight:800;cursor:pointer;-webkit-tap-highlight-color:transparent;border:none;transition:transform .12s}
+.cert-act.share{background:var(--lilac-l);color:var(--lilac-d)}
+.cert-act.dl{background:var(--lilac);color:#fff;box-shadow:0 4px 0 var(--lilac-d)}
+.cert-act.share:active{transform:scale(.97)}
+.cert-act.dl:active{transform:translateY(3px);box-shadow:0 1px 0 var(--lilac-d)}
+.toast{position:absolute;bottom:32px;left:50%;transform:translateX(-50%) translateY(20px);background:#15121F;color:#fff;font-size:13px;font-weight:700;padding:11px 18px;border-radius:100px;opacity:0;transition:all .3s cubic-bezier(.34,1.4,.64,1);z-index:300;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ── Course path ── */
 #s-course{background:var(--s2)}
@@ -315,7 +363,19 @@ body[data-band="pathfinder"] .chk-btn{box-shadow:0 3px 0 var(--lilac-d);border-r
           <div class="xp-burst" id="xp-burst"></div>
         </div>
 
+        <div class="screen" id="s-certs">
+          <div class="sb"><span class="sb-time">9:41</span><div class="sb-icons"><svg width="25" height="12" fill="currentColor"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity=".35" fill="none"/><rect x="2" y="2" width="16" height="8" rx="2"/><path d="M23 4v4a2 2 0 000-4z" opacity=".4"/></svg></div></div>
+          <div class="page-hdr" id="certs-hdr"></div>
+          <div class="certs-scroll" id="certs-scroll"></div>
+        </div>
+
+        <div class="screen" id="s-cert-detail">
+          <div class="sb"><span class="sb-time">9:41</span><div class="sb-icons"><svg width="25" height="12" fill="currentColor"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity=".35" fill="none"/><rect x="2" y="2" width="16" height="8" rx="2"/><path d="M23 4v4a2 2 0 000-4z" opacity=".4"/></svg></div></div>
+          <div class="cert-detail-scroll" id="cert-detail"></div>
+        </div>
+
       </div>
+      <div class="toast" id="toast"></div>
     </div>
   </div>
 </div>
@@ -365,6 +425,9 @@ const ICONS={
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   sparkles:'<path d="M12 3l1.7 4.5L18 9l-4.3 1.5L12 15l-1.7-4.5L6 9l4.3-1.5z"/><path d="M19 13.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>',
   arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
+  back:'<path d="M15 6l-6 6 6 6"/>',
+  share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>',
+  download:'<path d="M12 3v13"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/>',
   x:'<path d="M18 6L6 18M6 6l12 12"/>',
   app:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
   default:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10h8M8 14h5"/>'
@@ -488,7 +551,7 @@ const PASSAGE={
 };
 
 // ── State ──
-let currentBand='explorer', curCourse=null, curModInfo=null, stack=['s-catalog'];
+let currentBand='explorer', curCourse=null, curModInfo=null, stack=['s-catalog'], curCerts=[];
 let validateFn=null, MQ={};
 
 // ── Navigation ──
@@ -524,26 +587,13 @@ function renderCatalog(band){
     <div class="hc-ring">${ring(active.pct,'#ffffff',82,6)}</div>
   </div>`;
 
-  // certifications
-  const certs=d.courses.filter(c=>c.badge||c.pct===100).map(c=>({title:c.title,tier:c.badge||'gold'}));
-  html+='<div class="sec-lbl">My Certificates</div>';
-  html+=`<div class="cert-strip"><div class="blob" style="width:120px;height:120px;top:-50px;right:-20px"></div>
-    <div class="cert-head">${icon('award','#fff',16)} Earned Certifications</div>`;
-  if(certs.length){
-    html+='<div class="cert-row">'+certs.map((ct,i)=>{ const tm=TIER[ct.tier];
-      return `<div class="cert-card stag" style="animation-delay:${i*70}ms">
-        <div class="cert-medal">${icon('award',tm.c,22)}</div>
-        <div class="cert-tier" style="color:${tm.c}">${tm.l} Certificate</div>
-        <div class="cert-name">${ct.title}</div>
-        <div class="cert-date">Awarded · Apr 2026</div>
-      </div>`; }).join('')+'</div>';
-  } else {
-    html+='<div class="cert-empty">Finish a course to earn your first certificate. Your awards collect here.</div>';
-  }
-  html+='</div>';
+  const certs=d.courses.filter(c=>c.badge||c.pct===100).map(c=>({id:c.id,title:c.title,tier:c.badge||'gold',score:certScore(c.id,c.pct)}));
+  curCerts=certs;
 
   html+='<div class="sec-lbl">All Courses</div>';
   d.courses.forEach((c,i)=>{ html+=courseCardHTML(c,i,t); });
+
+  html+='<div class="sec-lbl">Certificates</div>'+certMini(certs);
   document.getElementById('cat-scroll').innerHTML=html;
   setTimeout(()=>animRings(document.getElementById('cat-scroll')),60);
 }
@@ -563,6 +613,56 @@ function courseCardHTML(c,idx,t){
   </div>`;
 }
 
+function certScore(cid,pct){ const ss=(MODS[cid]||[]).filter(m=>m.score!=null).map(m=>m.score); return ss.length?Math.round(ss.reduce((a,b)=>a+b,0)/ss.length):pct; }
+function certMini(certs){
+  if(!certs.length) return `<div class="cert-mini" style="cursor:default;box-shadow:none">
+    <div class="cert-mini-ic">${icon('award','#fff',20)}</div>
+    <div class="cert-mini-txt"><div class="cert-mini-t">No certificates yet</div><div class="cert-mini-s">Finish a course to earn your first one</div></div></div>`;
+  const names=certs.map(c=>c.title).join(' · ');
+  return `<div class="cert-mini" onclick="openCerts()">
+    <div class="cert-mini-ic">${icon('award','#fff',20)}</div>
+    <div class="cert-mini-txt"><div class="cert-mini-t">${certs.length} Certificate${certs.length>1?'s':''} Earned</div><div class="cert-mini-s">${names}</div></div>
+    <span class="cert-mini-chev">${icon('arrow','#fff',16)}</span></div>`;
+}
+function openCerts(){ renderCerts(); nav('s-certs'); }
+function openCert(i){ renderCertDetail(curCerts[i]); nav('s-cert-detail'); }
+function renderCerts(){
+  const t=THEME[currentBand];
+  document.getElementById('certs-hdr').innerHTML=`
+    <div class="back-btn" onclick="goBack()">${icon('back',t.d,17)}My Courses</div>
+    <div class="page-title">Certificates</div>
+    <div class="page-sub">${curCerts.length} earned · tap to view, share or download</div>`;
+  document.getElementById('certs-scroll').innerHTML=curCerts.map((ct,i)=>{ const tm=TIER[ct.tier];
+    return `<div class="cert-list-card stag" style="animation-delay:${i*60}ms" onclick="openCert(${i})">
+      <div class="clc-seal" style="background:${tm.c}1f">${icon('award',tm.c,24)}</div>
+      <div class="clc-info"><div class="clc-tier" style="color:${tm.c}">${tm.l} Certificate</div>
+        <div class="clc-name">${ct.title}</div><div class="clc-meta">Success rate ${ct.score}% · Apr 2026</div></div>
+      <span class="clc-chev">${icon('arrow',t.d,16)}</span></div>`; }).join('');
+}
+function renderCertDetail(cert){
+  const t=THEME[currentBand], tm=TIER[cert.tier], name=BANDS[currentBand].student.name;
+  document.getElementById('cert-detail').innerHTML=`
+    <div class="back-btn" onclick="goBack()">${icon('back',t.d,17)}Certificates</div>
+    <div class="certificate" style="--tier:${tm.c}">
+      <div class="cert-wordmark">Okul Madlen</div>
+      <div class="cert-seal" style="background:${tm.c}">${icon('award','#fff',30,2.4)}</div>
+      <div class="cert-h">Certificate of Achievement</div>
+      <div class="cert-small">This certifies that</div>
+      <div class="cert-recipient">${name}</div>
+      <div class="cert-small">has successfully completed</div>
+      <div class="cert-course">${cert.title}</div>
+      <div class="cert-tier-lbl" style="color:${tm.c};border-color:${tm.c}">${tm.l} Tier</div>
+      <div class="cert-foot"><span>Issued Apr 2026</span><span class="cert-sign">Madlen</span></div>
+    </div>
+    <div class="cert-stat"><span class="cert-stat-l">Your success rate</span><span class="cert-stat-v">${cert.score}%</span></div>
+    <div class="cert-actions">
+      <button class="cert-act share" onclick="showToast('Share sheet opened')">${icon('share','currentColor',18)} Share</button>
+      <button class="cert-act dl" onclick="showToast('Certificate saved to your device')">${icon('download','#fff',18)} Download</button>
+    </div>`;
+}
+let toastT=null;
+function showToast(m){ const el=document.getElementById('toast'); el.textContent=m; el.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('show'),1800); }
+
 function openCourse(id){ curCourse=id; renderCourse(id); nav('s-course'); }
 
 // ── Course path ──
@@ -572,7 +672,7 @@ function renderCourse(id){
   const t=THEME[currentBand], pf=currentBand==='pathfinder';
 
   document.getElementById('cd-hero').innerHTML=`
-    <div class="back-btn" onclick="goBack()">${icon('arrow',t.d,16)}<span style="transform:scaleX(-1);display:inline-block">${''}</span>My Courses</div>
+    <div class="back-btn" onclick="goBack()">${icon('back',t.d,17)}My Courses</div>
     <div class="course-banner" style="background:${pf?t.grad:c.bg};color:${pf?'#fff':'#1B1830'}">
       <div class="cb-top">
         <div class="cb-emoji" style="${pf?'':'background:'+c.color+'22'}">${icon(c.id,pf?'#fff':c.color,25)}</div>
@@ -626,7 +726,7 @@ function openMod(cid,mid){ const mods=MODS[cid]||MODS.english; const m=mods.find
 function modHeader(title,sub){
   const t=THEME[currentBand]; let segs=''; for(let i=0;i<5;i++) segs+=`<div class="mp-seg ${i<2?'done':i===2?'active':''}"></div>`;
   document.getElementById('mod-hdr').innerHTML=`
-    <div class="mod-back" onclick="goBack()">${icon('arrow',t.d,16)}<span>${title}</span></div>
+    <div class="mod-back" onclick="goBack()">${icon('back',t.d,17)}<span>${title}</span></div>
     <div class="mod-progbar">${segs}</div><div class="mod-step-lbl">${sub}</div>`;
 }
 function renderQuestion(typeLabel,title,sub,passage){
