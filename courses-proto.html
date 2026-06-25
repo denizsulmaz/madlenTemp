@@ -322,7 +322,9 @@ body[data-band="pathfinder"] .node.placement{box-shadow:0 4px 14px rgba(60,55,12
 .eval-note{font-size:11.5px;color:var(--muted);font-weight:500;margin-top:4px}
 
 /* timed */
-.timer-chip{display:inline-flex;align-items:center;gap:7px;background:var(--amber-l);color:var(--amber-d);font-size:13px;font-weight:800;padding:8px 14px;border-radius:100px;margin-bottom:16px;font-variant-numeric:tabular-nums}
+.timer-chip{display:inline-flex;align-items:center;gap:7px;background:var(--amber-l);color:var(--amber-d);font-size:13px;font-weight:800;padding:8px 14px;border-radius:100px;margin-bottom:16px;font-variant-numeric:tabular-nums;transition:background .2s,color .2s}
+.timer-chip.low{background:var(--coral-l);color:var(--coral);animation:micPulse 1s ease-in-out infinite}
+.timer-chip.up{background:var(--coral-l);color:#9f1239;animation:none}
 
 .res-banner{margin:0 20px 8px;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:12px;font-size:14.5px;font-weight:800;opacity:0;transform:translateY(16px);transition:all .3s cubic-bezier(.34,1.56,.64,1)}
 .res-banner svg{flex-shrink:0}
@@ -1106,10 +1108,17 @@ function timedHTML(label){ const q=DEF.timed; return `<div class="timer-chip" id
   <div class="passage"><span class="pg-lbl">Passage</span>${q.passage}</div><div class="q-text">${q.text}</div>`+optRowsMC(q); }
 function timedInit(){ const q=DEF.timed; MQ.q=q; armCheck('Check',false);
   document.querySelectorAll('.opt').forEach(el=>el.onclick=()=>{ if(MQ.done)return; document.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); MQ.sel=+el.dataset.i; armCheck('Check',true); });
-  let s=90; const tv=document.getElementById('tval');
-  MQ.timer&&clearInterval(MQ.timer);
-  MQ.timer=setInterval(()=>{ if(MQ.done){clearInterval(MQ.timer);return;} s--; if(s<0){clearInterval(MQ.timer);return;} tv.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); },1000);
+  let s=30; const tv=document.getElementById('tval'), chip=document.getElementById('timer');
+  const fmt=()=>{ tv.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }; fmt();
+  if(MQ.timer)clearInterval(MQ.timer);
+  MQ.timer=setInterval(()=>{ if(MQ.done){clearInterval(MQ.timer);return;} s--; if(s<=10&&chip)chip.classList.add('low');
+    if(s<=0){ clearInterval(MQ.timer); tv.textContent='0:00'; timeUp(q); return; } fmt(); },1000);
   validateFn=()=>{ clearInterval(MQ.timer); const ok=MQ.sel===q.correct; lockOpts(q.correct,MQ.sel); return {ok,sub:ok?'Correct — and on time.':'Option B is supported by the passage.'}; }; }
+function timeUp(q){ if(MQ.done)return; MQ.done=true;
+  const chip=document.getElementById('timer'); if(chip){ chip.classList.remove('low'); chip.classList.add('up'); chip.innerHTML=icon('clock','#9f1239',16)+" Time's up"; }
+  lockOpts(q.correct, MQ.sel==null?-1:MQ.sel);
+  const ok=MQ.sel===q.correct;
+  showResult(ok?{ok:true,title:'Just in time!',sub:'Correct answer locked in.'}:{ok:false,title:"Time's up!",sub:'You ran out of time — option '+String.fromCharCode(65+q.correct)+' was correct.'}); }
 
 function pushMsg(c,who,text){ const d=document.createElement('div'); d.className='msg '+who; d.innerHTML=(who==='ai'?`<div class="msg-who">${icon('sparkles','#6D5BD4',12)} Madlen AI</div>`:'')+text; c.appendChild(d); c.parentElement.scrollTop=c.parentElement.scrollHeight; }
 
