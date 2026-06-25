@@ -226,12 +226,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;ba
 .chip.sel{border-color:var(--lilac);background:var(--lilac-l);color:var(--lilac-d)}
 
 /* sequence */
-.seq-item{background:var(--s2);border:2px solid var(--border);border-radius:14px;padding:12px 12px 12px 15px;margin-bottom:10px;display:flex;align-items:center;gap:12px;transition:all .2s ease}
-.seq-num{width:26px;height:26px;border-radius:8px;background:var(--lilac);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.seq-txt{flex:1;font-size:14.5px;font-weight:700;color:var(--text)}
-.seq-arrows{display:flex;flex-direction:column;gap:3px}
-.seq-arr{width:30px;height:22px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted)}
-.seq-arr:active{background:var(--lilac-l)}
+.seq-item{background:#fff;border:1.6px solid var(--border);border-radius:13px;padding:14px 14px 14px 15px;margin-bottom:10px;display:flex;align-items:center;gap:13px;transition:transform .18s ease,box-shadow .18s ease,border-color .15s;touch-action:none;-webkit-tap-highlight-color:transparent;will-change:transform}
+.seq-item.dragging{transition:none;border-color:var(--lilac);box-shadow:0 12px 28px -8px rgba(108,91,212,.45);position:relative}
+.seq-num{width:28px;height:28px;border-radius:9px;background:var(--lilac);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s}
+.seq-item.dragging .seq-num{background:var(--lilac-d)}
+.seq-txt{flex:1;font-size:15px;font-weight:700;color:var(--text)}
+.seq-grip{color:var(--muted);display:flex;padding:4px 2px;cursor:grab;flex-shrink:0}
+.seq-item.dragging .seq-grip{cursor:grabbing;color:var(--lilac-d)}
 
 /* match */
 .match-grid{display:flex;gap:14px}
@@ -271,6 +272,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;ba
 .chat-input input:focus{outline:none}
 .chat-send{width:40px;height:40px;border-radius:50%;background:var(--lilac);color:#fff;border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:transform .15s}
 .chat-send:active{transform:scale(.9)}
+.scenario{background:var(--lilac-l);border-radius:14px;padding:14px 15px;margin-bottom:16px}
+.scenario-tag{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--lilac-d);display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.scenario-txt{font-size:13.5px;font-weight:600;color:var(--text);line-height:1.5}
+.qr-row{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.qr{background:#fff;color:var(--lilac-d);border:1.5px solid var(--lilac-m);border-radius:100px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .12s}
+.qr:active{transform:scale(.96)}
+.eval-card{border:1.6px solid var(--border);border-radius:14px;padding:16px;background:#fff;margin-bottom:6px}
+.eval-head{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--lilac-d);margin-bottom:13px}
+.eval-overall{display:flex;align-items:baseline;gap:8px;margin-bottom:15px}
+.eval-overall b{font-size:30px;font-weight:800;color:var(--text);letter-spacing:-1px;line-height:1}
+.eval-line{margin-bottom:12px}.eval-line:last-child{margin-bottom:0}
+.eval-line-top{display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.eval-line-top span:last-child{color:var(--lilac-d);font-variant-numeric:tabular-nums}
+.eval-bar{height:6px;background:var(--border);border-radius:100px;overflow:hidden}
+.eval-bar i{display:block;height:100%;width:0;background:var(--lilac);border-radius:100px;transition:width .8s cubic-bezier(.34,1.1,.64,1)}
+.eval-note{font-size:11.5px;color:var(--muted);font-weight:500;margin-top:4px}
 
 /* timed */
 .timer-chip{display:inline-flex;align-items:center;gap:7px;background:var(--amber-l);color:var(--amber-d);font-size:13px;font-weight:800;padding:8px 14px;border-radius:100px;margin-bottom:16px;font-variant-numeric:tabular-nums}
@@ -432,6 +449,7 @@ const ICONS={
   download:'<path d="M12 3v13"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/>',
   x:'<path d="M18 6L6 18M6 6l12 12"/>',
   app:'<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/>',
+  grip:'<path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01"/>',
   default:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10h8M8 14h5"/>'
 };
 function icon(id,color,size,sw){ size=size||26; sw=sw||2; return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${ICONS[id]||ICONS.default}</svg>`; }
@@ -774,6 +792,15 @@ const DEF={
   mcj:{text:'Which conclusion does the evidence best support?',opts:[{l:'A',t:'The trend will certainly continue.'},{l:'B',t:'The trend is likely but not guaranteed.'},{l:'C',t:'There is no real trend.'},{l:'D',t:'The data is irrelevant.'}],correct:1},
   timed:{passage:'Across the last decade, urban cycling has shifted from a fringe activity to a mainstream commute option. City investment in protected lanes, alongside cheaper e-bikes, widened access — though uptake still varies sharply by neighbourhood and climate.',text:'According to the passage, what most widened access to cycling?',opts:[{l:'A',t:'Stricter traffic laws.'},{l:'B',t:'Protected lanes and cheaper e-bikes.'},{l:'C',t:'Higher fuel prices.'},{l:'D',t:'Population growth.'}],correct:1}
 };
+// Role-play conversation: AI stays in character and drives it; quick replies keep it fast; whole chat is evaluated.
+const CHAT={
+  tag:'Role-play · Café in London',
+  setup:'You\'re the customer. Madlen AI is the barista. Order a drink, ask a question, and pay — reply in your own words or tap a suggestion.',
+  open:'Morning! Welcome in. What can I get for you today?',
+  aiTurns:['Great choice. Would you like anything to eat with that?','Lovely — that comes to £4.50 altogether. Card or cash?','Perfect, all set. Have a great day!'],
+  replies:[['A flat white, please.','What do you recommend?'],['Just a croissant, thanks.','No, just the drink.'],['Card, please.','Cash is fine.']],
+  eval:{overall:88,lines:[['Task completion','Ordered, asked, and paid successfully.','92'],['Language use','Natural phrasing with minor slips.','84'],['Politeness & tone','Greeted and thanked appropriately.','90']]}
+};
 
 // ── Type renderers ──
 function optRowsMC(q){ return q.opts.map((o,i)=>`<div class="opt" data-i="${i}"><div class="opt-ltr">${o.l}</div><div class="opt-txt">${o.t}</div></div>`).join(''); }
@@ -806,7 +833,7 @@ const TYPES={
       document.querySelectorAll('#fb-bank .chip').forEach(el=>el.onclick=()=>{ if(MQ.done)return; document.querySelectorAll('#fb-bank .chip').forEach(c=>c.classList.remove('sel')); el.classList.add('sel'); MQ.sel=+el.dataset.i; const s=document.getElementById('fb-slot'); s.textContent=q.bank[MQ.sel]; s.classList.remove('empty'); armCheck('Check',true); });
       validateFn=()=>{ const ok=MQ.sel===q.correct; const s=document.getElementById('fb-slot'); s.style.borderColor=ok?'var(--green)':'var(--coral)'; s.style.color=ok?'var(--green-d)':'var(--coral)'; if(!ok)s.textContent=q.bank[q.correct]; return {ok,sub:ok?'The word fits the context.':'"'+q.bank[q.correct]+'" fits the surrounding sentence.'}; }; } },
 
-  seq:{ html:()=>{ const q=DEF.seq; MQ.order=q.items.map((_,i)=>i); return `<div class="q-text">${q.text}</div><div id="seq-list"></div>`; },
+  seq:{ html:()=>{ const q=DEF.seq; MQ.order=q.items.map((_,i)=>i); return `<div class="q-text">${q.text}</div><div class="q-instruct">Drag the steps into the correct order.</div><div id="seq-list"></div>`; },
     init:()=>{ renderSeq(); armCheck('Check',true);
       validateFn=()=>{ const ok=MQ.order.every((v,i)=>v===DEF.seq.correct[i]); return {ok,sub:ok?'Correct order.':'Not in order yet — use the arrows to rearrange.'}; }; } },
 
@@ -841,19 +868,34 @@ const TYPES={
   read:{ html:()=>timedHTML('Reading timer'), init:()=>timedInit() },
   game:{ html:()=>timedHTML('Speed round'), init:()=>timedInit() },
 
-  chat:{ html:()=>`<div class="chat-thread" id="chat"></div>`, init:()=>{ const c=document.getElementById('chat');
-      MQ.turns=0; pushMsg(c,'ai','What was the most interesting thing you learned in this lesson?');
-      // input row lives in q-area below thread
-      const wrap=document.createElement('div'); wrap.className='chat-input';
-      wrap.innerHTML=`<input id="chat-in" placeholder="Message your AI tutor…"><button class="chat-send" id="chat-send">${icon('send','#fff',18)}</button>`;
-      document.getElementById('q-area').appendChild(wrap);
-      const send=()=>{ const inp=document.getElementById('chat-in'); const v=inp.value.trim(); if(!v||MQ.done)return; pushMsg(c,'me',v); inp.value=''; MQ.turns++;
-        setTimeout(()=>{ const replies=['Nice — can you explain why that surprised you?','Good thinking. How might you use that tomorrow?','That\'s a thoughtful answer. You\'ve got it.']; pushMsg(c,'ai',replies[Math.min(MQ.turns-1,replies.length-1)]); armCheck('Complete Lesson',true); },350); };
-      document.getElementById('chat-send').onclick=send;
-      document.getElementById('chat-in').onkeydown=e=>{ if(e.key==='Enter')send(); };
-      armCheck('Complete Lesson',false);
-      validateFn=()=>({skip:true,title:'Lesson complete',sub:'Great conversation with your AI tutor.'}); } }
+  chat:{ html:()=>`<div class="scenario"><div class="scenario-tag">${icon('sparkles',THEME[currentBand].d,13)} ${CHAT.tag}</div><div class="scenario-txt">${CHAT.setup}</div></div>
+    <div class="chat-thread" id="chat"></div><div class="qr-row" id="qr"></div>
+    <div class="chat-input" id="chatbar"><input id="chat-in" placeholder="Type your reply…"><button class="chat-send" id="chat-send">${icon('send','#fff',18)}</button></div>`,
+    init:()=>{ MQ.turn=0; const c=document.getElementById('chat');
+      pushMsg(c,'ai',CHAT.open); renderQR();
+      document.getElementById('chat-send').onclick=()=>chatSend();
+      document.getElementById('chat-in').onkeydown=e=>{ if(e.key==='Enter')chatSend(); };
+      armCheck('Finish & Evaluate',false);
+      validateFn=()=>{ endChatEval(); return {skip:true,title:'Conversation evaluated',sub:'Madlen AI scored your whole chat — see the breakdown above.'}; }; } }
 };
+function renderQR(){ const qr=document.getElementById('qr'); if(!qr)return; const set=CHAT.replies[MQ.turn]||[];
+  qr.innerHTML=set.map(r=>`<span class="qr">${r}</span>`).join('');
+  qr.querySelectorAll('.qr').forEach((el,i)=>el.onclick=()=>chatSend(set[i])); }
+function chatSend(txt){ if(MQ.done)return; const c=document.getElementById('chat'); const inp=document.getElementById('chat-in');
+  const v=txt||(inp?inp.value.trim():''); if(!v)return; if(inp)inp.value='';
+  pushMsg(c,'me',v); const ai=CHAT.aiTurns[MQ.turn]; MQ.turn++; armCheck('Finish & Evaluate',true);
+  document.getElementById('qr').innerHTML='';
+  setTimeout(()=>{ if(ai)pushMsg(c,'ai',ai); if(MQ.turn>=CHAT.aiTurns.length) endChatEval(); else renderQR(); },340); }
+function endChatEval(){ const c=document.getElementById('chat'); const qr=document.getElementById('qr'); if(qr)qr.innerHTML='';
+  const bar=document.getElementById('chatbar'); if(bar)bar.style.display='none';
+  if(document.getElementById('eval-card')){ armCheck('Finish & Evaluate',true); return; }
+  const ev=CHAT.eval; const card=document.createElement('div'); card.className='eval-card'; card.id='eval-card';
+  card.innerHTML=`<div class="eval-head">${icon('sparkles','#6D5BD4',14)} Madlen AI · Conversation Review</div>
+    <div class="eval-overall"><b>${ev.overall}%</b><span style="font-size:12px;font-weight:700;color:var(--muted)">overall</span></div>`+
+    ev.lines.map(l=>`<div class="eval-line"><div class="eval-line-top"><span>${l[0]}</span><span>${l[2]}%</span></div><div class="eval-bar"><i data-w="${l[2]}"></i></div><div class="eval-note">${l[1]}</div></div>`).join('');
+  c.insertAdjacentElement('afterend',card);
+  setTimeout(()=>card.querySelectorAll('.eval-bar i').forEach(el=>el.style.width=el.dataset.w+'%'),40);
+  armCheck('Finish & Evaluate',true); }
 
 function timedHTML(label){ const q=DEF.timed; return `<div class="timer-chip" id="timer">${icon('clock','#B45309',16)} <span id="tval">1:30</span> · ${label}</div>
   <div class="passage"><span class="pg-lbl">Passage</span>${q.passage}</div><div class="q-text">${q.text}</div>`+optRowsMC(q); }
@@ -867,10 +909,27 @@ function timedInit(){ const q=DEF.timed; MQ.q=q; armCheck('Check',false);
 function pushMsg(c,who,text){ const d=document.createElement('div'); d.className='msg '+who; d.innerHTML=(who==='ai'?`<div class="msg-who">${icon('sparkles','#6D5BD4',12)} Madlen AI</div>`:'')+text; c.appendChild(d); c.parentElement.scrollTop=c.parentElement.scrollHeight; }
 
 function renderSeq(){ const q=DEF.seq; const list=document.getElementById('seq-list');
-  list.innerHTML=MQ.order.map((idx,pos)=>`<div class="seq-item"><div class="seq-num">${pos+1}</div><div class="seq-txt">${q.items[idx]}</div>
-    <div class="seq-arrows"><div class="seq-arr" onclick="seqMove(${pos},-1)">${icon('arrow','currentColor',14)}</div><div class="seq-arr" onclick="seqMove(${pos},1)">${icon('arrow','currentColor',14)}</div></div></div>`).join('');
-  list.querySelectorAll('.seq-arr svg').forEach((s,i)=>{ s.style.transform=(i%2===0)?'rotate(-90deg)':'rotate(90deg)'; }); }
-function seqMove(pos,dir){ if(MQ.done)return; const j=pos+dir; if(j<0||j>=MQ.order.length)return; const o=MQ.order; [o[pos],o[j]]=[o[j],o[pos]]; renderSeq(); }
+  list.innerHTML=MQ.order.map((idx,pos)=>`<div class="seq-item"><div class="seq-num">${pos+1}</div><div class="seq-txt">${q.items[idx]}</div><div class="seq-grip">${icon('grip','currentColor',20,2.6)}</div></div>`).join('');
+  attachSeqDrag(list); }
+function attachSeqDrag(list){
+  const items=[].slice.call(list.children); if(!items.length) return;
+  const H=items[0].offsetHeight+10; // item height + margin
+  items.forEach((el,pos)=>{
+    el.addEventListener('pointerdown',e=>{
+      if(MQ.done) return; e.preventDefault();
+      const start=el.getBoundingClientRect().top, startY=e.clientY; let cur=pos;
+      el.classList.add('dragging'); try{ el.setPointerCapture(e.pointerId); }catch(_){}
+      const move=ev=>{ const dy=ev.clientY-startY; el.style.transform=`translateY(${dy}px)`;
+        let np=pos+Math.round(dy/H); np=Math.max(0,Math.min(items.length-1,np));
+        if(np!==cur){ items.forEach((it,ip)=>{ if(it===el) return; let sh=0;
+            if(np>pos && ip>pos && ip<=np) sh=-H; else if(np<pos && ip<pos && ip>=np) sh=H;
+            it.style.transform=sh?`translateY(${sh}px)`:''; }); cur=np; } };
+      const up=()=>{ el.removeEventListener('pointermove',move); el.removeEventListener('pointerup',up); el.removeEventListener('pointercancel',up);
+        const o=MQ.order, moved=o.splice(pos,1)[0]; o.splice(cur,0,moved); el.classList.remove('dragging'); renderSeq(); };
+      el.addEventListener('pointermove',move); el.addEventListener('pointerup',up); el.addEventListener('pointercancel',up);
+    });
+  });
+}
 function updateMatch(){ const cols=['#9B87F5','#34D399','#60A5FA','#F59E0B','#FB7185'];
   document.querySelectorAll('.mt').forEach(el=>{ el.querySelector('.mt-badge').textContent=''; el.style.borderColor=''; });
   Object.keys(MQ.map).forEach(li=>{ const ri=MQ.map[li], c=cols[li%cols.length];
