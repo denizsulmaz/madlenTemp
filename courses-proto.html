@@ -442,7 +442,10 @@ body[data-band="pathfinder"] .chk-btn{box-shadow:0 3px 0 var(--lilac-d);border-r
   <div class="dev-card">
     <div class="dev-ttl">Jump To Screen</div>
     <div class="dev-grp">
-      <button class="dev-btn" onclick="setBand(currentBand)">Catalog</button>
+      <div style="display:flex;gap:7px">
+        <button class="dev-btn" style="flex:1" onclick="setBand(currentBand)">Catalog</button>
+        <button class="dev-btn" style="flex:1" onclick="resetProto()">Reset</button>
+      </div>
       <button class="dev-btn" onclick="devCourse()">Course Path</button>
       <button class="dev-btn" onclick="openCerts()">Certificates</button>
     </div>
@@ -1017,6 +1020,7 @@ function setBand(band){ currentBand=band; stack=['s-catalog']; curCourse=null; c
   document.querySelectorAll('.screen').forEach(s=>{ s.classList.remove('active','behind'); s.style.transform='translateX(100%)'; });
   const cat=document.getElementById('s-catalog'); cat.style.transform=''; cat.classList.add('active'); renderCatalog(band); }
 function devCourse(){ const c=BANDS[currentBand].courses.find(x=>x.active)||BANDS[currentBand].courses[0]; openCourse(c.id); }
+function resetProto(){ MQ={}; curCerts=[]; curCourse=null; curModInfo=null; setBand('explorer'); }
 
 const TYPE_LIST=[['mc','Multiple Choice'],['ms','Multiple Select'],['tf','True / False'],['fb','Fill in Blank'],['seq','Sequence'],['match','Drag & Match'],['tap','Image Tap'],['free','AI Free Text'],['mcj','MC + Justify'],['read','Timed Read'],['game','Timed Game'],['chat','Chat with AI']];
 function buildDevTypes(){ document.getElementById('dev-types').innerHTML=TYPE_LIST.map(([k,l])=>`<button class="dev-btn" onclick="devType('${k}','${l}')">${l}</button>`).join(''); }
