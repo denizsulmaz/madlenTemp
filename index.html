@@ -33,6 +33,7 @@
   .row.sel{background:#e6e6e6;color:#000}
   .row.sel .pre,.row.sel .name,.row.sel .meta{color:#000}
   .row:hover:not(.sel){background:#161616}
+  .section-hdr{padding:1.4rem clamp(.4rem,2vw,1rem) .3rem;color:#444;font-size:12px;letter-spacing:.1em;text-transform:uppercase;user-select:none}
 
   .foot{color:#555;margin-top:1.8rem;border-top:1px solid #222;padding-top:1rem;white-space:pre-wrap}
   .foot kbd{color:#e6e6e6;background:#1a1a1a;border:1px solid #333;border-radius:3px;padding:0 5px;font-family:inherit;font-size:13px}
@@ -49,24 +50,48 @@
   <div class="foot"><kbd>↑</kbd> <kbd>↓</kbd> select   <kbd>⏎</kbd> open   <kbd>j</kbd>/<kbd>k</kbd> vim   <span id="count"></span></div>
 
 <script>
-const FILES = [
-  {file:"courses-proto.html",           meta:"my courses · mobile module path + gamification"},
-  {file:"smartBoardV2.html",            meta:"smart board v2 · device-free participation"},
-  {file:"smartboard.html",              meta:"interactive smartboard"},
-  {file:"classSelectorComponent3.html", meta:"class selector v3"},
-  {file:"classSelectorComponent2.html", meta:"class selector v2"},
-  {file:"classSelectorComponent.html",  meta:"class selector v1"},
+const SECTIONS = [
+  {
+    label: "Prototypes",
+    files: [
+      {file:"courses-proto.html",           meta:"my courses · mobile module path + gamification"},
+      {file:"smartBoardV2.html",            meta:"smart board v2 · device-free participation"},
+      {file:"smartboard.html",              meta:"interactive smartboard"},
+      {file:"classSelectorComponent3.html", meta:"class selector v3"},
+      {file:"classSelectorComponent2.html", meta:"class selector v2"},
+      {file:"classSelectorComponent.html",  meta:"class selector v1"},
+    ]
+  },
+  {
+    label: "PRDs",
+    files: [
+      {file:"okul_madlen_courses_v1.1.html", meta:"okul.madlen · my courses definition document v1.1"},
+    ]
+  }
 ];
+
+// Flatten to a navigable list, tracking section headers separately
+const FLAT = [];
+SECTIONS.forEach(s => {
+  FLAT.push({type:'section', label: s.label});
+  s.files.forEach(f => FLAT.push({type:'file', ...f}));
+});
+const FILES = FLAT.filter(f => f.type === 'file');
 
 let sel = 0;
 const list = document.getElementById('list');
 document.getElementById('count').textContent = FILES.length + " items";
 
 function render(){
-  list.innerHTML = FILES.map((f,i)=>`
-    <li class="row ${i===sel?'sel':''}" data-i="${i}">
-      <span class="pre">${i===sel?'›':' '}</span><span class="name">${f.file}</span><span class="meta">${f.meta}</span>
-    </li>`).join('');
+  let fileIdx = -1;
+  list.innerHTML = FLAT.map(item => {
+    if(item.type === 'section') return `<li class="section-hdr">${item.label}</li>`;
+    fileIdx++;
+    const i = fileIdx;
+    return `<li class="row ${i===sel?'sel':''}" data-i="${i}">
+      <span class="pre">${i===sel?'›':' '}</span><span class="name">${item.file}</span><span class="meta">${item.meta}</span>
+    </li>`;
+  }).join('');
 }
 
 function open(i){ window.location.href = FILES[i].file; }
