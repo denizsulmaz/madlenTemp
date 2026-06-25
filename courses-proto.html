@@ -132,6 +132,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;ba
 .q-area{flex:1;overflow-y:auto;padding:0 20px}
 .q-area::-webkit-scrollbar{display:none}
 .q-type-pill{display:inline-block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--lilac-d);background:var(--lilac-l);padding:5px 11px;border-radius:100px;margin-bottom:14px}
+.passage{background:var(--lilac-l);border-left:4px solid var(--lilac);border-radius:12px;padding:13px 15px;margin-bottom:18px;font-size:14.5px;line-height:1.62;color:var(--text)}
+.passage .pg-lbl{display:block;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--lilac-d);margin-bottom:7px}
+.passage b{background:rgba(155,135,245,.3);padding:0 4px;border-radius:4px;font-weight:800}
 
 /* audio */
 .audio-pl{background:var(--lilac-l);border-radius:16px;padding:12px 15px;display:flex;align-items:center;gap:13px;margin-bottom:20px;cursor:pointer;-webkit-tap-highlight-color:transparent}
@@ -309,6 +312,8 @@ const ICONS={
   learn:'<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.9 1 1 1.7l.1.5h5l.1-.5c.1-.7.5-1.3 1-1.7A6 6 0 0 0 12 3z"/>',
   finance:'<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><path d="M16 14.5h2"/>',
   critical:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.4-4.4"/>',
+  reading:'<path d="M12 7a3 3 0 0 0-3-3H3v13h6a3 3 0 0 1 3 3"/><path d="M12 7a3 3 0 0 1 3-3h6v13h-6a3 3 0 0 0-3 3"/><path d="M12 7v13"/>',
+  critreading:'<path d="M4 7V5a1 1 0 0 1 1-1h2"/><path d="M17 4h2a1 1 0 0 1 1 1v2"/><path d="M20 17v2a1 1 0 0 1-1 1h-2"/><path d="M7 20H5a1 1 0 0 1-1-1v-2"/><path d="M7 9h10"/><path d="M7 13h6"/>',
   default:'<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 10h8M8 14h5"/>'
 };
 function icon(id,color,size){ size=size||26; return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[id]||ICONS.default}</svg>`; }
@@ -327,10 +332,12 @@ const BANDS={
     {id:'learn',title:'Learning How to Learn',cat:'Study Skills',color:'#34D399',bg:'#E7FBF1',emoji:'🧠',pct:0,total:6,done:0,xp:0,isNew:true},
     {id:'finance',title:'Financial Literacy',cat:'Numeracy',color:'#38BDF8',bg:'#E6F7FF',emoji:'💰',pct:15,total:7,done:1,xp:100},
     {id:'critical',title:'Critical Thinking',cat:'Thinking Skills',color:'#F59E0B',bg:'#FFF6E5',emoji:'🔍',pct:0,total:6,done:0,xp:0},
+    {id:'reading',title:'Reading to Understand',cat:'Reading Skills',color:'#F472B6',bg:'#FDEEF8',emoji:'📖',pct:30,total:7,done:2,xp:200,isNew:true},
   ]},
   pathfinder:{xp:{cur:1840,max:2500},student:{name:'Selin',avatar:'🎓'},streak:31,courses:[
     {id:'english',title:'English Levels',cat:'Language',color:'#5E57B5',bg:'#ECEBF5',emoji:'🗣️',pct:85,total:14,done:12,badge:'gold',xp:1200},
     {id:'critical',title:'Critical Thinking',cat:'Thinking Skills',color:'#5E57B5',bg:'#ECEBF5',emoji:'🔍',pct:55,total:8,done:4,xp:400,active:true},
+    {id:'critreading',title:'Critical Reading',cat:'Reading Skills',color:'#5E57B5',bg:'#ECEBF5',emoji:'📑',pct:33,total:6,done:2,xp:480,isNew:true},
     {id:'finance',title:'Financial Literacy',cat:'Numeracy',color:'#5E57B5',bg:'#ECEBF5',emoji:'💰',pct:30,total:9,done:3,xp:300},
     {id:'learn',title:'Learning How to Learn',cat:'Study Skills',color:'#5E57B5',bg:'#ECEBF5',emoji:'🧠',pct:0,total:7,done:0,xp:0,isNew:true},
     {id:'eq',title:'Emotional Intelligence',cat:'Wellbeing',color:'#5E57B5',bg:'#ECEBF5',emoji:'🧭',pct:0,total:8,done:0,xp:0},
@@ -385,6 +392,23 @@ const MODS={
     {id:5,title:'Handling Failure',desc:'Setbacks into learning',type:'Free Text',st:'done',score:87},
     {id:6,title:'Building Connections',desc:'Genuine friendships',type:'Multiple Choice',st:'done',score:91},
     {id:7,title:'Reflection Journal',desc:'Write about your week',type:'Free Text',st:'bonus'},
+  ],
+  reading:[
+    {id:1,title:'Finding the Main Idea',desc:'Central claim vs. supporting detail',type:'Multiple Choice',st:'done',score:90},
+    {id:2,title:'Inference & Implication',desc:'What the text suggests but doesn\'t say',type:'Multiple Select',st:'done',score:82},
+    {id:3,title:'Vocabulary in Context',desc:'Infer a word\'s meaning from the passage',type:'Fill in Blank',st:'active'},
+    {id:4,title:'Text Structure',desc:'Compare/contrast, cause/effect, problem/solution',type:'Drag & Match',st:'locked'},
+    {id:5,title:'Author\'s Purpose',desc:'Why written, for whom, what tone',type:'Multiple Choice',st:'locked'},
+    {id:6,title:'Summarising',desc:'One-sentence summary, graded by Madlen AI',type:'AI Free Text',st:'locked'},
+    {id:7,title:'Passage Challenge',desc:'Bonus: mixed-skill review on a fresh text',type:'Free Text',st:'bonus'},
+  ],
+  critreading:[
+    {id:1,title:'Reading Long-Form Passages',desc:'Stamina & pacing on a TYT-length text',type:'Timed Read',st:'done',score:86},
+    {id:2,title:'Argument Mapping',desc:'Match sentences to claim / evidence / counter',type:'Drag & Match',st:'done',score:91},
+    {id:3,title:'Evaluating Evidence',desc:'Relevant, sufficient, and credible?',type:'Multiple Select',st:'active'},
+    {id:4,title:'Comparative Reading',desc:'Two passages, same topic, opposing positions',type:'Multiple Choice',st:'locked'},
+    {id:5,title:'Reading Between the Lines',desc:'Irony, implicit critique, assumptions',type:'MC + AI Justify',st:'locked'},
+    {id:6,title:'Speed & Accuracy',desc:'Bonus: timed game — score = accuracy × time',type:'Timed Game',st:'bonus'},
   ]
 };
 
@@ -395,6 +419,16 @@ const QS={
   ai_2:{text:'Which of these is an example of AI in everyday life?',opts:[
     {l:'A',t:'🎵 Music recommendation app'},{l:'B',t:'📞 Old landline phone'},
     {l:'C',t:'📺 Basic TV remote'},{l:'D',t:'🔦 Flashlight'}],correct:0},
+  reading_3:{
+    passage:'The expedition was plagued by <b>inclement</b> weather: relentless rain, a biting wind, and fog so dense the guides could barely make out the path a few metres ahead.',
+    text:'In this passage, the word "inclement" most likely means —',
+    opts:[{l:'A',t:'pleasant and mild'},{l:'B',t:'harsh and unpleasant'},{l:'C',t:'rare and unfamiliar'},{l:'D',t:'warm and humid'}],
+    correct:1},
+  critreading_3:{
+    passage:'"Our city should ban e-scooters. Scooter-related ER visits rose 40% last year. Besides, a friend of mine sprained her wrist riding one downtown last week."',
+    text:'Which choice best explains why the second piece of support is weak?',
+    opts:[{l:'A',t:'It cites a precise statistic.'},{l:'B',t:'It is a single anecdote, not representative evidence.'},{l:'C',t:'It names a specific location.'},{l:'D',t:'It restates the main claim.'}],
+    correct:1},
   default:{text:'Which option best completes the idea?',opts:[
     {l:'A',t:'The first choice — sounds plausible.'},{l:'B',t:'The correct answer with clear reasoning.'},
     {l:'C',t:'A tempting but incorrect option.'},{l:'D',t:'Clearly the wrong direction.'}],correct:1}
@@ -570,6 +604,7 @@ function renderQuestion(cid,mid){
       <div class="apl-btn"><svg id="apl-icon" width="14" height="16" viewBox="0 0 14 16" fill="white"><path d="M1 1.5L13 8L1 14.5V1.5Z"/></svg></div>
       <div class="apl-wave">${bars}</div><div class="apl-dur">0:08</div></div>`;
   }
+  if(q.passage){ html+=`<div class="passage"><span class="pg-lbl">📖 Passage</span>${q.passage}</div>`; }
   html+=`<div class="q-text">${q.text}</div>`;
   q.opts.forEach((o,i)=>{ html+=`<div class="mc-opt" data-i="${i}" onclick="selOption(this,${i})"><div class="mc-ltr">${o.l}</div><div class="mc-txt">${o.t}</div></div>`; });
   document.getElementById('q-area').innerHTML=html;
