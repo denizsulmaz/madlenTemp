@@ -28,7 +28,7 @@
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
   .row .pre{color:#555;width:2.2ch;flex-shrink:0}
-  .row .name{color:#e6e6e6}
+  .row .name{color:#e6e6e6;text-decoration:none}
   .row .meta{color:#555;margin-left:1.2ch}
   .row.sel{background:#e6e6e6;color:#000}
   .row.sel .pre,.row.sel .name,.row.sel .meta{color:#000}
@@ -89,7 +89,7 @@ function render(){
     fileIdx++;
     const i = fileIdx;
     return `<li class="row ${i===sel?'sel':''}" data-i="${i}">
-      <span class="pre">${i===sel?'›':' '}</span><span class="name">${item.file}</span><span class="meta">${item.meta}</span>
+      <span class="pre">${i===sel?'›':' '}</span><a class="name" href="${item.file}">${item.file}</a><span class="meta">${item.meta}</span>
     </li>`;
   }).join('');
 }
