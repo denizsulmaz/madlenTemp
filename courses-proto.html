@@ -683,22 +683,22 @@ const PLACEMENT_QS=[
   {text:'What is the plural of "child"?',opts:['childs','childrens','children','child'],correct:2},
   {text:'_____ is your name?',opts:['Who','What','Where','How'],correct:1},
   {text:'I _____ a student.',opts:['am','is','are','be'],correct:0},
-  {text:'She _____ to school every day.',opts:['go','goes','going','gone'],correct:1},
+  {kind:'listen',text:'Listen to the clip. Where does the speaker want to go?',opts:['To the airport','To the station','To the market','To the office'],correct:1},
   {text:'They _____ dinner when I arrived.',opts:['have','had','were having','are having'],correct:2},
   {text:'Which sentence is correct?',opts:['I have been there yesterday.','I went there yesterday.','I go there yesterday.','I was going there yesterday.'],correct:1},
   {text:'_____ you ever visited Paris?',opts:['Did','Have','Do','Were'],correct:1},
   {text:'The opposite of "ancient" is:',opts:['old','modern','historic','classic'],correct:1},
   {text:'If I _____ more time, I would travel more.',opts:['have','had','would have','will have'],correct:1},
   {text:'The report must _____ by Friday.',opts:['submit','submits','be submitted','submitted'],correct:2},
-  {text:'She spoke so quietly that I could _____ hear her.',opts:['barely','hardly','scarcely','almost not'],correct:0},
+  {kind:'speak',text:'Tap the mic and say this sentence aloud:',target:'I usually wake up at seven in the morning.',correct:'spoken'},
   {text:"The politician's speech was _____ with hidden promises.",opts:['laden','loading','loaded','load'],correct:2},
   {text:'By the time we arrived, the film _____ started.',opts:['has','had','would have','was'],correct:1},
-  {text:'Choose the most natural phrasing:',opts:["Despite of the rain, we continued.","Despite the rain, we continued.",'In spite to the rain, we continued.','Although the rain, we continued.'],correct:1},
+  {kind:'listen',text:'Listen to the conversation. What does the woman suggest?',opts:['Leaving earlier','Cancelling the trip','Taking the train','Waiting for the rain to stop'],correct:2},
   {text:'The new law has far-reaching _____ for the economy.',opts:['implications','implication','implying','imply'],correct:0},
   {text:'Choose the sentence with correct inversion:',opts:['Never I have seen such beauty.','Never have I seen such beauty.','I never have seen such beauty.','Seen such beauty never have I.'],correct:1},
   {text:'"Inclement" most nearly means:',opts:['mild','severe','uncertain','unusual'],correct:1},
   {text:'The policy _____ implemented had it not been for public opposition.',opts:['would be','would have been','will have been','had been'],correct:1},
-  {text:'Which correctly uses a cleft sentence?',opts:["It was Maria who solved the problem.","It was Maria that she solved the problem.",'Maria, it was she who solved the problem.','It is Maria solved the problem.'],correct:0},
+  {kind:'speak',text:'Read this sentence aloud, clearly and naturally:',target:'The committee reached a unanimous decision after a lengthy debate.',correct:'spoken'},
   {text:'Which sentence uses a nominative absolute correctly?',opts:['The storm having passed, we went outside.','Having passed the storm, we went outside.','The storm passing, outside we went.','We went outside, having the storm passed.'],correct:0},
   {text:'"Pellucid" is closest in meaning to:',opts:['murky','translucent','dense','opaque'],correct:1},
   {text:"The author's use of chiasmus primarily serves to:",opts:['introduce new evidence','create rhythmic emphasis','summarise the narrative','undermine the argument'],correct:1},
@@ -716,6 +716,28 @@ function placementOpts(){
   const btn=document.getElementById('chk-btn');
   document.querySelectorAll('.opt').forEach(el=>el.onclick=()=>{
     document.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');MQ.sel=+el.dataset.i;btn.disabled=false;});}
+function placementQHTML(q){
+  const tag=l=>`<div class="q-instruct" style="font-weight:800;color:var(--lilac-d);text-transform:uppercase;letter-spacing:.06em;margin:0 0 12px">${l}</div>`;
+  if(q.kind==='listen'){
+    const bh=[40,65,28,80,50,72,35,62,45,78,55,38,82,60,32];const bars=bh.map((h,i)=>`<div class="wb" style="--h:${h}%;--dur:${(.58+i*.07)}s;animation-delay:${i*.04}s"></div>`).join('');
+    return tag('Listening')+`<div class="q-text">${q.text}</div>
+      <div class="audio-pl" onclick="togAudio(this)"><div class="apl-btn"><svg id="apl-icon" width="14" height="16" viewBox="0 0 14 16" fill="white"><path d="M1 1.5L13 8L1 14.5V1.5Z"/></svg></div><div class="apl-wave">${bars}</div><div class="apl-dur">0:10</div></div>`+
+      q.opts.map((o,i)=>`<div class="opt" data-i="${i}"><div class="opt-ltr">${String.fromCharCode(65+i)}</div><div class="opt-txt">${o}</div></div>`).join('');
+  }
+  if(q.kind==='speak'){
+    const bh=[35,60,30,75,45,68,38,72,42,66,50];const bars=bh.map((h,i)=>`<div class="wb" style="--h:${h}%;--dur:${(.5+i*.06)}s;animation-delay:${i*.05}s"></div>`).join('');
+    return tag('Speaking')+`<div class="q-text">${q.text}</div><div class="speak-target">“${q.target}”</div>
+      <div class="speak-rec"><button class="rec-btn" id="rec-btn">${icon('mic','#fff',30)}</button><div class="rec-wave">${bars}</div><div class="rec-hint" id="rec-hint">Tap to record</div></div>`;
+  }
+  return `<div class="q-text">${q.text}</div>`+q.opts.map((o,i)=>`<div class="opt" data-i="${i}"><div class="opt-ltr">${String.fromCharCode(65+i)}</div><div class="opt-txt">${o}</div></div>`).join('');
+}
+function placementWire(q){
+  const btn=document.getElementById('chk-btn'); btn.disabled=true; MQ.sel=null;
+  if(q.kind==='speak'){ MQ.rec=false; const rb=document.getElementById('rec-btn'),hint=document.getElementById('rec-hint'),waves=document.querySelectorAll('.speak-rec .wb');
+    rb.onclick=()=>{ MQ.rec=!MQ.rec; rb.classList.toggle('live',MQ.rec); waves.forEach(w=>w.style.animationPlayState=MQ.rec?'running':'paused');
+      if(MQ.rec){ hint.textContent='Listening… tap to stop'; } else { hint.textContent='Recording ready'; MQ.sel='spoken'; btn.disabled=false; } };
+  } else { placementOpts(); }
+}
 function placementNext(){
   if(MQ.sel==null)return;
   MQ.pAnswers.push(MQ.sel);MQ.sel=null;
@@ -725,10 +747,10 @@ function placementNext(){
     showPlacementResult(level,correct);
   }else{
     MQ.pIdx++;const q=PLACEMENT_QS[MQ.pIdx];const isLast=MQ.pIdx===PLACEMENT_QS.length-1;
-    document.getElementById('q-area').innerHTML=`<div class="q-text">${q.text}</div>`+
-      q.opts.map((o,i)=>`<div class="opt" data-i="${i}"><div class="opt-ltr">${String.fromCharCode(65+i)}</div><div class="opt-txt">${o}</div></div>`).join('');
+    document.getElementById('q-area').innerHTML=placementQHTML(q);
+    document.getElementById('q-area').scrollTop=0;
     const btn=document.getElementById('chk-btn');btn.textContent=isLast?'See My Level':'Next →';btn.disabled=true;btn.className='chk-btn';
-    updatePlacementHeader();placementOpts();}}
+    updatePlacementHeader();placementWire(q);}}
 function showPlacementResult(level,correct){
   const color=CEFR_COLORS[level],name=CEFR_NAMES[level];
   document.getElementById('q-area').innerHTML=`
@@ -1169,12 +1191,11 @@ const TYPES={
   placement:{ html:()=>{
     MQ.pIdx=0; MQ.pAnswers=[]; MQ.sel=null;
     const q=PLACEMENT_QS[0];
-    return `<div class="placement-intro"><div class="pi-icon">${icon('award',THEME[currentBand].d,22)}</div><div><div class="pi-t">Level Assessment</div><div class="pi-s">25 questions · no time limit · no right/wrong feedback during the test · your CEFR level is revealed at the end.</div></div></div>
-      <div class="q-text">${q.text}</div>`+q.opts.map((o,i)=>`<div class="opt" data-i="${i}"><div class="opt-ltr">${String.fromCharCode(65+i)}</div><div class="opt-txt">${o}</div></div>`).join(''); },
+    return `<div class="placement-intro"><div class="pi-icon">${icon('award',THEME[currentBand].d,22)}</div><div><div class="pi-t">Level Assessment</div><div class="pi-s">25 questions — reading, grammar, listening & speaking. No time limit, no feedback during the test. Your CEFR level is revealed at the end.</div></div></div>`+placementQHTML(q); },
     init:()=>{
     updatePlacementHeader(); validateFn=null;
     const btn=document.getElementById('chk-btn'); btn.textContent='Next →'; btn.disabled=true; btn.className='chk-btn'; btn.onclick=placementNext;
-    placementOpts(); } },
+    placementWire(PLACEMENT_QS[0]); } },
 
   chat:{ html:()=>`<div class="scenario"><div class="scenario-tag">${icon('sparkles',THEME[currentBand].d,13)} ${CHAT.tag}</div><div class="scenario-txt">${CHAT.setup}</div></div>
     <div class="goals" id="goals"></div>
