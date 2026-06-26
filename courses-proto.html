@@ -643,7 +643,7 @@ const PASSAGE={
 
 // English structured by CEFR levels; starts with a placement test. Locked levels collapse to a header.
 const ENGLISH={
-  placement:{level:'A2',name:'Elementary'},
+  placement:{level:null,name:null},
   levels:[
     {cefr:'A1',name:'Beginner',units:[
       {t:'Greetings & Introductions',type:'Multiple Choice',st:'done',score:96},
@@ -674,6 +674,83 @@ const ENGLISH={
   ]
 };
 
+const CEFR_ORDER=['A1','A2','B1','B2','C1','C2'];
+const CEFR_NAMES={A1:'Beginner',A2:'Elementary',B1:'Intermediate',B2:'Upper-Intermediate',C1:'Advanced',C2:'Proficiency'};
+const CEFR_COLORS={A1:'#60A5FA',A2:'#34D399',B1:'#9B87F5',B2:'#F59E0B',C1:'#FB7185',C2:'#E8B23A'};
+
+const PLACEMENT_QS=[
+  {text:'Choose the correct sentence:',opts:["She don't like coffee.","She doesn't like coffee.",'She not like coffee.','She no like coffee.'],correct:1},
+  {text:'What is the plural of "child"?',opts:['childs','childrens','children','child'],correct:2},
+  {text:'_____ is your name?',opts:['Who','What','Where','How'],correct:1},
+  {text:'I _____ a student.',opts:['am','is','are','be'],correct:0},
+  {text:'She _____ to school every day.',opts:['go','goes','going','gone'],correct:1},
+  {text:'They _____ dinner when I arrived.',opts:['have','had','were having','are having'],correct:2},
+  {text:'Which sentence is correct?',opts:['I have been there yesterday.','I went there yesterday.','I go there yesterday.','I was going there yesterday.'],correct:1},
+  {text:'_____ you ever visited Paris?',opts:['Did','Have','Do','Were'],correct:1},
+  {text:'The opposite of "ancient" is:',opts:['old','modern','historic','classic'],correct:1},
+  {text:'If I _____ more time, I would travel more.',opts:['have','had','would have','will have'],correct:1},
+  {text:'The report must _____ by Friday.',opts:['submit','submits','be submitted','submitted'],correct:2},
+  {text:'She spoke so quietly that I could _____ hear her.',opts:['barely','hardly','scarcely','almost not'],correct:0},
+  {text:"The politician's speech was _____ with hidden promises.",opts:['laden','loading','loaded','load'],correct:2},
+  {text:'By the time we arrived, the film _____ started.',opts:['has','had','would have','was'],correct:1},
+  {text:'Choose the most natural phrasing:',opts:["Despite of the rain, we continued.","Despite the rain, we continued.",'In spite to the rain, we continued.','Although the rain, we continued.'],correct:1},
+  {text:'The new law has far-reaching _____ for the economy.',opts:['implications','implication','implying','imply'],correct:0},
+  {text:'Choose the sentence with correct inversion:',opts:['Never I have seen such beauty.','Never have I seen such beauty.','I never have seen such beauty.','Seen such beauty never have I.'],correct:1},
+  {text:'"Inclement" most nearly means:',opts:['mild','severe','uncertain','unusual'],correct:1},
+  {text:'The policy _____ implemented had it not been for public opposition.',opts:['would be','would have been','will have been','had been'],correct:1},
+  {text:'Which correctly uses a cleft sentence?',opts:["It was Maria who solved the problem.","It was Maria that she solved the problem.",'Maria, it was she who solved the problem.','It is Maria solved the problem.'],correct:0},
+  {text:'Which sentence uses a nominative absolute correctly?',opts:['The storm having passed, we went outside.','Having passed the storm, we went outside.','The storm passing, outside we went.','We went outside, having the storm passed.'],correct:0},
+  {text:'"Pellucid" is closest in meaning to:',opts:['murky','translucent','dense','opaque'],correct:1},
+  {text:"The author's use of chiasmus primarily serves to:",opts:['introduce new evidence','create rhythmic emphasis','summarise the narrative','undermine the argument'],correct:1},
+  {text:'Which best exemplifies litotes?',opts:['"It was not an unpleasant experience."','"It was a wonderful experience."','"It was the worst experience."','"It was quite a pleasant experience."'],correct:0},
+  {text:'The subjunctive mood is correctly used in:',opts:["If I was you, I'd leave.",'I suggest that he leaves early.','It is essential that she be informed.','She behaves as if she was the boss.'],correct:2},
+];
+
+function computeCEFR(c){if(c<=3)return'A1';if(c<=8)return'A2';if(c<=13)return'B1';if(c<=18)return'B2';if(c<=22)return'C1';return'C2';}
+function updatePlacementHeader(){
+  const n=MQ.pIdx+1,total=PLACEMENT_QS.length;
+  const lbl=document.querySelector('.mod-step-lbl');if(lbl)lbl.textContent=`Question ${n} of ${total}`;
+  const segs=document.querySelectorAll('.mp-seg'),each=total/segs.length;
+  segs.forEach((s,i)=>{s.classList.remove('done','active');if(n>=(i+1)*each)s.classList.add('done');else if(n>i*each)s.classList.add('active');});}
+function placementOpts(){
+  const btn=document.getElementById('chk-btn');
+  document.querySelectorAll('.opt').forEach(el=>el.onclick=()=>{
+    document.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel'));el.classList.add('sel');MQ.sel=+el.dataset.i;btn.disabled=false;});}
+function placementNext(){
+  if(MQ.sel==null)return;
+  MQ.pAnswers.push(MQ.sel);MQ.sel=null;
+  if(MQ.pIdx===PLACEMENT_QS.length-1){
+    const correct=MQ.pAnswers.filter((a,i)=>a===PLACEMENT_QS[i].correct).length;
+    const level=computeCEFR(correct);ENGLISH.placement.level=level;ENGLISH.placement.name=CEFR_NAMES[level];
+    showPlacementResult(level,correct);
+  }else{
+    MQ.pIdx++;const q=PLACEMENT_QS[MQ.pIdx];const isLast=MQ.pIdx===PLACEMENT_QS.length-1;
+    document.getElementById('q-area').innerHTML=`<div class="q-text">${q.text}</div>`+
+      q.opts.map((o,i)=>`<div class="opt" data-i="${i}"><div class="opt-ltr">${String.fromCharCode(65+i)}</div><div class="opt-txt">${o}</div></div>`).join('');
+    const btn=document.getElementById('chk-btn');btn.textContent=isLast?'See My Level':'Next →';btn.disabled=true;btn.className='chk-btn';
+    updatePlacementHeader();placementOpts();}}
+function showPlacementResult(level,correct){
+  const color=CEFR_COLORS[level],name=CEFR_NAMES[level];
+  document.getElementById('q-area').innerHTML=`
+    <div style="text-align:center;padding:8px 0 20px">
+      <div style="width:84px;height:84px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;margin:0 auto 14px;box-shadow:0 10px 28px ${color}55">
+        <span style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px">${level}</span></div>
+      <div style="font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:5px">Your CEFR Level</div>
+      <div style="font-size:26px;font-weight:800;color:var(--text);letter-spacing:-.5px">${name}</div>
+      <div style="font-size:13px;color:var(--muted);font-weight:600;margin-top:7px;line-height:1.5">${correct} of ${PLACEMENT_QS.length} correct · your path unlocks at ${level}</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden">
+      ${CEFR_ORDER.map((c,ci)=>{const pi=CEFR_ORDER.indexOf(level);const st=ci<pi?'done':ci===pi?'current':'locked';const col=st==='done'?'var(--green)':st==='current'?color:'#C4BFDB';const lbl=st==='done'?'Complete':st==='current'?'Start here':'Locked';
+        return`<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;${ci<CEFR_ORDER.length-1?'border-bottom:1px solid var(--border)':''}"><div style="width:38px;height:38px;border-radius:10px;background:${col}22;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:${col};flex-shrink:0">${c}</div><div style="flex:1;font-size:13px;font-weight:700;color:${st==='locked'?'var(--muted)':'var(--text)'}">${CEFR_NAMES[c]}</div><div style="font-size:11px;font-weight:800;color:${col}">${lbl}</div></div>`;}).join('')}
+    </div>`;
+  document.getElementById('res-area').innerHTML='';
+  const btn=document.getElementById('chk-btn');btn.textContent='Unlock My Path';btn.disabled=false;btn.className='chk-btn';
+  btn.style.cssText=`background:${color};box-shadow:0 5px 0 ${shade(color)}`;
+  btn.onclick=()=>{btn.style.cssText='';goBack();};
+  const lbl=document.querySelector('.mod-step-lbl');if(lbl)lbl.textContent='Assessment complete · 25 of 25';
+  document.querySelectorAll('.mp-seg').forEach(s=>{s.classList.remove('active');s.classList.add('done');});
+  fireConfetti();}
+
 // ── State ──
 let currentBand='explorer', curCourse=null, curModInfo=null, stack=['s-catalog'], curCerts=[];
 let validateFn=null, MQ={};
@@ -681,14 +758,19 @@ let validateFn=null, MQ={};
 // ── Navigation ──
 function nav(to,forward=true){
   const cur=stack[stack.length-1]; if(to===cur)return;
+  if(MQ.timer){clearInterval(MQ.timer);MQ.timer=null;}
   document.querySelectorAll('.screen').forEach(s=>{
     s.classList.remove('active','behind');
     if(s.id===cur){ s.classList.add(forward?'behind':''); s.style.transform=forward?'':'translateX(100%)'; }
     else if(s.id===to){ s.style.transform=forward?'translateX(100%)':'translateX(-26%)'; s.offsetHeight; s.classList.add('active'); s.style.transform=''; }
+    else{ s.style.transform='translateX(100%)'; }
   });
   forward?stack.push(to):stack.pop();
 }
-function goBack(){ if(stack.length>1) nav(stack[stack.length-2],false); }
+function goBack(){
+  if(MQ.timer){clearInterval(MQ.timer);MQ.timer=null;}
+  if(stack.length>1) nav(stack[stack.length-2],false);
+}
 function animRings(scope){ (scope||document).querySelectorAll('.ring-fg').forEach(el=>{ el.style.strokeDashoffset=el.dataset.off; }); }
 
 // ── Catalog ──
@@ -880,11 +962,14 @@ function renderEnglishPath(c){
   const NODE=60, GAP=100, HEAD=70, TOP=74, BOT=120;
   let y=TOP, ai=0; const pts=[]; let heads='';
   pts.push({x:cx,y,placement:true}); y+=GAP+4;
+  const placedLevel=ENGLISH.placement.level;
+  const placedIdx=placedLevel?CEFR_ORDER.indexOf(placedLevel):-1;
   ENGLISH.levels.forEach(lv=>{
-    const state=lv.units.every(u=>u.st==='done')?'done':(lv.units.some(u=>u.st==='active'||u.st==='done')?'current':'locked');
+    const lvIdx=CEFR_ORDER.indexOf(lv.cefr);
+    const state=placedLevel?(lvIdx<placedIdx?'done':lvIdx===placedIdx?'current':'locked'):(lv.units.every(u=>u.st==='done')?'done':lv.units.some(u=>u.st==='active'||u.st==='done')?'current':'locked');
     heads+=`<div class="lvl-head ${state}" style="top:${(y-27).toFixed(0)}px"><div class="lvl-badge">${lv.cefr}</div><div class="lvl-info"><div class="lvl-name">${lv.name}</div><div class="lvl-sub">${lv.units.length} units${state==='locked'?' · locked':state==='done'?' · complete':''}</div></div><span class="lvl-end">${state==='done'?icon('check',t.d,18,2.6):state==='locked'?icon('lock','#AAA3C2',18):''}</span></div>`;
     y+=HEAD;
-    if(state!=='locked'){ lv.units.forEach((u,ui)=>{ pts.push({x:cx+ENG_AMP[ai%8]*U,y,unit:u,cefr:lv.cefr,ui}); ai++; y+=GAP; }); }
+    if(state!=='locked'){ lv.units.forEach((u,ui)=>{ const eff=state==='done'?'done':(u.st||(ui===0?'active':'locked')); pts.push({x:cx+ENG_AMP[ai%8]*U,y,unit:{...u,st:eff},cefr:lv.cefr,ui}); ai++; y+=GAP; }); }
     y+=8;
   });
   const H=y+BOT;
@@ -894,8 +979,10 @@ function renderEnglishPath(c){
   let nodes='';
   pts.forEach(p=>{ const left=p.x-NODE/2, top=p.y-NODE/2;
     if(p.placement){
-      nodes+=`<div class="node placement" style="left:${left}px;top:${top}px;width:${NODE}px;height:${NODE}px" onclick="openEng('PLACEMENT',0)">${icon('award','#fff',26,2.2)}</div>`;
-      nodes+=`<div class="node-lbl" style="left:${p.x}px;top:${(top+NODE+7).toFixed(0)}px"><span class="nl-step">START HERE</span> · Level Assessment<span class="nl-type">Placed · ${ENGLISH.placement.level}</span></div>`;
+      const pl=ENGLISH.placement.level;
+      const pCls=pl?'done':'placement', pIc=pl?icon('check','#fff',26,2.6):icon('award','#fff',26,2.2);
+      nodes+=`<div class="node ${pCls}" style="left:${left}px;top:${top}px;width:${NODE}px;height:${NODE}px" onclick="openEng('PLACEMENT',0)">${pIc}</div>`;
+      nodes+=`<div class="node-lbl" style="left:${p.x}px;top:${(top+NODE+7).toFixed(0)}px"><span class="nl-step">${pl?'DONE':'START HERE'}</span> · Level Assessment<span class="nl-type">${pl?'Placed · '+pl:'Take the test'}</span></div>`;
       return; }
     const u=p.unit, cls=u.st==='bonus'?'bonus':u.st;
     if(u.st==='active') nodes+=`<div class="start-bubble" style="left:${p.x}px;top:${(top-30).toFixed(0)}px">START</div>`;
@@ -912,7 +999,9 @@ function renderEnglishPath(c){
   setTimeout(()=>{ wrap.scrollTop=Math.max(0,line[prog].y-220); },30);
 }
 function openEng(cefr,ui){
-  if(cefr==='PLACEMENT'){ curModInfo={cid:'english',title:'Level Assessment',type:'Placement'}; renderQuestion('Placement','Level Assessment','Adaptive · finds your CEFR level',null); nav('s-module'); return; }
+  if(cefr==='PLACEMENT'){ curModInfo={cid:'english',title:'Level Assessment',type:'Placement'};
+    const pl=ENGLISH.placement.level;
+    renderQuestion('Placement','Level Assessment',pl?`Retake · currently placed at ${pl}`:'25 questions · no right/wrong feedback',null); nav('s-module'); return; }
   const lv=ENGLISH.levels.find(l=>l.cefr===cefr), u=lv.units[ui];
   curModInfo={cid:'english',title:u.t,type:u.type}; renderQuestion(u.type,u.t,`${cefr} · ${u.type}`,null); nav('s-module');
 }
@@ -1020,12 +1109,20 @@ const TYPES={
       validateFn=()=>{ const ok=MQ.order.every((v,i)=>v===DEF.seq.correct[i]); return {ok,sub:ok?'Correct order.':'Not in order yet — use the arrows to rearrange.'}; }; } },
 
   match:{ html:()=>{ const q=DEF.match; return `<div class="q-text">${q.text}</div><div class="match-hint">Tap a sentence, then tap its role.</div><div class="match-grid">
-      <div class="match-col">`+q.left.map((s,i)=>`<div class="mt mt-l" data-i="${i}">${s}<span class="mt-badge"></span></div>`).join('')+`</div>
-      <div class="match-col">`+q.right.map((s,i)=>`<div class="mt mt-r" data-i="${i}">${s}<span class="mt-badge"></span></div>`).join('')+`</div></div>`; },
-    init:()=>{ const q=DEF.match; MQ.map={}; MQ.selL=null; armCheck('Check',false);
-      document.querySelectorAll('.mt-l').forEach(el=>el.onclick=()=>{ if(MQ.done)return; document.querySelectorAll('.mt-l').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); MQ.selL=+el.dataset.i; });
-      document.querySelectorAll('.mt-r').forEach(el=>el.onclick=()=>{ if(MQ.done||MQ.selL===null)return; MQ.map[MQ.selL]=+el.dataset.i; MQ.selL=null; document.querySelectorAll('.mt-l').forEach(x=>x.classList.remove('sel')); updateMatch(); if(Object.keys(MQ.map).length===q.left.length)armCheck('Check',true); });
-      validateFn=()=>{ const ok=q.correct.every((ri,li)=>MQ.map[li]===ri); return {ok,sub:ok?'Every role matched.':'Some pairings are off — tap to redo them.'}; }; } },
+      <div class="match-col">`+q.left.map((s,i)=>`<div class="mt mt-l" data-i="${i}">${s}</div>`).join('')+`</div>
+      <div class="match-col">`+q.right.map((s,i)=>`<div class="mt mt-r" data-i="${i}">${s}</div>`).join('')+`</div></div>`; },
+    init:()=>{ const q=DEF.match; MQ.matched=0; MQ.selL=null; validateFn=null;
+      const btn=document.getElementById('chk-btn'); btn.textContent='Match all pairs'; btn.disabled=true; btn.className='chk-btn';
+      function tryMatch(li,ri){ const lEl=document.querySelector('.mt-l[data-i="'+li+'"]'),rEl=document.querySelector('.mt-r[data-i="'+ri+'"]');
+        const ok=q.correct[li]===ri;
+        document.querySelectorAll('.mt-l').forEach(x=>x.classList.remove('sel')); MQ.selL=null;
+        if(ok){ [lEl,rEl].forEach(x=>{x.style.borderColor='var(--green)';x.style.background='var(--green-l)';x.style.color='var(--green-d)';});
+          setTimeout(()=>{ [lEl,rEl].forEach(x=>{x.style.opacity='.3';x.style.pointerEvents='none';x.style.borderColor='var(--green)';x.style.background='var(--green-l)';x.style.color='var(--green-d)';});
+            MQ.matched++; if(MQ.matched===q.left.length){MQ.done=true;setTimeout(()=>showResult({ok:true,title:'All matched!',sub:'Every pair is correct.'}),120);} },550);
+        }else{ [lEl,rEl].forEach(x=>{x.style.borderColor='var(--coral)';x.style.background='var(--coral-l)';});
+          setTimeout(()=>{[lEl,rEl].forEach(x=>{x.style.borderColor='';x.style.background='';});},520); } }
+      document.querySelectorAll('.mt-l').forEach(el=>el.onclick=()=>{ if(MQ.done||el.style.pointerEvents==='none')return; document.querySelectorAll('.mt-l').forEach(x=>x.classList.remove('sel')); el.classList.add('sel'); MQ.selL=+el.dataset.i; });
+      document.querySelectorAll('.mt-r').forEach(el=>el.onclick=()=>{ if(MQ.done||el.style.pointerEvents==='none'||MQ.selL==null)return; tryMatch(MQ.selL,+el.dataset.i); }); } },
 
   tap:{ html:()=>{ const q=DEF.tap; return `<div class="q-text">${q.text}</div><div class="tap-scene">`+
       q.tiles.map((tl,i)=>`<div class="tap-tile" data-i="${i}">${icon(tl.ic,'currentColor',30)}<span class="tap-cap">${tl.t}</span></div>`).join('')+`</div>`; },
@@ -1069,11 +1166,15 @@ const TYPES={
       validateFn=()=>{ document.getElementById('speak-fb').innerHTML=`<div class="ai-feedback show"><div class="ai-ic">${icon('sparkles','#fff',18)}</div><div><div class="ai-name">Madlen AI · Pronunciation</div><div class="ai-body">Clear and natural. Watch the “th” sound in “the”.<span class="ai-score">88% match</span></div></div></div>`;
         return {skip:true,title:'Pronunciation scored',sub:'Madlen AI reviewed your speech — see feedback above.'}; }; } },
 
-  placement:{ html:()=>{ const q=DEF.placement; return `<div class="placement-intro"><div class="pi-icon">${icon('award',THEME[currentBand].d,22)}</div><div><div class="pi-t">Level Assessment</div><div class="pi-s">${q.note}</div></div></div>
-      <div class="q-text">${q.text}</div>`+q.opts.map((o,i)=>`<div class="opt" data-i="${i}"><div class="opt-ltr">${o.l}</div><div class="opt-txt">${o.t}</div></div>`).join(''); },
-    init:()=>{ const q=DEF.placement; armCheck('Submit answer',false);
-      document.querySelectorAll('.opt').forEach(el=>el.onclick=()=>{ if(MQ.done)return; document.querySelectorAll('.opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); MQ.sel=+el.dataset.i; armCheck('Submit answer',true); });
-      validateFn=()=>{ lockOpts(q.correct,MQ.sel); return {skip:true,title:`Placed at ${q.level} · ${q.levelName}`,sub:'Your path starts here — earlier levels are marked complete.'}; }; } },
+  placement:{ html:()=>{
+    MQ.pIdx=0; MQ.pAnswers=[]; MQ.sel=null;
+    const q=PLACEMENT_QS[0];
+    return `<div class="placement-intro"><div class="pi-icon">${icon('award',THEME[currentBand].d,22)}</div><div><div class="pi-t">Level Assessment</div><div class="pi-s">25 questions · no time limit · no right/wrong feedback during the test · your CEFR level is revealed at the end.</div></div></div>
+      <div class="q-text">${q.text}</div>`+q.opts.map((o,i)=>`<div class="opt" data-i="${i}"><div class="opt-ltr">${String.fromCharCode(65+i)}</div><div class="opt-txt">${o}</div></div>`).join(''); },
+    init:()=>{
+    updatePlacementHeader(); validateFn=null;
+    const btn=document.getElementById('chk-btn'); btn.textContent='Next →'; btn.disabled=true; btn.className='chk-btn'; btn.onclick=placementNext;
+    placementOpts(); } },
 
   chat:{ html:()=>`<div class="scenario"><div class="scenario-tag">${icon('sparkles',THEME[currentBand].d,13)} ${CHAT.tag}</div><div class="scenario-txt">${CHAT.setup}</div></div>
     <div class="goals" id="goals"></div>
