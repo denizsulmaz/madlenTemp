@@ -396,6 +396,32 @@
 
             </section>
 
+            <!-- ================= VIEW 3: EXPANDED TOOL VIEW ================= -->
+            <section id="expand-view" class="hidden w-full max-w-5xl mx-auto flex flex-col gap-6 opacity-0 transition-all duration-300">
+                
+                <!-- Back header -->
+                <div class="bg-white border border-[#EBEAE4] rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 select-none shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <button onclick="closeExpandView()" class="p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 transition-premium">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+                        </button>
+                        <div>
+                            <h2 id="expand-tool-title" class="text-sm font-extrabold text-slate-800">Seçilen Araç</h2>
+                            <p class="text-[11px] text-slate-400 mt-0.5" id="expand-tool-subtitle">Tüm üretilen kazanım içerikleri listeleniyor</p>
+                        </div>
+                    </div>
+                    <button onclick="closeExpandView()" class="w-full sm:w-auto px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl transition-premium flex items-center justify-center gap-1.5">
+                        ← Sonuçlara Geri Dön
+                    </button>
+                </div>
+
+                <!-- Cards Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-16" id="expand-cards-container">
+                    <!-- Expanded cards grid will be dynamically injected here -->
+                </div>
+
+            </section>
+
         </div>
     </main>
 
@@ -1158,7 +1184,10 @@
                             <span class="p-1.5 ${type.bgColor} ${type.textColor} rounded-lg">${type.icon}</span>
                             <h3 class="text-sm font-extrabold text-slate-800">${type.label}</h3>
                         </div>
-                        <span class="text-[11px] font-bold text-slate-400">${activeKazanimsArr.length} Kaynak Hazır</span>
+                        <button onclick="expandToolRow('${type.key}', '${type.label}')" class="text-xs font-black text-[#D17A3B] hover:text-[#B7642B] transition-premium flex items-center gap-1 cursor-pointer">
+                            Tümünü Gör
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path></svg>
+                        </button>
                     </div>
 
                     <!-- Horizontal Scroll Row Container -->
@@ -1322,6 +1351,259 @@
                     row.classList.add('hidden');
                 }
             });
+        }
+
+        // --- EXPANDED DETAIL VIEW FLOW ---
+        function expandToolRow(toolKey, toolLabel) {
+            // Stop other playing audio
+            stopPodcastAudio();
+
+            const resultsView = document.getElementById('results-view');
+            const expandView = document.getElementById('expand-view');
+            const expandTitle = document.getElementById('expand-tool-title');
+            const expandCardsContainer = document.getElementById('expand-cards-container');
+
+            expandTitle.textContent = `${toolLabel} (Tüm İçerikler)`;
+            
+            const subjectData = ACADEMIC_DATA[selectedSubject]?.[selectedGrade] || { plans: [], podcasts: [], quizzes: [] };
+            let activeKazanimsArr = Array.from(selectedKazanims);
+            if (activeKazanimsArr.length === 0) {
+                const subPrefix = selectedSubject.substring(0, 3).toUpperCase();
+                activeKazanimsArr = [`${subPrefix}.${selectedGrade}.1.1`, `${subPrefix}.${selectedGrade}.1.2`, `${subPrefix}.${selectedGrade}.2.1`];
+            }
+            const originalLength = activeKazanimsArr.length;
+            while (activeKazanimsArr.length < 6) {
+                for (let i = 0; i < originalLength && activeKazanimsArr.length < 6; i++) {
+                    const suffix = Math.floor(activeKazanimsArr.length / originalLength) + 1;
+                    activeKazanimsArr.push(`${activeKazanimsArr[i]}_${suffix}`);
+                }
+            }
+
+            let cardsHtml = "";
+
+            activeKazanimsArr.forEach((kazId, cardIndex) => {
+                const kazText = getKazanimText(kazId);
+                
+                if (toolKey === "lesson_plan") {
+                    const plan = subjectData.plans.find(p => p.kazanim === kazId) || {
+                        title: `${kazText} Ders Tasarımı`,
+                        duration: "40 Dk",
+                        desc: "Kazanım hedeflerine yönelik interaktif sınıf etkinlikleri ve öğretmen ders planı.",
+                        methods: ["Soru-Cevap", "Grup Çalışması"]
+                    };
+                    cardsHtml += `
+                        <!-- CARD: DERS PLANI -->
+                        <div class="bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-premium flex flex-col justify-between h-[255px]">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] font-extrabold px-1.5 py-0.5 bg-orange-100 text-orange-700 rounded">${kazId}</span>
+                                    <span class="text-[10px] text-slate-400 font-semibold">⏱️ ${plan.duration}</span>
+                                </div>
+                                <h4 class="text-xs font-extrabold text-slate-800 line-clamp-2 leading-relaxed">${plan.title}</h4>
+                                <p class="text-[11px] text-slate-500 leading-relaxed line-clamp-3">${plan.desc}</p>
+                                <div class="flex gap-1 flex-wrap mt-1">
+                                    ${plan.methods.map(m => `<span class="text-[9px] bg-slate-50 text-slate-600 font-semibold px-2 py-0.5 border rounded-md">${m}</span>`).join('')}
+                                </div>
+                            </div>
+                            <div class="flex gap-2 pt-3 border-t border-slate-50">
+                                <button onclick="alert('Ders planı editörü açılıyor...')" class="flex-grow py-2 bg-[#FAF9F5] hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-[10px] rounded-xl transition-premium">
+                                    Planı İncele
+                                </button>
+                                <button onclick="showToast('Ders planı indirildi.')" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-[10px] transition-premium">
+                                    📥
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } 
+                
+                else if (toolKey === "podcast") {
+                    const pod = subjectData.podcasts.find(p => p.kazanim === kazId) || {
+                        id: `pod-mock-${kazId}`,
+                        title: `${kazText} Sesli Anlatım`,
+                        duration: "06:20",
+                        audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+                        speaker: "Madlen AI Anlatıcı",
+                        desc: "Öğrencilerin konu pekiştirmesi yapabilmeleri için hazırlanan sesli podcast."
+                    };
+                    const podIdUnique = `${pod.id}-${cardIndex}-expanded`;
+                    cardsHtml += `
+                        <!-- CARD: PODCAST -->
+                        <div class="bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-premium flex flex-col justify-between h-[255px]">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] font-extrabold px-1.5 py-0.5 bg-amber-100 text-amber-800 rounded">${kazId}</span>
+                                    <div class="flex items-center h-4" id="waveform-${podIdUnique}">
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                    </div>
+                                </div>
+                                <h4 class="text-xs font-extrabold text-slate-800 line-clamp-2 leading-relaxed">${pod.title}</h4>
+                                <p class="text-[10px] text-slate-400 font-bold">${pod.speaker} • ${pod.duration}</p>
+                                
+                                <!-- Compact Audio Playbar -->
+                                <div class="bg-[#FAF9F5] p-2 rounded-xl border border-slate-100 flex items-center gap-2 mt-2">
+                                    <button onclick="togglePodcastPlay('${podIdUnique}', '${pod.audioUrl}')" id="playbtn-${podIdUnique}" class="w-8 h-8 rounded-full bg-[#D17A3B] text-white flex items-center justify-center font-bold shadow hover:bg-[#B7642B] transition-premium focus:outline-none shrink-0 select-none">
+                                        <svg id="play-icon-${podIdUnique}" class="w-4.5 h-4.5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                                        <svg id="pause-icon-${podIdUnique}" class="w-4.5 h-4.5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+                                    </button>
+                                    <div class="flex-grow flex items-center gap-1.5 min-w-0">
+                                        <span class="text-[9px] text-slate-500 font-bold font-mono" id="time-current-${podIdUnique}">00:00</span>
+                                        <div class="flex-grow relative h-1 bg-slate-200 rounded-full cursor-pointer" onclick="seekPodcast(event, '${podIdUnique}')">
+                                            <div id="play-progress-${podIdUnique}" class="absolute left-0 top-0 bottom-0 bg-[#D17A3B] rounded-full w-0"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-[11px] pt-3 border-t border-slate-50">
+                                <span class="text-slate-500 truncate max-w-[170px]">${pod.desc}</span>
+                                <button onclick="alert('Transkript editörü yükleniyor...')" class="text-[#D17A3B] font-extrabold hover:underline shrink-0">
+                                    Transkript
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } 
+                
+                else if (toolKey === "contextual_question") {
+                    const storyTitle = kazId === "TAR.9.1.1" ? "Antik Atina Meclisi" : "Arşiv Belgelerinin Keşfi";
+                    const storyDesc = kazId === "TAR.9.1.1" ? "Demokrasinin ilk tohumlarının atıldığı dönemde, mecliste alınan kararların sonraki nesillere aktarılma biçimi." : "Kadeş Tableti'nin arkeolojik kazılarda bulunması ve kil tablet üzerindeki hiyerogliflerin çözülme serüveni.";
+                    cardsHtml += `
+                        <!-- CARD: BAĞLAMLI SORU -->
+                        <div class="bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-premium flex flex-col justify-between h-[255px]">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] font-extrabold px-1.5 py-0.5 bg-purple-100 text-purple-700 rounded">${kazId}</span>
+                                    <span class="text-[9px] font-bold px-1.5 py-0.5 bg-slate-100 text-slate-700 rounded">Senaryolu Soru</span>
+                                </div>
+                                <h4 class="text-xs font-extrabold text-slate-800 line-clamp-1 leading-relaxed">${storyTitle}</h4>
+                                <p class="text-[10px] text-slate-400 italic line-clamp-2 leading-relaxed">${storyDesc}</p>
+                                <p class="text-[11px] text-slate-600 line-clamp-2 font-semibold">Soru: Bu olayın tarih bilimi açısından önemini kaynak türleri üzerinden değerlendiriniz.</p>
+                            </div>
+                            <div class="flex gap-2 pt-3 border-t border-slate-50">
+                                <button onclick="alert('Bağlam: ${storyDesc}\n\nSoru: Bu olayın tarih bilimi açısından önemini değerlendiriniz.\n\nCevap: Birinci elden kaynak niteliğindeki bu bulgular, geçmiş olayların kesinliğinin tespiti için hayati önem taşır.')" class="flex-grow py-2 bg-[#FAF9F5] hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-[10px] rounded-xl transition-premium">
+                                    Çözümü Gör
+                                </button>
+                                <button onclick="showToast('Bağlamlı soru ödev olarak atandı.')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-[10px] font-bold transition-premium">
+                                    Ata
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } 
+                
+                else if (toolKey === "kazanim_question") {
+                    const quizData = subjectData.quizzes.find(q => q.questions.some(qn => qn.options)) || {
+                        questions: [{ q: `${kazText} ile ilgili aşağıdaki önermelerden hangisi doğrudan birinci elden kaynaklara örnek gösterilebilir?`, options: ["Kral Yıllıkları (Tablet)", "Dönemi anlatan tarih kitabı", "Tarihi belgesel", "Modern araştırma tezi"], correct: 0 }]
+                    };
+                    const qn = quizData.questions[0];
+                    cardsHtml += `
+                        <!-- CARD: KAZANIM TEMELLİ SORU -->
+                        <div class="bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-premium flex flex-col justify-between h-[255px]">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] font-extrabold px-1.5 py-0.5 bg-red-100 text-red-700 rounded">${kazId}</span>
+                                    <span class="text-[9px] font-bold px-1.5 py-0.5 bg-emerald-100 text-emerald-800 rounded">Çoktan Seçmeli</span>
+                                </div>
+                                <h4 class="text-xs font-extrabold text-slate-800 line-clamp-3 leading-relaxed">${qn.q}</h4>
+                                <div class="grid grid-cols-2 gap-1.5 mt-1 text-[10px] font-semibold text-slate-600">
+                                    ${qn.options.slice(0,2).map((opt, oIdx) => `<div class="p-1.5 border rounded-lg bg-slate-50 truncate">${String.fromCharCode(65+oIdx)}) ${opt}</div>`).join('')}
+                                    <div class="col-span-2 text-center text-[9px] text-slate-400 italic">ve 2 seçenek daha...</div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 pt-3 border-t border-slate-50">
+                                <button onclick="alert('Doğru cevap: A) ${qn.options[0]}')" class="flex-grow py-2 bg-[#FAF9F5] hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-[10px] rounded-xl transition-premium">
+                                    Cevabı Gör
+                                </button>
+                                <button onclick="showToast('Kazanım sorusu test bankasına eklendi.')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-[10px] font-bold transition-premium">
+                                    Ekle
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } 
+                
+                else if (toolKey === "lesson_notes") {
+                    cardsHtml += `
+                        <!-- CARD: DERS NOTLARI -->
+                        <div class="bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-premium flex flex-col justify-between h-[255px]">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] font-extrabold px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded">${kazId}</span>
+                                    <span class="text-[9px] font-bold px-1.5 py-0.5 bg-slate-100 text-slate-700 rounded">Özet Not</span>
+                                </div>
+                                <h4 class="text-xs font-extrabold text-slate-800 line-clamp-2 leading-relaxed">${kazText} Özet Notu</h4>
+                                <ul class="text-[10px] text-slate-500 space-y-1 pl-4 list-disc mt-1 font-semibold leading-relaxed">
+                                    <li class="line-clamp-1">Kazanımın en can alıcı 1. odak noktası.</li>
+                                    <li class="line-clamp-1">Sınavlarda sıklıkla çeldirici olarak sorulan yer.</li>
+                                    <li class="line-clamp-1">Unutulmaması gereken temel kavram listesi.</li>
+                                </ul>
+                            </div>
+                            <div class="flex gap-2 pt-3 border-t border-slate-50">
+                                <button onclick="showToast('Akıllı tahtaya ders notu yansıtıldı.')" class="flex-grow py-2 bg-[#FAF9F5] hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-[10px] rounded-xl transition-premium flex items-center justify-center gap-1">
+                                    🖥️ Tahtaya Yansıt
+                                </button>
+                                <button onclick="showToast('Öğrenci çalışma kağıdı indirildi.')" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-[10px] transition-premium">
+                                    📥
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } 
+                
+                else if (toolKey === "music") {
+                    const songIdUnique = `music-mock-${kazId}-${cardIndex}-expanded`;
+                    cardsHtml += `
+                        <!-- CARD: MÜZİK / ŞARKILAR -->
+                        <div class="w-[325px] h-[255px] bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-premium flex flex-col justify-between h-[255px]">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] font-extrabold px-1.5 py-0.5 bg-pink-100 text-pink-700 rounded">${kazId}</span>
+                                    <span class="text-[9px] font-bold px-1.5 py-0.5 bg-slate-100 text-slate-700 rounded">Akustik Şarkı</span>
+                                </div>
+                                <h4 class="text-xs font-extrabold text-slate-800 line-clamp-2 leading-relaxed">${kazText} Şarkı Sözleri</h4>
+                                <p class="text-[10px] text-slate-400 italic line-clamp-3 leading-relaxed mt-1">"Geçmişin izleri tabletlerde saklı, / Thukydides anlatır bilimsel ve aklı, / Herodot hikayeci yazar her bir farkı, / Öğrenelim tarihi dönüyor zaman çarkı..."</p>
+                            </div>
+                            <div class="flex gap-2 pt-3 border-t border-slate-50">
+                                <button onclick="togglePodcastPlay('${songIdUnique}', 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')" id="playbtn-${songIdUnique}" class="flex-grow py-2 bg-[#D17A3B]/10 hover:bg-[#D17A3B]/20 text-[#D17A3B] border border-[#D17A3B]/20 font-bold text-[10px] rounded-xl transition-premium flex items-center justify-center gap-1.5 select-none">
+                                    <span id="play-icon-${songIdUnique}">▶ Şarkıyı Çal</span>
+                                    <span id="pause-icon-${songIdUnique}" class="hidden">⏸ Duraklat</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            expandCardsContainer.innerHTML = cardsHtml;
+
+            // Transition views
+            resultsView.classList.add('opacity-0');
+            setTimeout(() => {
+                resultsView.classList.add('hidden');
+                expandView.classList.remove('hidden');
+                setTimeout(() => {
+                    expandView.classList.remove('opacity-0');
+                }, 50);
+            }, 300);
+        }
+
+        function closeExpandView() {
+            stopPodcastAudio();
+
+            const resultsView = document.getElementById('results-view');
+            const expandView = document.getElementById('expand-view');
+
+            expandView.classList.add('opacity-0');
+            setTimeout(() => {
+                expandView.classList.add('hidden');
+                resultsView.classList.remove('hidden');
+                setTimeout(() => {
+                    resultsView.classList.remove('opacity-0');
+                }, 50);
+            }, 300);
         }
 
         // --- TOAST NOTIFICATIONS ---
