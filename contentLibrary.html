@@ -389,64 +389,9 @@
                     </button>
                 </div>
 
-                <!-- TABS (Tüm İçerikler, Podcastler, Planlar...) -->
-                <div class="flex border-b border-slate-200 select-none">
-                    <button onclick="switchTab('all')" class="tab-btn active border-b-2 border-[#D17A3B] text-[#D17A3B] font-bold text-sm px-5 py-3 transition-premium" data-tab="all">Tüm İçerikler</button>
-                    <button onclick="switchTab('plan')" class="tab-btn text-slate-500 hover:text-slate-800 font-medium text-sm px-5 py-3 transition-premium" data-tab="plan">Ders Planları</button>
-                    <button onclick="switchTab('podcast')" class="tab-btn text-slate-500 hover:text-slate-800 font-medium text-sm px-5 py-3 transition-premium" data-tab="podcast">Podcastler (Sesli Anlatım)</button>
-                    <button onclick="switchTab('quiz')" class="tab-btn text-slate-500 hover:text-slate-800 font-medium text-sm px-5 py-3 transition-premium" data-tab="quiz">Soru Bankası & Değerlendirme</button>
-                </div>
-
-                <!-- ================= FILTERED ROWS ================= -->
-                <div class="space-y-8 pb-16">
-                    
-                    <!-- ROW 1: DERS PLANLARI (Lesson Plans) -->
-                    <div class="result-row flex flex-col gap-4" data-type="plan">
-                        <div class="flex items-center justify-between select-none">
-                            <div class="flex items-center gap-2">
-                                <span class="p-1.5 bg-orange-100 text-orange-700 rounded-lg">📚</span>
-                                <h2 class="text-base font-extrabold text-slate-800">Ders Planları (Kazanım Odaklı)</h2>
-                            </div>
-                            <span class="text-xs text-slate-400" id="plan-count">2 Plan Listeleniyor</span>
-                        </div>
-                        <!-- Cards Grid -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="plans-grid">
-                            <!-- Dynamic Content -->
-                        </div>
-                    </div>
-
-                    <!-- ROW 2: PODCASTLER (Audio Playback) -->
-                    <div class="result-row flex flex-col gap-4" data-type="podcast">
-                        <div class="flex items-center justify-between select-none">
-                            <div class="flex items-center gap-2">
-                                <span class="p-1.5 bg-amber-100 text-amber-700 rounded-lg">🎙️</span>
-                                <h2 class="text-base font-extrabold text-slate-800">Yapay Zeka Destekli Sesli Anlatımlar (Podcastler)</h2>
-                            </div>
-                            <span class="text-xs text-slate-400" id="podcast-count">2 Anlatım Bulundu</span>
-                        </div>
-                        
-                        <!-- Podcast List Container -->
-                        <div class="space-y-4" id="podcasts-list">
-                            <!-- Dynamic Content -->
-                        </div>
-                    </div>
-
-                    <!-- ROW 3: DEĞERLENDİRME & SORULAR -->
-                    <div class="result-row flex flex-col gap-4" data-type="quiz">
-                        <div class="flex items-center justify-between select-none">
-                            <div class="flex items-center gap-2">
-                                <span class="p-1.5 bg-red-100 text-red-700 rounded-lg">📝</span>
-                                <h2 class="text-base font-extrabold text-slate-800">Soru ve Sınav Setleri</h2>
-                            </div>
-                            <span class="text-xs text-slate-400" id="quiz-count">1 Sınav Hazır</span>
-                        </div>
-
-                        <!-- Quiz Grid -->
-                        <div class="bg-white rounded-2xl border border-[#EBEAE4] p-6 shadow-sm flex flex-col gap-4" id="quizzes-container">
-                            <!-- Dynamic Content -->
-                        </div>
-                    </div>
-
+                <!-- ================= FILTERED ROWS (Grouped by Concept, listed horizontally) ================= -->
+                <div class="space-y-10 pb-16 font-sans" id="concept-rows-container">
+                    <!-- Concept rows will be dynamically injected here -->
                 </div>
 
             </section>
@@ -959,178 +904,198 @@
         }
 
         // --- RENDER DYNAMIC RESULTS ---
+        function getKazanimText(kazId) {
+            const subjectData = ACADEMIC_DATA[selectedSubject];
+            if (!subjectData || !subjectData[selectedGrade]) return kazId;
+            const units = subjectData[selectedGrade].units;
+            for (let u of units) {
+                for (let k of u.kazanims) {
+                    if (k.id === kazId) return k.text;
+                }
+            }
+            return `${selectedSubject} Dersi Öğrenme Çıktısı`;
+        }
+
         function renderSearchResults() {
             const subjectData = ACADEMIC_DATA[selectedSubject]?.[selectedGrade] || { plans: [], podcasts: [], quizzes: [] };
-            
-            // Filter outcomes based on active checkboxes
-            const filteredPlans = subjectData.plans.filter(p => selectedKazanims.has(p.kazanim));
-            const filteredPodcasts = subjectData.podcasts.filter(pod => selectedKazanims.has(pod.kazanim));
-            const filteredQuizzes = subjectData.quizzes; // show unit assessment
+            const container = document.getElementById('concept-rows-container');
+            container.innerHTML = "";
 
-            // 1. Render Plans
-            const plansGrid = document.getElementById('plans-grid');
-            document.getElementById('plan-count').textContent = `${filteredPlans.length} Ders Planı Listeleniyor`;
-            if (filteredPlans.length === 0) {
-                plansGrid.innerHTML = `<div class="col-span-2 text-center py-6 text-xs text-slate-400 bg-white border border-dashed rounded-xl">Seçilen kazanımlara uygun ders planı üretilmemiştir.</div>`;
-            } else {
-                plansGrid.innerHTML = filteredPlans.map(plan => `
-                    <div class="bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-premium flex flex-col justify-between gap-4">
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] font-extrabold px-1.5 py-0.5 bg-orange-100 text-[#D17A3B] rounded">${plan.kazanim}</span>
-                                <span class="text-[11px] font-bold text-slate-400 flex items-center gap-1">⏱️ ${plan.duration}</span>
-                            </div>
-                            <h3 class="text-sm font-extrabold text-slate-800">${plan.title}</h3>
-                            <p class="text-xs text-slate-500 leading-relaxed">${plan.desc}</p>
-                            <div class="flex gap-1.5 flex-wrap mt-2">
-                                ${plan.methods.map(m => `<span class="text-[10px] bg-slate-50 text-slate-600 font-semibold px-2 py-0.5 border rounded-md">${m}</span>`).join('')}
-                            </div>
-                        </div>
-                        <div class="flex gap-2 pt-2 border-t border-slate-50">
-                            <button onclick="alert('Ders planı editörü açılıyor...')" class="flex-grow py-2.5 bg-[#FAF9F5] hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-xs rounded-xl transition-premium flex items-center justify-center gap-1.5">
-                                👁️ Detayı Gör
-                            </button>
-                            <button onclick="showToast('Ders planı başarıyla indirildi.')" class="p-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl transition-premium">
-                                📥
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
+            if (selectedKazanims.size === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-sm text-slate-400">Herhangi bir kazanım seçilmedi.</div>`;
+                return;
             }
 
-            // 2. Render Podcasts
-            const podcastsList = document.getElementById('podcasts-list');
-            document.getElementById('podcast-count').textContent = `${filteredPodcasts.length} Sesli Anlatım Bulundu`;
-            if (filteredPodcasts.length === 0) {
-                podcastsList.innerHTML = `<div class="text-center py-8 text-xs text-slate-400 bg-white border border-dashed rounded-xl">Seçilen kazanımlara uygun podcast ses kaydı henüz üretilmemiştir.</div>`;
-            } else {
-                podcastsList.innerHTML = filteredPodcasts.map(pod => `
-                    <div class="bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm flex flex-col gap-4">
-                        <!-- Upper Info Block -->
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                            <div class="flex items-start gap-3">
-                                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#D17A3B] to-[#F59E0B] flex items-center justify-center text-white text-lg shrink-0 shadow-md relative overflow-hidden">
-                                    <span>🎙️</span>
-                                </div>
-                                <div class="flex flex-col gap-0.5">
-                                    <h3 class="text-sm font-extrabold text-slate-800 flex items-center gap-2">
-                                        ${pod.title}
-                                        <span class="text-[9px] font-extrabold px-1.5 py-0.5 bg-amber-100 text-[#D17A3B] rounded">${pod.kazanim}</span>
-                                    </h3>
-                                    <span class="text-[11px] text-slate-500 font-medium">${pod.speaker} • ${pod.duration}</span>
-                                </div>
-                            </div>
-                            <!-- Waveform decoration -->
-                            <div class="flex items-center h-8" id="waveform-${pod.id}">
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                                <div class="wave-bar"></div>
-                            </div>
+            // Create a row for each active Kazanım/Concept
+            Array.from(selectedKazanims).forEach(kazId => {
+                const kazText = getKazanimText(kazId);
+
+                // Fetch matching entities
+                const plan = subjectData.plans.find(p => p.kazanim === kazId) || {
+                    id: `plan-mock-${kazId}`,
+                    title: `${kazText} Ders Tasarımı`,
+                    duration: "40 Dk",
+                    desc: "Yapay zeka ile hazırlanan kazanım odaklı aktif öğrenme etkinlikleri ve öğretmen ders planı.",
+                    methods: ["Soru-Cevap", "Grup Tartışması"]
+                };
+
+                const pod = subjectData.podcasts.find(p => p.kazanim === kazId) || {
+                    id: `pod-mock-${kazId}`,
+                    title: `${kazText} Sesli Anlatım`,
+                    duration: "06:20",
+                    audioUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+                    speaker: "Madlen AI Anlatıcı",
+                    desc: "Öğrencilerin konu pekiştirmesi yapabilmeleri için hazırlanan sesli podcast."
+                };
+
+                const quiz = subjectData.quizzes.find(q => q.questions.some(qn => qn.q.includes(kazId) || qn.q.includes("Kazanım"))) || {
+                    id: `quiz-mock-${kazId}`,
+                    title: `${kazText} Kazanım Değerlendirme Testi`,
+                    desc: "Kazanım ölçümü için hazırlanan klasik ve çoktan seçmeli sorulardan oluşan değerlendirme."
+                };
+
+                // Section Title and Horizontal Scroll List
+                const rowSection = document.createElement('div');
+                rowSection.className = "flex flex-col gap-3 select-none";
+
+                rowSection.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-black px-2 py-1 bg-amber-100 text-[#D17A3B] rounded-lg">${kazId}</span>
+                            <h3 class="text-sm font-extrabold text-slate-800">${kazText}</h3>
                         </div>
-
-                        <!-- Audio Progress Controls -->
-                        <div class="bg-[#FAF9F5] p-3.5 rounded-2xl border border-slate-100 flex items-center gap-4">
-                            <!-- Play button -->
-                            <button onclick="togglePodcastPlay('${pod.id}', '${pod.audioUrl}')" id="playbtn-${pod.id}" class="w-10 h-10 rounded-full bg-[#D17A3B] text-white flex items-center justify-center font-bold shadow-md hover:bg-[#B7642B] transition-premium focus:outline-none select-none">
-                                <svg id="play-icon-${pod.id}" class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
-                                <svg id="pause-icon-${pod.id}" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
-                            </button>
-
-                            <!-- Slider & Elapsed Time -->
-                            <div class="flex-grow flex items-center gap-3">
-                                <span class="text-[10px] text-slate-500 font-bold font-mono" id="time-current-${pod.id}">00:00</span>
-                                <div class="flex-grow relative h-1.5 bg-slate-200 rounded-full cursor-pointer" onclick="seekPodcast(event, '${pod.id}')">
-                                    <div id="play-progress-${pod.id}" class="absolute left-0 top-0 bottom-0 bg-[#D17A3B] rounded-full w-0"></div>
-                                </div>
-                                <span class="text-[10px] text-slate-500 font-bold font-mono" id="time-total-${pod.id}">${pod.duration}</span>
-                            </div>
-
-                            <!-- Speed selector -->
-                            <div class="relative">
-                                <select onchange="changePlaybackSpeed(this)" class="bg-white border rounded-lg text-[10px] font-bold py-1 px-2 pr-5 appearance-none focus:outline-none cursor-pointer">
-                                    <option value="1">1.0x</option>
-                                    <option value="1.25">1.25x</option>
-                                    <option value="1.5">1.5x</option>
-                                    <option value="2">2.0x</option>
-                                </select>
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-1.5 text-slate-400">
-                                    <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Description & transcript trigger -->
-                        <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-50">
-                            <p class="text-slate-500 italic max-w-xl truncate">${pod.desc}</p>
-                            <button onclick="alert('Transkript editörü yükleniyor...')" class="text-xs text-[#D17A3B] font-bold hover:underline shrink-0">
-                                💬 Metin Halini Gör
-                            </button>
-                        </div>
+                        <span class="text-[11px] font-bold text-slate-400">Üretilen Kaynaklar (5 Tip)</span>
                     </div>
-                `).join('');
-            }
 
-            // 3. Render Quizzes
-            const quizzesContainer = document.getElementById('quizzes-container');
-            document.getElementById('quiz-count').textContent = `${filteredQuizzes.length} Sınav Seti`;
-            if (filteredQuizzes.length === 0) {
-                quizzesContainer.innerHTML = `<div class="text-center py-6 text-xs text-slate-400 bg-white border border-dashed rounded-xl">Kazanımlara uygun soru seti bulunamadı.</div>`;
-            } else {
-                quizzesContainer.innerHTML = filteredQuizzes.map(quiz => `
-                    <div class="flex flex-col gap-4">
-                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-4">
-                            <div>
-                                <h3 class="text-sm font-extrabold text-slate-800">${quiz.title}</h3>
-                                <p class="text-[11px] text-slate-500">Değerlendirme Tipi: Açık Uçlu ve Çoktan Seçmeli Karışık</p>
+                    <!-- Horizontal Scroll Row Container -->
+                    <div class="flex flex-row overflow-x-auto gap-4 pb-4 pt-1 custom-scrollbar min-w-full">
+                        
+                        <!-- CARD 1: DERS PLANI -->
+                        <div class="w-[320px] h-[255px] bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-premium flex flex-col justify-between shrink-0">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] font-extrabold px-2 py-0.5 bg-orange-100 text-orange-700 rounded-md">📅 Ders Planlama</span>
+                                    <span class="text-[10px] text-slate-400 font-semibold">⏱️ ${plan.duration}</span>
+                                </div>
+                                <h4 class="text-xs font-extrabold text-slate-800 line-clamp-2 leading-relaxed">${plan.title}</h4>
+                                <p class="text-[11px] text-slate-500 leading-relaxed line-clamp-3">${plan.desc}</p>
+                                <div class="flex gap-1 flex-wrap mt-1">
+                                    ${plan.methods ? plan.methods.map(m => `<span class="text-[9px] bg-slate-50 text-slate-600 font-semibold px-2 py-0.5 border rounded-md">${m}</span>`).join('') : ''}
+                                </div>
                             </div>
-                            <div class="flex gap-2">
-                                <button onclick="showToast('Soru seti yazdırılmaya hazır')" class="px-3.5 py-2 border rounded-xl hover:bg-slate-50 text-slate-700 font-bold text-xs transition-premium">
-                                    🖨️ PDF Yazdır
+                            <div class="flex gap-2 pt-3 border-t border-slate-50">
+                                <button onclick="alert('Ders planı editörü açılıyor...')" class="flex-grow py-2 bg-[#FAF9F5] hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-[10px] rounded-xl transition-premium">
+                                    Planı İncele
                                 </button>
-                                <button onclick="alert('Öğrencilere ödev olarak atandı.')" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs rounded-xl transition-premium shadow-md">
-                                    ➕ Ödev Ata
+                                <button onclick="showToast('Ders planı indirildi.')" class="px-3 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-[10px] transition-premium">
+                                    📥
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Questions List -->
-                        <div class="space-y-4">
-                            ${quiz.questions.map((q, idx) => `
-                                <div class="p-4 bg-[#FAF9F5]/80 rounded-xl border border-slate-100 flex flex-col gap-2.5">
-                                    <div class="flex items-center gap-2 select-none">
-                                        <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 text-[10px] font-extrabold flex items-center justify-center">S${idx+1}</span>
-                                        <span class="text-xs font-extrabold text-slate-500">Kazanım Değerlendirme</span>
+                        <!-- CARD 2: PODCAST -->
+                        <div class="w-[320px] h-[255px] bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-premium flex flex-col justify-between shrink-0">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] font-extrabold px-2 py-0.5 bg-amber-100 text-amber-800 rounded-md">🎙️ Podcast Anlatımı</span>
+                                    <div class="flex items-center h-4" id="waveform-${pod.id}">
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
+                                        <div class="wave-bar"></div>
                                     </div>
-                                    <p class="text-xs font-extrabold text-slate-800 leading-relaxed">${q.q}</p>
-                                    
-                                    ${q.options ? `
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mt-2">
-                                            ${q.options.map((opt, oIdx) => `
-                                                <div class="p-3 bg-white border border-slate-200 rounded-xl text-xs font-semibold hover:border-slate-400 cursor-pointer flex items-center justify-between transition-premium">
-                                                    <span>${String.fromCharCode(65 + oIdx)}) ${opt}</span>
-                                                    ${oIdx === q.correct ? `<span class="text-emerald-500 font-bold">✓ Doğru</span>` : ''}
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    ` : `
-                                        <div class="mt-2">
-                                            <button onclick="toggleAnswer('ans-${quiz.id}-${idx}')" class="text-xs text-[#D17A3B] font-bold hover:underline flex items-center gap-1 focus:outline-none">
-                                                <span>💡 Model Yapay Zeka Cevabını Göster</span>
-                                            </button>
-                                            <div id="ans-${quiz.id}-${idx}" class="hidden mt-3 p-3 bg-emerald-50 border border-emerald-100 rounded-xl text-xs text-emerald-950 font-semibold leading-relaxed">
-                                                ${q.a}
-                                            </div>
-                                        </div>
-                                    `}
                                 </div>
-                            `).join('')}
+                                <h4 class="text-xs font-extrabold text-slate-800 line-clamp-2 leading-relaxed">${pod.title}</h4>
+                                <p class="text-[10px] text-slate-400 font-bold">${pod.speaker} • ${pod.duration}</p>
+                                
+                                <!-- Compact Audio Playbar -->
+                                <div class="bg-[#FAF9F5] p-2 rounded-xl border border-slate-100 flex items-center gap-2 mt-2">
+                                    <button onclick="togglePodcastPlay('${pod.id}', '${pod.audioUrl}')" id="playbtn-${pod.id}" class="w-8 h-8 rounded-full bg-[#D17A3B] text-white flex items-center justify-center font-bold shadow hover:bg-[#B7642B] transition-premium focus:outline-none shrink-0 select-none">
+                                        <svg id="play-icon-${pod.id}" class="w-4.5 h-4.5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                                        <svg id="pause-icon-${pod.id}" class="w-4.5 h-4.5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
+                                    </button>
+                                    <div class="flex-grow flex items-center gap-1.5 min-w-0">
+                                        <span class="text-[9px] text-slate-500 font-bold font-mono" id="time-current-${pod.id}">00:00</span>
+                                        <div class="flex-grow relative h-1 bg-slate-200 rounded-full cursor-pointer" onclick="seekPodcast(event, '${pod.id}')">
+                                            <div id="play-progress-${pod.id}" class="absolute left-0 top-0 bottom-0 bg-[#D17A3B] rounded-full w-0"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-[11px] pt-3 border-t border-slate-50">
+                                <span class="text-slate-500 truncate max-w-[170px]">${pod.desc}</span>
+                                <button onclick="alert('Transkript editörü yükleniyor...')" class="text-[#D17A3B] font-extrabold hover:underline shrink-0">
+                                    Transkript
+                                </button>
+                            </div>
                         </div>
+
+                        <!-- CARD 3: SORU BANKASI / SINAV -->
+                        <div class="w-[320px] h-[255px] bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-premium flex flex-col justify-between shrink-0">
+                            <div class="flex flex-col gap-2 flex-grow">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] font-extrabold px-2 py-0.5 bg-red-100 text-red-700 rounded-md">📝 Soru Üretimi</span>
+                                    <span class="text-[10px] text-slate-400 font-semibold">5 Soru</span>
+                                </div>
+                                <h4 class="text-xs font-extrabold text-slate-800 line-clamp-2 leading-relaxed">${quiz.title}</h4>
+                                <p class="text-[11px] text-slate-500 leading-relaxed line-clamp-3">${quiz.desc || 'Kazanım ölçümü için hazırlanmış açık uçlu ve çoktan seçmeli değerlendirme sınavı.'}</p>
+                            </div>
+                            <div class="flex gap-2 pt-3 border-t border-slate-50">
+                                <button onclick="alert('Ölçme değerlendirme soruları editörü açılıyor...')" class="flex-grow py-2 bg-[#FAF9F5] hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-[10px] rounded-xl transition-premium">
+                                    Soruları Listele
+                                </button>
+                                <button onclick="alert('Soru seti öğrencilere ödev olarak atandı.')" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-[10px] font-bold transition-premium">
+                                    Ödev Ata
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- CARD 4: EĞİTSEL VİDEO -->
+                        <div class="w-[320px] h-[255px] bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-premium flex flex-col justify-between shrink-0">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] font-extrabold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-md">🎥 Eğitsel Video</span>
+                                    <span class="text-[10px] text-slate-400 font-semibold">05:12 Dk</span>
+                                </div>
+                                <h4 class="text-xs font-extrabold text-slate-800 line-clamp-2 leading-relaxed">${kazText} Görsel Anlatım</h4>
+                                <p class="text-[11px] text-slate-500 leading-relaxed line-clamp-3">Akıllı tahtada sınıf içi gösterime uygun, yapay zeka ile canlandırılmış animasyon ve görsel ders anlatımı videosu.</p>
+                            </div>
+                            <div class="flex gap-2 pt-3 border-t border-slate-50">
+                                <button onclick="showToast('Akıllı Tahta entegrasyonu başlatıldı.')" class="flex-grow py-2 bg-[#FAF9F5] hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-[10px] rounded-xl transition-premium flex items-center justify-center gap-1">
+                                    🖥️ Tahtada Aç
+                                </button>
+                                <button onclick="alert('Video oynatıcı önizlemesi yükleniyor...')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-bold transition-premium">
+                                    Oynat
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- CARD 5: KAVRAM YANILGILARI -->
+                        <div class="w-[320px] h-[255px] bg-white rounded-2xl border border-[#EBEAE4] p-5 shadow-sm hover:shadow-md hover:border-slate-300 transition-premium flex flex-col justify-between shrink-0">
+                            <div class="flex flex-col gap-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-[9px] font-extrabold px-2 py-0.5 bg-pink-100 text-pink-800 rounded-md">🧠 Kavram Yanılgısı</span>
+                                    <span class="text-[10px] text-pink-600 font-bold">Önemli Hatalar</span>
+                                </div>
+                                <h4 class="text-xs font-extrabold text-slate-800 line-clamp-2 leading-relaxed">${kazId} Konusunda Yapılan Yanılgılar</h4>
+                                <p class="text-[11px] text-slate-500 leading-relaxed line-clamp-3">Öğrencilerin bu konuda en sık düştüğü kavram kargaşaları, yanlış kavranan kurallar ve öğretmenler için düzeltici ipuçları.</p>
+                            </div>
+                            <div class="flex gap-2 pt-3 border-t border-slate-50">
+                                <button onclick="alert('Bu kazanım için sık yapılan hatalar:\n1. Kaynakların güvenilirlik analizi yapılmadan doğrudan doğru kabul edilmesi.\n2. Birincil ve ikincil kaynakların kronolojik sıralamalarında anakronizm yapılması.')" class="flex-grow py-2 bg-[#FAF9F5] hover:bg-slate-100 text-slate-700 border border-slate-200 font-bold text-[10px] rounded-xl transition-premium">
+                                    Yanılgıları Gör
+                                </button>
+                                <button onclick="showToast('Yanılgı kartları sınıfa ve velilere gönderildi.')" class="px-4 py-2 bg-pink-600 hover:bg-pink-700 text-white rounded-xl text-[10px] font-bold transition-premium">
+                                    Sınıfa İlet
+                                </button>
+                            </div>
+                        </div>
+
                     </div>
-                `).join('');
-            }
+                `;
+
+                container.appendChild(rowSection);
+            });
         }
 
         // --- INTERACTIVE SIMULATED PLAYBACK (HTML5 Audio or Mock timer if audio url hits issues) ---
