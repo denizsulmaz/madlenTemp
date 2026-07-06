@@ -905,15 +905,16 @@
 
         // --- RENDER DYNAMIC RESULTS ---
         function getKazanimText(kazId) {
+            const cleanId = kazId.split('_')[0];
             const subjectData = ACADEMIC_DATA[selectedSubject];
-            if (!subjectData || !subjectData[selectedGrade]) return kazId;
+            if (!subjectData || !subjectData[selectedGrade]) return `${cleanId} Dersi Öğrenme Çıktısı`;
             const units = subjectData[selectedGrade].units;
             for (let u of units) {
                 for (let k of u.kazanims) {
-                    if (k.id === kazId) return k.text;
+                    if (k.id === cleanId) return k.text;
                 }
             }
-            return `${selectedSubject} Dersi Öğrenme Çıktısı`;
+            return `${cleanId} Dersi Öğrenme Çıktısı`;
         }
 
         function renderSearchResults() {
@@ -921,21 +922,31 @@
             const container = document.getElementById('concept-rows-container');
             container.innerHTML = "";
 
-            if (selectedKazanims.size === 0) {
-                container.innerHTML = `<div class="text-center py-10 text-sm text-slate-400">Herhangi bir kazanım seçilmedi.</div>`;
-                return;
+            // Always show results screen, fallback to default mock array if selectedKazanims is empty
+            let activeKazanimsArr = Array.from(selectedKazanims);
+            if (activeKazanimsArr.length === 0) {
+                const subPrefix = selectedSubject.substring(0, 3).toUpperCase();
+                activeKazanimsArr = [`${subPrefix}.${selectedGrade}.1.1`, `${subPrefix}.${selectedGrade}.1.2`, `${subPrefix}.${selectedGrade}.2.1`];
             }
 
-            // Group by Content Type (alt alta rows)
-            const CONTENT_TYPES = [
-                { key: "contextual_question", label: "Bağlamlı Sorular", icon: "🧩", bgColor: "bg-purple-100", textColor:             let activeKazanimsArr = Array.from(selectedKazanims);
-            // Pad to at least 5 elements to check horizontal scroll wireframe
+            // Ensure every row has minimum 6 cards to verify horizontal sliding mechanism
             const originalLength = activeKazanimsArr.length;
-            while (activeKazanimsArr.length < 5) {
-                for (let i = 0; i < originalLength && activeKazanimsArr.length < 5; i++) {
-                    activeKazanimsArr.push(activeKazanimsArr[i]);
+            while (activeKazanimsArr.length < 6) {
+                for (let i = 0; i < originalLength && activeKazanimsArr.length < 6; i++) {
+                    const suffix = Math.floor(activeKazanimsArr.length / originalLength) + 1;
+                    activeKazanimsArr.push(`${activeKazanimsArr[i]}_${suffix}`);
                 }
             }
+
+            // Group by Content Type (alt alta rows) - 6 Tools
+            const CONTENT_TYPES = [
+                { key: "contextual_question", label: "Bağlamlı Sorular", icon: "🧩", bgColor: "bg-purple-100", textColor: "text-purple-700" },
+                { key: "kazanim_question", label: "Kazanım Temelli Sorular", icon: "🎯", bgColor: "bg-red-100", textColor: "text-red-700" },
+                { key: "lesson_plan", label: "Ders Planları", icon: "📅", bgColor: "bg-orange-100", textColor: "text-orange-700" },
+                { key: "podcast", label: "Podcast İçerikleri", icon: "🎙️", bgColor: "bg-amber-100", textColor: "text-amber-800" },
+                { key: "lesson_notes", label: "Ders Notları", icon: "📝", bgColor: "bg-blue-100", textColor: "text-blue-700" },
+                { key: "music", label: "Eğitsel Müzikler / Şarkılar", icon: "🎵", bgColor: "bg-pink-100", textColor: "text-pink-700" }
+            ];
 
             CONTENT_TYPES.forEach(type => {
                 // Concept rows layout
