@@ -49,15 +49,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;ba
 .sec-lbl:first-child{margin-top:4px}
 
 /* Continue hero */
-.hero-continue{background:var(--grad);border-radius:var(--r);padding:20px;color:#fff;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 16px 34px -12px rgba(90,65,190,.6);-webkit-tap-highlight-color:transparent;transition:transform .16s ease;display:flex;align-items:center;gap:16px}
+.hero-continue{background:var(--grad);border-radius:var(--r);padding:16px 20px;color:#fff;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 18px 38px -12px rgba(90,65,190,.62);-webkit-tap-highlight-color:transparent;transition:transform .16s ease;display:flex;align-items:center;gap:16px}
 .hero-continue:active{transform:scale(.98)}
 .hero-continue .blob{position:absolute;border-radius:50%;background:rgba(255,255,255,.09);pointer-events:none}
 .hc-left{flex:1;min-width:0;position:relative;z-index:1}
 .hc-eyebrow{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.82}
-.hc-title{font-size:23px;font-weight:800;letter-spacing:-.5px;margin:7px 0 6px;line-height:1.1}
+.hc-title{font-size:22px;font-weight:800;letter-spacing:-.5px;margin:6px 0 5px;line-height:1.1}
 .hc-sub{font-size:12.5px;font-weight:600;opacity:.85}
-.hc-resume{display:inline-flex;align-items:center;gap:6px;margin-top:16px;background:rgba(255,255,255,.95);color:var(--lilac-d);font-size:13px;font-weight:800;padding:9px 15px;border-radius:100px;box-shadow:0 6px 16px rgba(0,0,0,.16)}
-.hc-ring{position:relative;z-index:1;flex-shrink:0;display:flex;align-items:center;justify-content:center;width:96px;height:96px;border-radius:50%;background:rgba(255,255,255,.14);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25)}
+.hc-resume{display:inline-flex;align-items:center;gap:6px;margin-top:12px;background:rgba(255,255,255,.95);color:var(--lilac-d);font-size:12.5px;font-weight:800;padding:8px 14px;border-radius:100px;box-shadow:0 6px 16px rgba(0,0,0,.16)}
+.hc-ring{position:relative;z-index:1;flex-shrink:0;display:flex;align-items:center;justify-content:center;width:84px;height:84px;border-radius:50%;background:rgba(255,255,255,.14);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.25)}
+
+/* Slim fully-rounded action pills (Create + Library) */
+.pill-banner{position:relative;isolation:isolate;overflow:hidden;border-radius:100px;padding:9px 12px 9px 9px;margin:11px 0 3px;color:#fff;display:flex;align-items:center;gap:11px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:transform .16s ease}
+.pill-banner:active{transform:scale(.98)}
+.pb-ic{flex-shrink:0;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);position:relative;z-index:1}
+.pb-title{flex:1;min-width:0;position:relative;z-index:1;font-size:15px;font-weight:800;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb-arrow{flex-shrink:0;position:relative;z-index:1;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.28);display:flex;align-items:center;justify-content:center}
+
+/* Create-your-own-course — glowy animated gradient */
+.create-course{box-shadow:0 0 0 1px rgba(255,255,255,.22) inset,0 12px 30px -12px rgba(150,100,220,.7)}
+.create-course::before{content:"";position:absolute;inset:-45px;z-index:-2;background:linear-gradient(115deg,#6D5BD4,#B06AB3,#4A90E2,#9B87F5,#6D5BD4);background-size:230% 230%;filter:blur(22px) saturate(1.25);animation:ccShift 7s ease infinite}
+.create-course::after{content:"";position:absolute;inset:-90%;z-index:-1;background:radial-gradient(circle at 30% 26%,rgba(255,255,255,.5),rgba(255,255,255,.12) 30%,transparent 60%);filter:blur(46px);animation:ccSpin 11s linear infinite}
+@keyframes ccShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+@keyframes ccSpin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.create-course::before,.create-course::after{animation:none}}
+
+/* AstroLearn library pill */
+.lib-banner{background:linear-gradient(135deg,#252350,#403C82 52%,#6D5BD4);box-shadow:0 12px 30px -14px rgba(37,35,80,.8)}
+.lib-banner::after{content:"";position:absolute;top:-60%;right:-8%;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(155,135,245,.5),transparent 68%);pointer-events:none}
+
+/* Certificates pill (bottom) */
+.cert-pill{margin-top:18px;background:linear-gradient(135deg,#E8B23A,#D8912E 55%,#C08457);box-shadow:0 12px 30px -14px rgba(180,120,40,.75)}
+.cert-pill::after{content:"";position:absolute;top:-60%;right:-8%;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(255,240,200,.45),transparent 68%);pointer-events:none}
 
 /* Course card with ring */
 .cc{background:var(--surface);border-radius:var(--r2);padding:14px;margin-bottom:11px;border:1px solid var(--border);cursor:pointer;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;transition:transform .15s ease;box-shadow:0 2px 10px rgba(80,60,170,.04)}
@@ -409,7 +432,7 @@ body[data-band="pathfinder"] .chk-btn{box-shadow:0 3px 0 var(--lilac-d);border-r
           </div></div>
           <div class="cat-header">
             <div class="cat-top">
-              <div><div class="cat-greeting">Good morning,</div><div class="cat-name" id="cat-name">Ayşe</div></div>
+              <div><div class="cat-greeting">Günaydın,</div><div class="cat-name" id="cat-name">Ayşe</div></div>
               <div class="cat-right">
                 <span class="xp-pill" id="xp-pill"></span>
                 <div class="avatar" id="cat-avatar">A</div>
@@ -440,6 +463,12 @@ body[data-band="pathfinder"] .chk-btn{box-shadow:0 3px 0 var(--lilac-d);border-r
           <div class="certs-scroll" id="certs-scroll"></div>
         </div>
 
+        <div class="screen" id="s-library">
+          <div class="sb"><span class="sb-time">9:41</span><div class="sb-icons"><svg width="25" height="12" fill="currentColor"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity=".35" fill="none"/><rect x="2" y="2" width="16" height="8" rx="2"/><path d="M23 4v4a2 2 0 000-4z" opacity=".4"/></svg></div></div>
+          <div class="page-hdr" id="lib-hdr"></div>
+          <div class="certs-scroll" id="lib-scroll"></div>
+        </div>
+
         <div class="screen" id="s-cert-detail">
           <div class="sb"><span class="sb-time">9:41</span><div class="sb-icons"><svg width="25" height="12" fill="currentColor"><rect x=".5" y=".5" width="21" height="11" rx="3.5" stroke="currentColor" stroke-opacity=".35" fill="none"/><rect x="2" y="2" width="16" height="8" rx="2"/><path d="M23 4v4a2 2 0 000-4z" opacity=".4"/></svg></div></div>
           <div class="cert-detail-scroll" id="cert-detail"></div>
@@ -462,8 +491,7 @@ body[data-band="pathfinder"] .chk-btn{box-shadow:0 3px 0 var(--lilac-d);border-r
   <div class="dev-card">
     <div class="dev-ttl">Grade Band</div>
     <div class="dev-grp">
-      <button class="dev-btn on" data-band="explorer" onclick="setBand('explorer')"><span class="dev-dot" style="background:#9B87F5"></span>Explorer · Gr 1–4</button>
-      <button class="dev-btn" data-band="builder" onclick="setBand('builder')"><span class="dev-dot" style="background:#7C6BF0"></span>Builder · Gr 5–8</button>
+      <button class="dev-btn on" data-band="builder" onclick="setBand('builder')"><span class="dev-dot" style="background:#7C6BF0"></span>Builder · Gr 5–8</button>
       <button class="dev-btn" data-band="pathfinder" onclick="setBand('pathfinder')"><span class="dev-dot" style="background:#5E57B5"></span>Pathfinder · Gr 9–12</button>
     </div>
   </div>
@@ -501,6 +529,12 @@ const ICONS={
   eq:'<path d="M19 5.5c-1.8-1.8-4.5-1.6-6 .2l-1 1.1-1-1.1c-1.5-1.8-4.2-2-6-.2-1.7 1.8-1.7 4.6 0 6.4L12 19l7-7.1c1.7-1.8 1.7-4.6 0-6.4z"/>',
   learn:'<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.5.4.9 1 1 1.7l.1.5h5l.1-.5c.1-.7.5-1.3 1-1.7A6 6 0 0 0 12 3z"/>',
   finance:'<rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10h18"/><path d="M16 14.5h2"/>',
+  math:'<rect x="4" y="3" width="16" height="18" rx="2.5"/><path d="M8 7h8"/><path d="M8 12h2M13 12h2M8 16h2M13 16h2"/>',
+  science:'<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="9" ry="4"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="4" transform="rotate(120 12 12)"/>',
+  turkish:'<path d="M4 5h9a3 3 0 0 1 3 3v11a2.5 2.5 0 0 0-2.5-2.5H4z"/><path d="M20 5h-2a3 3 0 0 0-3 3v11"/>',
+  history:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/><path d="M3.5 9A9 9 0 0 1 12 3"/>',
+  library:'<rect x="4" y="4" width="4" height="16" rx="1"/><rect x="10" y="4" width="4" height="16" rx="1"/><path d="M16.5 5.2l3.4-.9 3 13.9-3.4.9z"/><path d="M4 8.5h4M10 8.5h4"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
   critical:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.4-4.4"/>',
   reading:'<path d="M12 7a3 3 0 0 0-3-3H3v13h6a3 3 0 0 1 3 3"/><path d="M12 7a3 3 0 0 1 3-3h6v13h-6a3 3 0 0 0-3 3"/><path d="M12 7v13"/>',
   critreading:'<path d="M4 7V5a1 1 0 0 1 1-1h2"/><path d="M17 4h2a1 1 0 0 1 1 1v2"/><path d="M20 17v2a1 1 0 0 1-1 1h-2"/><path d="M7 20H5a1 1 0 0 1-1-1v-2"/><path d="M7 9h10"/><path d="M7 13h6"/>',
@@ -538,31 +572,34 @@ function ring(pct,color,size,sw){ size=size||58; sw=sw||5; const r=(size-sw)/2-1
 
 // ── Theme ──
 const THEME={
-  explorer:  {accent:'#9B87F5',d:'#6D5BD4',l:'#EDE9FF',m:'#C8BCFA',bg:'#F0EDFF',grad:'linear-gradient(135deg,#A593F8,#7C66E6)'},
   builder:   {accent:'#7C6BF0',d:'#523BC4',l:'#E8E4FF',m:'#BBB0F4',bg:'#EEEBFF',grad:'linear-gradient(135deg,#8B79F2,#5E45DD)'},
   pathfinder:{accent:'#5E57B5',d:'#3E397F',l:'#E8E7F2',m:'#B8B4D6',bg:'#F3F3F8',grad:'linear-gradient(135deg,#4C4790,#2C2A60)'}
 };
 
+// group:'astro' → AstroLearn Kütüphanesi (müfredatla hizalı hazır + kendi ürettiği kurslar)
+// group:'extra' → Müfredat Dışı Kurslar (yalnızca YZ Okuryazarlığı, İngilizce, Finansal Okuryazarlık)
 const BANDS={
-  explorer:{xp:{cur:340,max:500},student:{name:'Ayşe'},courses:[
-    {id:'english',title:'English Levels',cat:'Language',color:'#60A5FA',bg:'#EAF3FF',pct:65,total:8,done:5,badge:'silver',xp:340,active:true},
-    {id:'ai',title:'AI Literacy',cat:'Future Skills',color:'#9B87F5',bg:'#EFEAFF',pct:20,total:6,done:1,xp:80},
-    {id:'safety',title:'Online Safety',cat:'Digital',color:'#FB7185',bg:'#FFEDF0',pct:0,total:5,done:0,xp:0,isNew:true},
-    {id:'eq',title:'Emotional Intelligence',cat:'Wellbeing',color:'#F472B6',bg:'#FDEEF8',pct:100,total:7,done:7,badge:'gold',xp:700},
-  ]},
   builder:{xp:{cur:1840,max:2500},student:{name:'Kerem'},courses:[
-    {id:'english',title:'English Levels',cat:'Language',color:'#60A5FA',bg:'#EAF3FF',pct:40,total:12,done:5,xp:500,active:true},
-    {id:'ai',title:'AI Literacy',cat:'Future Skills',color:'#9B87F5',bg:'#EFEAFF',pct:75,total:8,done:6,badge:'silver',xp:600},
-    {id:'reading',title:'Reading to Understand',cat:'Reading Skills',color:'#F472B6',bg:'#FDEEF8',pct:30,total:7,done:2,xp:200,isNew:true},
-    {id:'finance',title:'Financial Literacy',cat:'Numeracy',color:'#38BDF8',bg:'#E6F7FF',pct:15,total:7,done:1,xp:100},
-    {id:'critical',title:'Critical Thinking',cat:'Thinking Skills',color:'#F59E0B',bg:'#FFF6E5',pct:0,total:6,done:0,xp:0},
+    // AstroLearn Kütüphanesi
+    {id:'math',title:'Cebirsel İfadeler',cat:'Müfredat · Matematik · Hazır',color:'#7C6BF0',bg:'#ECEAFF',pct:45,total:10,done:4,xp:420,active:true,group:'astro'},
+    {id:'science',title:'Kuvvet ve Enerji',cat:'Müfredat · Fen · Hazır',color:'#38BDF8',bg:'#E6F7FF',pct:20,total:8,done:2,xp:180,group:'astro'},
+    {id:'turkish',title:'Paragrafta Anlam',cat:'Müfredat · Türkçe · Hazır',color:'#F472B6',bg:'#FDEEF8',pct:100,total:7,done:7,badge:'gold',xp:700,group:'astro'},
+    {id:'history',title:'Osmanlı Kuruluş Dönemi',cat:'Senin Kursun · YZ ile üretildi',color:'#F59E0B',bg:'#FFF6E5',pct:0,total:6,done:0,xp:0,isNew:true,group:'astro'},
+    // Müfredat Dışı Kurslar
+    {id:'ai',title:'YZ Okuryazarlığı',cat:'Geleceğin Becerileri',color:'#9B87F5',bg:'#EFEAFF',pct:75,total:8,done:6,badge:'silver',xp:600,group:'extra'},
+    {id:'english',title:'İngilizce',cat:'Dil',color:'#60A5FA',bg:'#EAF3FF',pct:40,total:12,done:5,xp:500,group:'extra'},
+    {id:'finance',title:'Finansal Okuryazarlık',cat:'Sayısal Beceriler',color:'#38BDF8',bg:'#E6F7FF',pct:15,total:7,done:1,xp:100,group:'extra'},
   ]},
   pathfinder:{xp:{cur:3120,max:4000},student:{name:'Selin'},courses:[
-    {id:'english',title:'English Levels',cat:'Language',color:'#5E57B5',bg:'#ECEBF5',pct:85,total:14,done:12,badge:'gold',xp:1200},
-    {id:'critical',title:'Critical Thinking',cat:'Thinking Skills',color:'#5E57B5',bg:'#ECEBF5',pct:55,total:8,done:4,xp:400,active:true},
-    {id:'critreading',title:'Critical Reading',cat:'Reading Skills',color:'#5E57B5',bg:'#ECEBF5',pct:33,total:6,done:2,xp:480,isNew:true},
-    {id:'finance',title:'Financial Literacy',cat:'Numeracy',color:'#5E57B5',bg:'#ECEBF5',pct:100,total:9,done:9,badge:'gold',xp:900},
-    {id:'learn',title:'Learning How to Learn',cat:'Study Skills',color:'#5E57B5',bg:'#ECEBF5',pct:0,total:7,done:0,xp:0},
+    // AstroLearn Kütüphanesi
+    {id:'math',title:'Türev ve İntegral',cat:'Müfredat · Matematik · Hazır',color:'#5E57B5',bg:'#ECEBF5',pct:60,total:12,done:7,xp:820,active:true,group:'astro'},
+    {id:'science',title:'Elektrik ve Manyetizma',cat:'Müfredat · Fizik · Hazır',color:'#5E57B5',bg:'#ECEBF5',pct:100,total:9,done:9,badge:'gold',xp:900,group:'astro'},
+    {id:'turkish',title:'Cumhuriyet Dönemi Edebiyatı',cat:'Müfredat · Edebiyat · Hazır',color:'#5E57B5',bg:'#ECEBF5',pct:30,total:10,done:3,xp:300,group:'astro'},
+    {id:'history',title:'İnkılap Tarihi Tekrarı',cat:'Senin Kursun · YZ ile üretildi',color:'#5E57B5',bg:'#ECEBF5',pct:0,total:8,done:0,xp:0,isNew:true,group:'astro'},
+    // Müfredat Dışı Kurslar
+    {id:'ai',title:'YZ Okuryazarlığı',cat:'Geleceğin Becerileri',color:'#5E57B5',bg:'#ECEBF5',pct:55,total:8,done:4,xp:400,group:'extra'},
+    {id:'english',title:'İngilizce',cat:'Dil',color:'#5E57B5',bg:'#ECEBF5',pct:85,total:14,done:12,badge:'gold',xp:1200,group:'extra'},
+    {id:'finance',title:'Finansal Okuryazarlık',cat:'Sayısal Beceriler',color:'#5E57B5',bg:'#ECEBF5',pct:100,total:9,done:9,badge:'gold',xp:900,group:'extra'},
   ]}
 };
 
@@ -773,7 +810,7 @@ function showPlacementResult(level,correct){
   fireConfetti();}
 
 // ── State ──
-let currentBand='explorer', curCourse=null, curModInfo=null, stack=['s-catalog'], curCerts=[];
+let currentBand='builder', curCourse=null, curModInfo=null, stack=['s-catalog'], curCerts=[];
 let validateFn=null, MQ={};
 
 // ── Navigation ──
@@ -795,7 +832,7 @@ function goBack(){
 function animRings(scope){ (scope||document).querySelectorAll('.ring-fg').forEach(el=>{ el.style.strokeDashoffset=el.dataset.off; }); }
 
 // ── Catalog ──
-const TIER={gold:{l:'Gold',c:'#E8B23A'},silver:{l:'Silver',c:'#9AA3B2'},bronze:{l:'Bronze',c:'#C08457'}};
+const TIER={gold:{l:'Altın',c:'#E8B23A'},silver:{l:'Gümüş',c:'#9AA3B2'},bronze:{l:'Bronz',c:'#C08457'}};
 function renderCatalog(band){
   const d=BANDS[band], t=THEME[band];
   document.getElementById('cat-name').textContent=d.student.name;
@@ -803,24 +840,48 @@ function renderCatalog(band){
   document.getElementById('xp-pill').innerHTML=`${iconFill('bolt',t.d,15)}${d.xp.cur.toLocaleString()} XP`;
 
   const active=d.courses.find(c=>c.active)||d.courses[0];
-  let html=`<div class="hero-continue" onclick="openCourse('${active.id}')">
+
+  // Sertifikalar ekranı için hesapla (ana ekranda bölüm gösterilmiyor)
+  curCerts=d.courses.filter(c=>c.badge||c.pct===100).map(c=>({id:c.id,title:c.title,tier:c.badge||'gold',score:certScore(c.id,c.pct)}));
+
+  // 1) Öğrenmeye Devam Et — en üstteki banner
+  let html=`<div class="hero-continue stag" onclick="openCourse('${active.id}')">
     <div class="blob" style="width:130px;height:130px;top:-40px;left:-30px"></div>
     <div class="hc-left">
-      <div class="hc-eyebrow">Continue Learning</div>
       <div class="hc-title">${active.title}</div>
-      <div class="hc-sub">${active.done} of ${active.total} modules · ${active.xp} XP</div>
-      <span class="hc-resume">Resume ${icon('arrow',t.d,15)}</span>
+      <div class="hc-sub">${active.done}/${active.total} modül · ${active.xp} XP</div>
+      <span class="hc-resume">Devam et ${icon('arrow',t.d,15)}</span>
     </div>
-    <div class="hc-ring">${ring(active.pct,'#ffffff',82,6)}</div>
+    <div class="hc-ring">${ring(active.pct,'#ffffff',70,6)}</div>
   </div>`;
 
-  const certs=d.courses.filter(c=>c.badge||c.pct===100).map(c=>({id:c.id,title:c.title,tier:c.badge||'gold',score:certScore(c.id,c.pct)}));
-  curCerts=certs;
+  // 2) Kendi Kursunu Oluştur — ince glowy gradient pill
+  html+=`<div class="pill-banner create-course stag" style="animation-delay:60ms" onclick="showToast('Kurs oluşturucu yakında')">
+    <div class="pb-ic">${icon('sparkles','#fff',22)}</div>
+    <div class="pb-title">Kendi Kursunu Oluştur</div>
+    <span class="pb-arrow">${icon('arrow','#fff',17)}</span>
+  </div>`;
 
-  html+='<div class="sec-lbl">All Courses</div>';
-  d.courses.forEach((c,i)=>{ html+=courseCardHTML(c,i,t); });
+  // 3) AstroLearn Kütüphanesi — ince pill (tıklayınca kütüphane sayfası açılır)
+  const astro=d.courses.filter(c=>c.group==='astro');
+  html+=`<div class="pill-banner lib-banner stag" style="animation-delay:120ms" onclick="openLibrary()">
+    <div class="pb-ic">${icon('library','#fff',22)}</div>
+    <div class="pb-title">AstroLearn Kütüphanesi</div>
+    <span class="pb-arrow">${icon('arrow','#fff',17)}</span>
+  </div>`;
 
-  html+='<div class="sec-lbl">Certificates</div>'+certMini(certs);
+  // 4) Madlen Kursları — müfredat dışı
+  const extra=d.courses.filter(c=>c.group==='extra');
+  html+='<div class="sec-lbl">Madlen Kursları</div>';
+  extra.forEach((c,i)=>{ html+=courseCardHTML(c,i,t); });
+
+  // 5) Sertifikalar — ince pill (en altta)
+  html+=`<div class="pill-banner cert-pill stag" onclick="openCerts()">
+    <div class="pb-ic">${icon('award','#fff',22)}</div>
+    <div class="pb-title">Sertifikalar</div>
+    <span class="pb-arrow">${icon('arrow','#fff',17)}</span>
+  </div>`;
+
   document.getElementById('cat-scroll').innerHTML=html;
   setTimeout(()=>animRings(document.getElementById('cat-scroll')),60);
 }
@@ -829,12 +890,12 @@ function courseCardHTML(c,idx,t){
   const tm=c.badge?TIER[c.badge]:null;
   return `<div class="cc stag" style="animation-delay:${idx*60}ms" onclick="openCourse('${c.id}')">
     ${tm?`<div class="cc-badge">${icon('award',tm.c,19)}</div>`:''}
-    ${c.isNew?`<div class="cc-new">New</div>`:''}
+    ${c.isNew?`<div class="cc-new">Yeni</div>`:''}
     <div class="cc-medal" style="background:${c.bg}">${icon(c.id,c.color,27)}</div>
     <div class="cc-info">
       <div class="cc-cat">${c.cat}</div>
       <div class="cc-title">${c.title}</div>
-      <div class="cc-meta">${c.done}/${c.total} modules${tm?' · '+tm.l:''}</div>
+      <div class="cc-meta">${c.done}/${c.total} modül${tm?' · '+tm.l:''}</div>
     </div>
     <div class="cc-ring">${ring(c.pct,c.color,54,5)}</div>
   </div>`;
@@ -844,47 +905,59 @@ function certScore(cid,pct){ const ss=(MODS[cid]||[]).filter(m=>m.score!=null).m
 function certMini(certs){
   if(!certs.length) return `<div class="cert-mini" style="cursor:default;box-shadow:none">
     <div class="cert-mini-ic">${icon('award','#fff',20)}</div>
-    <div class="cert-mini-txt"><div class="cert-mini-t">No certificates yet</div><div class="cert-mini-s">Finish a course to earn your first one</div></div></div>`;
+    <div class="cert-mini-txt"><div class="cert-mini-t">Henüz sertifikan yok</div><div class="cert-mini-s">İlkini kazanmak için bir kursu tamamla</div></div></div>`;
   const names=certs.map(c=>c.title).join(' · ');
   return `<div class="cert-mini" onclick="openCerts()">
     <div class="cert-mini-ic">${icon('award','#fff',20)}</div>
-    <div class="cert-mini-txt"><div class="cert-mini-t">${certs.length} Certificate${certs.length>1?'s':''} Earned</div><div class="cert-mini-s">${names}</div></div>
+    <div class="cert-mini-txt"><div class="cert-mini-t">${certs.length} Sertifika Kazanıldı</div><div class="cert-mini-s">${names}</div></div>
     <span class="cert-mini-chev">${icon('arrow','#fff',16)}</span></div>`;
+}
+// ── AstroLearn Kütüphanesi ──
+function openLibrary(){ renderLibrary(); nav('s-library'); }
+function renderLibrary(){
+  const t=THEME[currentBand];
+  const astro=BANDS[currentBand].courses.filter(c=>c.group==='astro');
+  document.getElementById('lib-hdr').innerHTML=`
+    <div class="back-btn" onclick="goBack()">${icon('back',t.d,17)}Kurslarım</div>
+    <div class="page-title">AstroLearn Kütüphanesi</div>
+    <div class="page-sub">Müfredatla hizalı hazır ve YZ ile ürettiğin kurslar</div>`;
+  document.getElementById('lib-scroll').innerHTML=astro.map((c,i)=>courseCardHTML(c,i,t)).join('');
+  setTimeout(()=>animRings(document.getElementById('lib-scroll')),60);
 }
 function openCerts(){ renderCerts(); nav('s-certs'); }
 function openCert(i){ renderCertDetail(curCerts[i]); nav('s-cert-detail'); }
 function renderCerts(){
   const t=THEME[currentBand];
   document.getElementById('certs-hdr').innerHTML=`
-    <div class="back-btn" onclick="goBack()">${icon('back',t.d,17)}My Courses</div>
-    <div class="page-title">Certificates</div>
-    <div class="page-sub">${curCerts.length} earned · tap to view, share or download</div>`;
+    <div class="back-btn" onclick="goBack()">${icon('back',t.d,17)}Kurslarım</div>
+    <div class="page-title">Sertifikalar</div>
+    <div class="page-sub">${curCerts.length} kazanıldı · görüntülemek, paylaşmak veya indirmek için dokun</div>`;
   document.getElementById('certs-scroll').innerHTML=curCerts.map((ct,i)=>{ const tm=TIER[ct.tier];
     return `<div class="cert-list-card stag" style="animation-delay:${i*60}ms" onclick="openCert(${i})">
       <div class="clc-seal" style="background:${tm.c}1f">${icon('award',tm.c,24)}</div>
-      <div class="clc-info"><div class="clc-tier" style="color:${tm.c}">${tm.l} Certificate</div>
-        <div class="clc-name">${ct.title}</div><div class="clc-meta">Success rate ${ct.score}% · Apr 2026</div></div>
+      <div class="clc-info"><div class="clc-tier" style="color:${tm.c}">${tm.l} Sertifika</div>
+        <div class="clc-name">${ct.title}</div><div class="clc-meta">Başarı oranı %${ct.score} · Nis 2026</div></div>
       <span class="clc-chev">${icon('arrow',t.d,16)}</span></div>`; }).join('');
 }
 function renderCertDetail(cert){
   const t=THEME[currentBand], tm=TIER[cert.tier], name=BANDS[currentBand].student.name;
   document.getElementById('cert-detail').innerHTML=`
-    <div class="back-btn" onclick="goBack()">${icon('back',t.d,17)}Certificates</div>
+    <div class="back-btn" onclick="goBack()">${icon('back',t.d,17)}Sertifikalar</div>
     <div class="certificate" style="--tier:${tm.c}">
       <div class="cert-wordmark">Okul Madlen</div>
       <div class="cert-seal" style="background:${tm.c}">${icon('award','#fff',30,2.4)}</div>
-      <div class="cert-h">Certificate of Achievement</div>
-      <div class="cert-small">This certifies that</div>
+      <div class="cert-h">Başarı Sertifikası</div>
+      <div class="cert-small">Bu sertifika,</div>
       <div class="cert-recipient">${name}</div>
-      <div class="cert-small">has successfully completed</div>
+      <div class="cert-small">adlı öğrencinin başarıyla tamamladığını belgeler</div>
       <div class="cert-course">${cert.title}</div>
-      <div class="cert-tier-lbl" style="color:${tm.c};border-color:${tm.c}">${tm.l} Tier</div>
-      <div class="cert-foot"><span>Issued Apr 2026</span><span class="cert-sign">Madlen</span></div>
+      <div class="cert-tier-lbl" style="color:${tm.c};border-color:${tm.c}">${tm.l} Seviye</div>
+      <div class="cert-foot"><span>Nis 2026 tarihli</span><span class="cert-sign">Madlen</span></div>
     </div>
-    <div class="cert-stat"><span class="cert-stat-l">Your success rate</span><span class="cert-stat-v">${cert.score}%</span></div>
+    <div class="cert-stat"><span class="cert-stat-l">Başarı oranın</span><span class="cert-stat-v">%${cert.score}</span></div>
     <div class="cert-actions">
-      <button class="cert-act share" onclick="showToast('Share sheet opened')">${icon('share','currentColor',18)} Share</button>
-      <button class="cert-act dl" onclick="showToast('Certificate saved to your device')">${icon('download','#fff',18)} Download</button>
+      <button class="cert-act share" onclick="showToast('Paylaşım penceresi açıldı')">${icon('share','currentColor',18)} Paylaş</button>
+      <button class="cert-act dl" onclick="showToast('Sertifika cihazına kaydedildi')">${icon('download','#fff',18)} İndir</button>
     </div>`;
 }
 let toastT=null;
@@ -924,16 +997,16 @@ function renderCourse(id){
   const t=THEME[currentBand], pf=currentBand==='pathfinder';
 
   document.getElementById('cd-hero').innerHTML=`
-    <div class="back-btn" onclick="goBack()">${icon('back',t.d,17)}My Courses</div>
+    <div class="back-btn" onclick="goBack()">${icon('back',t.d,17)}Kurslarım</div>
     <div class="course-banner" style="background:${pf?t.grad:c.bg};color:${pf?'#fff':'#1B1830'}">
       <div class="cb-top">
         <div class="cb-emoji" style="${pf?'':'background:'+c.color+'22'}">${icon(c.id,pf?'#fff':c.color,25)}</div>
         <div><div class="cb-cat" style="${pf?'':'color:'+c.color}">${c.cat}</div><div class="cb-title">${c.title}</div></div>
       </div>
       <div class="cb-stats">
-        <div class="cb-stat"><div class="cb-sv">${c.done}/${c.total}</div><div class="cb-sl">Modules</div></div>
+        <div class="cb-stat"><div class="cb-sv">${c.done}/${c.total}</div><div class="cb-sl">Modül</div></div>
         <div class="cb-stat"><div class="cb-sv">${c.xp}</div><div class="cb-sl">XP</div></div>
-        <div class="cb-stat"><div class="cb-sv">${c.pct}%</div><div class="cb-sl">Complete</div></div>
+        <div class="cb-stat"><div class="cb-sv">${c.pct}%</div><div class="cb-sl">Tamamlandı</div></div>
       </div>
     </div>`;
 
@@ -1287,7 +1360,7 @@ function setBand(band){ currentBand=band; stack=['s-catalog']; curCourse=null; c
   document.querySelectorAll('.screen').forEach(s=>{ s.classList.remove('active','behind'); s.style.transform='translateX(100%)'; });
   const cat=document.getElementById('s-catalog'); cat.style.transform=''; cat.classList.add('active'); renderCatalog(band); }
 function devCourse(){ const c=BANDS[currentBand].courses.find(x=>x.active)||BANDS[currentBand].courses[0]; openCourse(c.id); }
-function resetProto(){ MQ={}; curCerts=[]; curCourse=null; curModInfo=null; setBand('explorer'); }
+function resetProto(){ MQ={}; curCerts=[]; curCourse=null; curModInfo=null; setBand('builder'); }
 
 const TYPE_LIST=[['mc','Multiple Choice'],['ms','Multiple Select'],['tf','True / False'],['fb','Fill in Blank'],['seq','Sequence'],['match','Drag & Match'],['tap','Image Tap'],['listen','Listening'],['speak','Speaking'],['free','AI Free Text'],['mcj','MC + Justify'],['read','Timed Read'],['game','Timed Game'],['chat','Chat with AI'],['placement','Placement']];
 function buildDevTypes(){ document.getElementById('dev-types').innerHTML=TYPE_LIST.map(([k,l])=>`<button class="dev-btn" onclick="devType('${k}','${l}')">${l}</button>`).join(''); }
@@ -1301,7 +1374,7 @@ sty.textContent='@keyframes nodeShake{0%,100%{transform:translateX(0)}25%{transf
 document.head.appendChild(sty);
 
 buildDevTypes();
-setBand('explorer');
+setBand('builder');
 </script>
 </body>
 </html>
