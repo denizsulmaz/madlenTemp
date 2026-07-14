@@ -180,8 +180,10 @@ h1{font-family:Georgia,'Times New Roman',serif;font-size:27px;letter-spacing:-.4
 
       <div class="split">
         <div class="colL">
-          <div class="lbl">Year</div>
-          <div class="pills yr" id="yrPills"></div>
+          <div class="lbl" id="levelLbl">Key stage</div>
+          <div class="pills" id="ksPills"></div>
+          <div class="pills yr" id="yrPills" style="display:none"></div>
+          <div class="qualnote" id="qualNote"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Qualification: <b id="qualName">A-Level</b></div>
 
           <div class="lbl">Curriculum</div>
           <div class="curr" id="currBtns">
@@ -190,10 +192,6 @@ h1{font-family:Georgia,'Times New Roman',serif;font-size:27px;letter-spacing:-.4
           </div>
 
           <div id="ukLeft">
-            <div class="lbl">Key stage</div>
-            <div class="pills" id="ksPills"></div>
-            <div class="qualnote"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Qualification: <b id="qualName">A-Level</b></div>
-
             <div class="lbl">Exam board</div>
             <div class="boards" id="boards"></div>
 
@@ -415,6 +413,10 @@ function renderCurr(){
   document.querySelectorAll("#currBtns .cbtn").forEach(b=>b.classList.toggle("on",b.dataset.curr===state.curr));
   $("ukLeft").style.display=uk?"":"none";
   $("intlLeft").style.display=uk?"none":"";
+  $("levelLbl").textContent=uk?"Key stage":"Year";
+  $("ksPills").style.display=uk?"":"none";
+  $("yrPills").style.display=uk?"none":"";
+  $("qualNote").style.display=uk?"":"none";
   $("ocSearch").placeholder=uk?"Search specification topic/outcome...":"Search unit/topic/learning area...";
   state.ocs.clear();state.open=new Set([0]);
 }
