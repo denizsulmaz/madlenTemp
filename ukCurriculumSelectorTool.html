@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Podcast Generator — UK Curriculum selector</title>
+<style>
+:root{
+  --orange:#F5883E; --orange-d:#C2621D; --orange-l:#FFF4EA; --orange-b:#F9B984;
+  --bg:#F7F3ED; --surface:#FFFFFF; --s2:#FCF9F4; --s3:#F8F4EE;
+  --text:#251E16; --muted:#9C8E7E; --muted2:#B4A896; --border:#EFE7DC; --border2:#E4DACB;
+  --purple:#8B5CF6; --purple-d:#6D28D9; --purple-l:#F5F3FF; --purple-b:#DDD6FE;
+  --pink:#EC4899;
+  --green:#10B981; --green-d:#047857; --green-l:#ECFDF5; --green-b:#A7F3D0;
+  --amber:#F59E0B; --amber-d:#B45309; --amber-l:#FFFBEB; --amber-b:#FDE68A;
+  --rose:#F43F5E;  --rose-d:#BE123C;  --rose-l:#FFF1F2;  --rose-b:#FECDD3;
+  --blue:#3B82F6;  --blue-d:#1D4ED8;  --blue-l:#EFF6FF;  --blue-b:#BFDBFE;
+  --violet:#8B5CF6;--violet-d:#6D28D9;--violet-l:#F5F3FF;--violet-b:#DDD6FE;
+  --teal:#14B8A6;  --teal-d:#0F766E;  --teal-l:#F0FDFA;  --teal-b:#99F6E4;
+  --shadow:0 1px 2px rgba(37,30,22,.04),0 8px 28px -12px rgba(37,30,22,.10);
+  --r:16px; --r2:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.45}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+select,input{font:inherit;color:inherit}
+svg{display:block}
+
+.frame{display:flex;min-height:100vh}
+.rail{width:52px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0;position:sticky;top:0;height:100vh}
+.rail .ri{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.rail .ri.on{background:var(--orange-l);color:var(--orange)}
+.rail .ri:hover{background:var(--s3)}
+@media(max-width:760px){.rail{display:none}}
+
+.main{flex:1;min-width:0;padding:18px clamp(12px,4vw,44px) 60px}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;padding:4px 2px 6px}
+.crumbs a{color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.crumbs a:hover{color:var(--text)}
+h1{font-family:Georgia,'Times New Roman',serif;font-size:27px;letter-spacing:-.4px;margin:2px 0 2px}
+.tagline{font-size:13.5px;color:var(--muted);font-weight:500;margin-bottom:16px}
+
+.card{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:clamp(18px,2.5vw,34px)}
+.card-title{font-size:15px;font-weight:800;color:var(--rose);margin-bottom:16px}
+
+/* input-mode tabs */
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px}
+.mode{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px 8px;border:1px solid var(--border2);border-radius:10px;background:var(--surface);font-weight:700;font-size:14px;color:var(--muted);transition:border-color .15s,background .15s,color .15s}
+.mode:hover{border-color:var(--purple-b)}
+.mode.on{background:var(--purple-l);border-color:var(--purple);color:var(--purple-d)}
+
+.split{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+@media(max-width:820px){.split{grid-template-columns:1fr}}
+
+.lbl{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px;display:flex;align-items:center;gap:6px}
+.lbl:first-child{margin-top:0}
+.lbl .cnt{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:600;color:var(--muted2)}
+
+/* key stage pills */
+.pills{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pill{padding:13px 8px;border:1px solid var(--border2);border-radius:10px;background:var(--surface);font-weight:700;font-size:14px;text-align:center;transition:border-color .15s,background .15s,color .15s}
+.pill:hover{border-color:var(--orange-b)}
+.pill.on{background:var(--orange-l);border-color:var(--orange);color:var(--orange-d)}
+.pill small{display:block;font-size:9.5px;font-weight:600;color:var(--muted);margin-top:1px}
+.pill.on small{color:var(--orange-d);opacity:.75}
+.pills.yr{grid-template-columns:repeat(4,1fr)}
+
+/* curriculum buttons */
+.curr{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cbtn{padding:14px 8px;border:1px solid var(--border2);border-radius:10px;background:var(--surface);font-weight:700;font-size:13.5px;text-align:center;color:var(--muted);transition:border-color .15s,background .15s,color .15s}
+.cbtn:hover{border-color:var(--orange-b)}
+.cbtn.on{background:var(--orange-l);border-color:var(--orange);color:var(--orange-d)}
+
+/* exam board */
+.boards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.board{padding:14px 8px;border:1px solid var(--border2);border-radius:10px;background:var(--surface);font-weight:700;font-size:13.5px;text-align:center;transition:border-color .15s,background .15s,color .15s}
+.progs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.board:hover{border-color:var(--orange-b)}
+.board.on{background:var(--orange-l);border-color:var(--orange);color:var(--orange-d)}
+.qualnote{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--muted);background:var(--s3);border-radius:100px;padding:5px 11px;margin-top:10px}
+.qualnote b{color:var(--text)}
+
+/* subject cards */
+.subjects{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-height:330px;overflow-y:auto;padding:2px}
+.subj{display:flex;align-items:center;gap:9px;padding:12px 11px;border-radius:11px;border:1px solid var(--border2);background:var(--surface);font-weight:700;font-size:13px;line-height:1.2;text-align:left;transition:border-color .15s;position:relative}
+.subj .nm{min-width:0}
+.subj .code{display:block;font-size:10.5px;font-weight:700;color:var(--muted2);margin-top:1px}
+.subj .ic{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.subj.t-green{background:var(--green-l)}   .subj.t-green .ic{color:var(--green-d)}
+.subj.t-amber{background:var(--amber-l)}   .subj.t-amber .ic{color:var(--amber-d)}
+.subj.t-rose{background:var(--rose-l)}     .subj.t-rose .ic{color:var(--rose-d)}
+.subj.t-blue{background:var(--blue-l)}     .subj.t-blue .ic{color:var(--blue-d)}
+.subj.t-violet{background:var(--violet-l)} .subj.t-violet .ic{color:var(--violet-d)}
+.subj.t-teal{background:var(--teal-l)}     .subj.t-teal .ic{color:var(--teal-d)}
+.subj.t-green.on{border-color:var(--green)}.subj.t-amber.on{border-color:var(--amber)}
+.subj.t-rose.on{border-color:var(--rose)}  .subj.t-blue.on{border-color:var(--blue)}
+.subj.t-violet.on{border-color:var(--violet)}.subj.t-teal.on{border-color:var(--teal)}
+.subj.on::after{content:"";position:absolute;top:5px;right:5px;width:6px;height:6px;border-radius:50%;background:currentColor;opacity:.55}
+
+/* ── right panel: outcomes ── */
+.search{width:100%;padding:11px 14px;border:1px solid var(--border2);border-radius:10px;background:var(--surface);font-size:13px;font-weight:500;color:var(--text);outline:none;margin-bottom:10px}
+.search::placeholder{color:var(--muted2)}
+.search:focus{border-color:var(--orange-b)}
+.units{border:1px solid var(--border);border-radius:var(--r2);background:var(--surface);max-height:520px;overflow-y:auto}
+.unit{border-bottom:1px solid var(--border)}
+.unit:last-child{border-bottom:none}
+.uhead{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:12px 14px;font-weight:700;font-size:13px;transition:background .12s}
+.uhead:hover{background:var(--s2)}
+.uhead .ucnt{margin-left:auto;font-size:11px;font-weight:700;color:var(--muted2)}
+.uhead .chev{color:var(--muted2);transition:transform .18s}
+.unit.open .chev{transform:rotate(180deg)}
+.ubody{display:none;padding:0 14px 10px}
+.unit.open .ubody{display:block}
+.oc{display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;padding:9px 8px;border-radius:9px;transition:background .12s}
+.oc:hover{background:var(--s2)}
+.oc.on{background:var(--orange-l)}
+.oc .box{width:16px;height:16px;border-radius:5px;border:1.5px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;background:var(--surface);color:#fff;transition:background .12s,border-color .12s}
+.oc.on .box{background:var(--orange);border-color:var(--orange)}
+.oc .box svg{opacity:0}
+.oc.on .box svg{opacity:1}
+.oc .code{font-size:10px;font-weight:800;color:var(--orange-d);letter-spacing:.02em;white-space:nowrap;margin-top:3px}
+.oc .octag{margin-left:auto;flex-shrink:0;font-size:10.5px;font-weight:800;padding:3px 11px;border-radius:100px;margin-top:2px}
+.oc .octag.core{background:var(--blue-l);color:var(--blue-d)}
+.oc .octag.supp{background:var(--amber-l);color:var(--amber-d)}
+.oc .tx b{font-weight:600;font-size:12.5px;display:block}
+.oc .tx ul{list-style:none;margin-top:3px}
+.oc .tx li{font-size:11px;color:var(--muted);font-weight:500;padding-left:2px}
+.empty-note{font-size:12.5px;color:var(--muted2);font-weight:600;padding:26px 16px;text-align:center}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--orange-l);color:var(--orange-d);border:1px solid var(--orange-b);font-size:11.5px;font-weight:700;padding:4px 7px 4px 10px;border-radius:100px}
+.chip button{display:flex;color:inherit;opacity:.65}
+.chip button:hover{opacity:1}
+
+/* ── audio settings ── */
+.settings{display:flex;flex-wrap:wrap;gap:14px;margin-top:20px}
+.set{min-width:130px}
+.set .k{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.set select{width:100%;padding:9px 10px;border:1px solid var(--border2);border-radius:9px;background:var(--surface);font-size:13px;font-weight:600;outline:none}
+.set select:focus{border-color:var(--orange-b)}
+.voices{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px}
+.voice{display:flex;align-items:center;gap:8px;border:1px solid var(--border2);border-radius:10px;padding:9px 12px;font-weight:700;font-size:13px;background:var(--surface)}
+.voice .dot{width:22px;height:22px;border-radius:50%;background:var(--s3);display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.tag{font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:100px}
+.tag.a{background:var(--amber-l);color:var(--amber-d)}
+.tag.b{background:var(--blue-l);color:var(--blue-d)}
+.compq{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;max-width:420px;margin-top:14px;padding:11px;border:1px solid var(--border2);border-radius:10px;font-weight:700;font-size:13px;color:var(--muted);transition:border-color .15s,color .15s}
+.compq:hover{border-color:var(--orange-b);color:var(--text)}
+.compq.on{background:var(--orange-l);border-color:var(--orange);color:var(--orange-d)}
+.gen{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:18px;background:linear-gradient(90deg,#A78BFA,#EC4899);color:#fff;font-weight:800;font-size:14.5px;padding:13px;border-radius:12px;box-shadow:0 10px 24px -10px rgba(167,102,220,.55);transition:transform .14s,opacity .14s}
+.gen:hover{transform:translateY(-1px)}
+.gen[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+</style>
+</head>
+<body>
+
+<div class="frame">
+  <nav class="rail" aria-label="App navigation">
+    <button class="ri" title="Home"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></button>
+    <button class="ri" title="Assignments"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></button>
+    <button class="ri on" title="Toolbox"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4.5 4.5 0 0 0-6 6L3 18l3 3 5.7-5.7a4.5 4.5 0 0 0 6-6L15 12l-3-3 2.7-2.7z"/></svg></button>
+    <button class="ri" title="Chat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg></button>
+    <button class="ri" title="Library"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M9 3v18"/></svg></button>
+    <button class="ri" title="Analytics"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button>
+  </nav>
+
+  <main class="main">
+    <div class="crumbs"><a href="#"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Toolbox</a></div>
+    <h1>Podcast Generator</h1>
+    <div class="tagline">Turn your lessons into a podcast! 🎧</div>
+
+    <div class="card">
+      <div class="card-title">Create New Podcast</div>
+
+      <div class="modes">
+        <button class="mode"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Text Input</button>
+        <button class="mode on"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Learning Outcome</button>
+        <button class="mode"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6z"/><path d="M14 3v6h6"/></svg>File Upload</button>
+      </div>
+
+      <div class="split">
+        <div class="colL">
+          <div class="lbl">Curriculum</div>
+          <div class="curr" id="currBtns">
+            <button class="cbtn" data-curr="intl">International Curriculum</button>
+            <button class="cbtn on" data-curr="uk">National (UK)</button>
+          </div>
+
+          <div id="ukLeft">
+            <div class="lbl">Key stage</div>
+            <div class="pills" id="ksPills"></div>
+            <div class="qualnote"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Qualification: <b id="qualName">A-Level</b></div>
+
+            <div class="lbl">Exam board</div>
+            <div class="boards" id="boards"></div>
+
+            <div class="lbl">Select subject</div>
+            <div class="subjects" id="subjects"></div>
+          </div>
+
+          <div id="intlLeft" style="display:none">
+            <div class="lbl">Year</div>
+            <div class="pills yr" id="yrPills"></div>
+
+            <div class="lbl">Programme</div>
+            <div class="progs" id="progs"></div>
+
+            <div class="lbl">Select course</div>
+            <div class="subjects" id="courses"></div>
+          </div>
+
+          <div class="settings">
+            <div class="set"><div class="k">Length</div><select><option>Short</option><option selected>Medium</option><option>Long</option></select></div>
+            <div class="set"><div class="k">Output Language</div><select><option selected>🇬🇧 EN</option><option>🇹🇷 TR</option></select></div>
+            <div class="set"><div class="k">CEFR Level</div><select><option>A2</option><option selected>B1</option><option>B2</option><option>C1</option></select></div>
+          </div>
+          <div class="voices">
+            <div class="voice"><span class="dot"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Albert <span class="tag a">Mature</span><span class="tag b">Normal</span></div>
+            <div class="voice"><span class="dot"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3a3 3 0 0 1 3 3v6a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>Audrey <span class="tag a">Adult</span><span class="tag b">Normal</span></div>
+          </div>
+          <button class="compq" id="compQ"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-1.8-4.7-2-8-2v15c3.3 0 6 .2 8 2 2-1.8 4.7-2 8-2V4c-3.3 0-6 .2-8 2zM12 6v15"/></svg>Insert Comprehension Questions</button>
+        </div>
+
+        <div class="colR">
+          <input class="search" id="ocSearch" type="text" placeholder="Search specification topic/outcome...">
+          <div class="units" id="units"></div>
+          <div class="chips" id="ocChips"></div>
+        </div>
+      </div>
+
+      <button class="gen" id="genBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Generate Audio Lesson</button>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+
+const KS=[{id:"KS1",qual:"National Curriculum"},{id:"KS2",qual:"National Curriculum"},{id:"KS3",qual:"National Curriculum"},{id:"KS4",qual:"GCSE"},{id:"KS5",qual:"A-Level"}];
+const BOARDS=["AQA","Edexcel"];
+
+const ICONS={
+  bank:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 4l9 5.5M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>',
+  brief:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>',
+  dna:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c0 6 10 6 10 12M17 3c0 6-10 6-10 12M7 15c0 3 2 6 2 6M17 15c0 3-2 6-2 6M8.5 7h7M8.5 17h7"/></svg>',
+  flask:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3v6L4.8 18a2 2 0 0 0 1.8 3h10.8a2 2 0 0 0 1.8-3L14 9V3M8 3h8M7.5 15h9"/></svg>',
+  code:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 8-5 4 5 4M16 8l5 4-5 4M13 5l-2 14"/></svg>',
+  coin:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.5c-.8-1.5-2.6-2.5-5-2.5-2.8 0-5 1.6-5 3.5S9.2 11 12 11s5 1.6 5 3.5-2.2 3.5-5 3.5c-2.4 0-4.2-1-5-2.5"/></svg>',
+  globe:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14.5 14.5 0 0 1 0 18 14.5 14.5 0 0 1 0-18"/></svg>',
+  hist:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21h16M5 21V8l7-5 7 5v13M9 21v-6h6v6M12 8h.01"/></svg>',
+  fx:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 15c2 0 2-6 4-6m-3 3h4M9 9h1.5"/></svg>',
+  atom:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/></svg>',
+  brain:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3A3.5 3.5 0 0 0 6 6.5c-2 .5-3 2-3 4 0 1.4.6 2.6 1.6 3.4-.4.7-.6 1.4-.6 2.1A4 4 0 0 0 8 20c.6.6 1.5 1 2.5 1 .5 0 1-.1 1.5-.3.5.2 1 .3 1.5.3 1 0 1.9-.4 2.5-1a4 4 0 0 0 4-4c0-.7-.2-1.4-.6-2.1 1-.8 1.6-2 1.6-3.4 0-2-1-3.5-3-4A3.5 3.5 0 0 0 14.5 3c-1 0-1.9.4-2.5 1.1A3.5 3.5 0 0 0 9.5 3z"/><path d="M12 4v17"/></svg>',
+  book:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-1.8-4.7-2-8-2v15c3.3 0 6 .2 8 2 2-1.8 4.7-2 8-2V4c-3.3 0-6 .2-8 2zM12 6v15"/></svg>',
+  palette:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 1 9-9c0 2-1.3 3-3 3h-2c-1.2 0-2 1-1.5 2.1.6 1.3-.3 3.9-2.5 3.9z"/><circle cx="7.5" cy="10.5" r=".5"/><circle cx="12" cy="7.5" r=".5"/><circle cx="16.5" cy="10.5" r=".5"/></svg>',
+  camera:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.2"/></svg>',
+  cube:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 8 4.5v9L12 20l-8-4.5v-9L12 2zM12 11l8-4.5M12 11 4 6.5M12 11v9"/></svg>',
+  lang:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h9M8.5 3v2c0 4-2.5 7.5-5.5 9M5.5 8c1.5 3 4 5.5 7 6.5M13 21l4.5-10L22 21M14.8 17h5.4"/></svg>',
+  masks:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4.5 4.5 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/></svg>',
+  music:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l10-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>',
+  scale:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M8 21h8M6 6l6-2 6 2M6 6l-3 6a3 3 0 0 0 6 0L6 6zM18 6l-3 6a3 3 0 0 0 6 0l-3-6z"/></svg>',
+  media:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="15" height="15" rx="2"/><path d="M18 8h2a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2M7 9h7M7 13h7M7 17h4"/></svg>',
+  leaf:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c0-9 5-14 16-16-1 11-6 16-13 16H4zM4 20c3-5 7-9 12-12"/></svg>',
+  bulb:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 1 4 10.5c-.8.7-1 1.5-1 2.5h-6c0-1-.2-1.8-1-2.5A6 6 0 0 1 12 3z"/></svg>',
+  dumbbell:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>',
+  users:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-5-6.3"/></svg>'
+};
+
+const SUBJECTS=[
+  {id:"7127",name:"Accounting",                              icon:"bank",    tone:"t-amber"},
+  {id:"7201",name:"Art and Design: Art, craft and design",   icon:"palette", tone:"t-rose"},
+  {id:"7202",name:"Art and Design: Fine art",                icon:"palette", tone:"t-violet"},
+  {id:"7203",name:"Art and Design: Graphic communication",   icon:"palette", tone:"t-blue"},
+  {id:"7206",name:"Art and Design: Photography",             icon:"camera",  tone:"t-teal"},
+  {id:"7204",name:"Art and Design: Textile design",          icon:"palette", tone:"t-amber"},
+  {id:"7205",name:"Art and Design: Three-dimensional design",icon:"cube",    tone:"t-green"},
+  {id:"7637",name:"Bengali",                                 icon:"lang",    tone:"t-rose"},
+  {id:"7402",name:"Biology",                                 icon:"dna",     tone:"t-green"},
+  {id:"7132",name:"Business",                                icon:"brief",   tone:"t-blue"},
+  {id:"7405",name:"Chemistry",                               icon:"flask",   tone:"t-violet"},
+  {id:"7517",name:"Computer Science",                        icon:"code",    tone:"t-teal"},
+  {id:"7237",name:"Dance",                                   icon:"music",   tone:"t-rose"},
+  {id:"7262",name:"Drama and Theatre",                       icon:"masks",   tone:"t-amber"},
+  {id:"7136",name:"Economics",                               icon:"coin",    tone:"t-green"},
+  {id:"7702",name:"English Language",                        icon:"book",    tone:"t-rose"},
+  {id:"7707",name:"English Language and Literature",         icon:"book",    tone:"t-amber"},
+  {id:"7712",name:"English Literature A",                    icon:"book",    tone:"t-violet"},
+  {id:"7717",name:"English Literature B",                    icon:"book",    tone:"t-blue"},
+  {id:"7447",name:"Environmental Science",                   icon:"leaf",    tone:"t-green"},
+  {id:"7652",name:"French",                                  icon:"lang",    tone:"t-blue"},
+  {id:"7367",name:"Further Mathematics",                     icon:"fx",      tone:"t-violet"},
+  {id:"7037",name:"Geography",                               icon:"globe",   tone:"t-teal"},
+  {id:"7662",name:"German",                                  icon:"lang",    tone:"t-amber"},
+  {id:"7042",name:"History",                                 icon:"hist",    tone:"t-amber"},
+  {id:"7252",name:"History of Art",                          icon:"palette", tone:"t-teal"},
+  {id:"7162",name:"Law",                                     icon:"scale",   tone:"t-blue"},
+  {id:"7357",name:"Mathematics",                             icon:"fx",      tone:"t-rose"},
+  {id:"7572",name:"Media Studies",                           icon:"media",   tone:"t-violet"},
+  {id:"7272",name:"Music",                                   icon:"music",   tone:"t-green"},
+  {id:"7172",name:"Philosophy",                              icon:"bulb",    tone:"t-amber"},
+  {id:"7582",name:"Physical Education",                      icon:"dumbbell",tone:"t-green"},
+  {id:"7408",name:"Physics",                                 icon:"atom",    tone:"t-blue"},
+  {id:"7152",name:"Politics",                                icon:"bank",    tone:"t-rose"},
+  {id:"7182",name:"Psychology",                              icon:"brain",   tone:"t-violet"},
+  {id:"7062",name:"Religious Studies",                       icon:"book",    tone:"t-teal"},
+  {id:"7192",name:"Sociology",                               icon:"users",   tone:"t-teal"},
+  {id:"7692",name:"Spanish",                                 icon:"lang",    tone:"t-rose"}
+];
+
+/* Spec units → outcomes with sub-detail bullets, mirroring the MEB unit/outcome tree */
+const SPEC={
+  "7127":[
+    {unit:"3.2 Types of business organisation",ocs:[
+      {c:"3.2.1",t:"Understand the main types of business organisation and their key features",d:["a) Sole traders, partnerships and limited companies.","b) Reasons for choosing each form of organisation."]},
+      {c:"3.2.2",t:"Evaluate the advantages and disadvantages of each type of organisation",d:["a) Liability, continuity, finance and control.","b) Suitability for different business contexts."]},
+      {c:"3.2.3",t:"Understand the accounting implications of each organisational form",d:["a) Capital structure differences.","b) Appropriation of profits."]}
+    ]},
+    {unit:"3.3 The double entry model",ocs:[
+      {c:"3.3.1",t:"Apply the principles of the double entry model to record transactions",d:["a) Debit and credit rules for assets, liabilities, income and expenses.","b) Recording transactions in ledger accounts."]},
+      {c:"3.3.2",t:"Balance ledger accounts and extract a trial balance",d:["a) Balancing off accounts at period end.","b) Purpose and limitations of the trial balance."]}
+    ]},
+    {unit:"3.4 Verification of accounting records",ocs:[
+      {c:"3.4.1",t:"Prepare bank reconciliation statements",d:["a) Updating the cash book.","b) Reconciling the bank statement balance."]},
+      {c:"3.4.2",t:"Use control accounts to verify ledgers",d:["a) Sales and purchases ledger control accounts.","b) Identifying and correcting discrepancies."]}
+    ]},
+    {unit:"3.6 Financial statements of sole traders",ocs:[
+      {c:"3.6.1",t:"Prepare income statements for sole traders",d:["a) Adjustments for accruals, prepayments and depreciation.","b) Calculation of gross and net profit."]},
+      {c:"3.6.2",t:"Prepare statements of financial position",d:["a) Classification of assets and liabilities.","b) Presentation of capital and drawings."]}
+    ]}
+  ],
+  "7402":[
+    {unit:"3.1 Biological molecules",ocs:[
+      {c:"3.1.1",t:"Describe the structure and function of carbohydrates, lipids and proteins",d:["a) Monomers and polymers; condensation and hydrolysis.","b) Tests for reducing sugars, starch, lipids and proteins."]},
+      {c:"3.1.2",t:"Explain the structure of DNA and RNA and the process of semi-conservative replication",d:["a) Nucleotide structure and polynucleotide formation.","b) Role of DNA helicase and DNA polymerase."]}
+    ]},
+    {unit:"3.2 Cells",ocs:[
+      {c:"3.2.1",t:"Compare the structure of eukaryotic and prokaryotic cells",d:["a) Organelles and their functions.","b) Cell fractionation and microscopy methods."]},
+      {c:"3.2.2",t:"Explain transport across cell membranes",d:["a) Diffusion, osmosis and active transport.","b) Factors affecting rate of movement."]}
+    ]},
+    {unit:"3.4 Genetic information and variation",ocs:[
+      {c:"3.4.1",t:"Explain how the genetic code is used in protein synthesis",d:["a) Transcription and translation.","b) Gene mutation and its effects."]},
+      {c:"3.4.2",t:"Analyse genetic diversity within and between species",d:["a) Natural selection and adaptation.","b) Investigating variation."]}
+    ]}
+  ],
+  "7037":[
+    {unit:"3.1 Water and carbon cycles",ocs:[
+      {c:"3.1.1",t:"Explain the global distribution and cycling of water and carbon",d:["a) Stores, flows and budgets at global and local scale.","b) Human impacts on the cycles."]},
+      {c:"3.1.2",t:"Assess the relationship between the water and carbon cycles and climate",d:["a) Feedback loops and climate change.","b) Mitigation and adaptation responses."]}
+    ]},
+    {unit:"3.5 Hazards",ocs:[
+      {c:"3.5.1",t:"Explain the nature and distribution of tectonic, atmospheric and wildfire hazards",d:["a) Plate tectonics theory and hazard types.","b) Hazard perception and responses."]},
+      {c:"3.5.2",t:"Evaluate human responses to hazardous environments",d:["a) Case studies of contrasting hazard events.","b) Risk management strategies."]}
+    ]},
+    {unit:"3.7 Changing places",ocs:[
+      {c:"3.7.1",t:"Analyse how places are shaped by internal and external forces",d:["a) Endogenous and exogenous factors.","b) Place meaning and representation."]}
+    ]}
+  ],
+  "7408":[
+    {unit:"3.3 Waves",ocs:[
+      {c:"3.3.1",t:"Describe the properties of progressive and stationary waves",d:["a) Amplitude, frequency, wavelength, phase.","b) Formation of stationary waves on strings."]},
+      {c:"3.3.2",t:"Explain interference and diffraction phenomena",d:["a) Two-source interference and path difference.","b) Diffraction gratings and their applications."]}
+    ]},
+    {unit:"3.4 Mechanics and materials",ocs:[
+      {c:"3.4.1",t:"Apply equations of motion to uniformly accelerated bodies",d:["a) SUVAT equations and projectile motion.","b) Graphical representation of motion."]},
+      {c:"3.4.2",t:"Explain the behaviour of materials under stress",d:["a) Hooke's law and the Young modulus.","b) Elastic and plastic deformation."]}
+    ]},
+    {unit:"3.5 Electricity",ocs:[
+      {c:"3.5.1",t:"Analyse DC circuits using Kirchhoff's laws",d:["a) Series and parallel combinations.","b) EMF and internal resistance."]}
+    ]}
+  ]
+};
+
+/* ── International (previous interface) data ── */
+const YEARS=["9","10","11","12"];
+const PROGS=["AP","IGCSE","IB","ALEVEL","COMMON CORE","OXF"];
+const COURSES=[
+  {id:"bio",  name:"Biology",         icon:"dna",     tone:"t-teal"},
+  {id:"glob", name:"Global Persp.",   icon:"globe",   tone:"t-violet"},
+  {id:"tur",  name:"Turkish L1",      icon:"lang",    tone:"t-violet"},
+  {id:"bus",  name:"Business Studies",icon:"brief",   tone:"t-green"},
+  {id:"geo",  name:"Geography",       icon:"globe",   tone:"t-green"},
+  {id:"phys", name:"Physics",         icon:"atom",    tone:"t-green"},
+  {id:"chem", name:"Chemistry",       icon:"flask",   tone:"t-green"},
+  {id:"eco",  name:"Economics",       icon:"coin",    tone:"t-green"},
+  {id:"cs",   name:"Computer Science",icon:"code",    tone:"t-blue"},
+  {id:"hist", name:"History",         icon:"hist",    tone:"t-amber"},
+  {id:"math", name:"Maths",           icon:"fx",      tone:"t-amber"},
+  {id:"drama",name:"Drama",           icon:"masks",   tone:"t-violet"}
+];
+const INTL_SPEC={
+  bio:[
+    {unit:"1 - Characteristics And Classification Of Living Organisms",ocs:[
+      {c:"1.1",t:"Characteristics of living organisms",tag:"core",d:["1 Describe the characteristics of living organisms: movement, respiration, sensitivity, growth, reproduction, excretion and nutrition"]},
+      {c:"1.2",t:"Concept and uses of classification systems",tag:"core",d:["1 State that organisms can be classified into groups by the features that they share","2 Describe a species as a group of organisms that can reproduce to produce fertile offspring","3 Describe the binomial system of naming species","4 Construct and use dichotomous keys based on identifiable features"]},
+      {c:"1.2",t:"Concept and uses of classification systems",tag:"supp",d:["5 Explain that classification systems aim to reflect evolutionary relationships","6 Explain that the sequences of bases in DNA are used as a means of classification","7 Explain that groups of organisms which share a more recent ancestor have base sequences in DNA that are more similar"]},
+      {c:"1.3",t:"Features of organisms",tag:"core",d:["1 List the main features used in the classification of the five kingdoms","2 List the main features of the groups of vertebrates and arthropods"]}
+    ]},
+    {unit:"2 - Organisation Of The Organism",ocs:[
+      {c:"2.1",t:"Cell structure and size of specimens",tag:"core",d:["1 Describe and compare the structure of plant and animal cells","2 Describe the functions of the structures in plant and animal cells","3 Calculate magnification and size of biological specimens"]},
+      {c:"2.1",t:"Cell structure and size of specimens",tag:"supp",d:["4 Describe the structure of bacterial cells","5 Relate the structure of specialised cells to their functions"]}
+    ]},
+    {unit:"3 - Movement Into And Out Of Cells",ocs:[
+      {c:"3.1",t:"Diffusion",tag:"core",d:["1 Describe diffusion as the net movement of particles down a concentration gradient","2 Describe the importance of diffusion of gases and solutes in living organisms"]},
+      {c:"3.2",t:"Osmosis",tag:"core",d:["1 State that water diffuses through partially permeable membranes by osmosis","2 Investigate osmosis using dialysis tubing or plant tissue"]}
+    ]}
+  ]
+};
+
+const state={curr:"uk",ks:"KS5",board:"AQA",subject:"7127",year:"9",prog:"IGCSE",course:"bio",ocs:new Set(),open:new Set([0]),q:""};
+
+function renderCurr(){
+  const uk=state.curr==="uk";
+  document.querySelectorAll("#currBtns .cbtn").forEach(b=>b.classList.toggle("on",b.dataset.curr===state.curr));
+  $("ukLeft").style.display=uk?"":"none";
+  $("intlLeft").style.display=uk?"none":"";
+  $("ocSearch").placeholder=uk?"Search specification topic/outcome...":"Search unit/topic/learning area...";
+  state.ocs.clear();state.open=new Set([0]);
+}
+function renderYears(){
+  $("yrPills").innerHTML=YEARS.map(y=>`<button class="pill ${state.year===y?"on":""}" data-year="${y}">${y}</button>`).join("");
+}
+function renderProgs(){
+  $("progs").innerHTML=PROGS.map(p=>`<button class="board ${state.prog===p?"on":""}" data-prog="${p}">${p}</button>`).join("");
+}
+function renderCourses(){
+  $("courses").innerHTML=COURSES.map(c=>`<button class="subj ${c.tone} ${state.course===c.id?"on":""}" data-course="${c.id}"><span class="ic">${ICONS[c.icon]}</span><span class="nm">${c.name}</span></button>`).join("");
+}
+
+function renderKs(){
+  $("ksPills").innerHTML=KS.map(k=>`<button class="pill ${state.ks===k.id?"on":""}" data-ks="${k.id}">${k.id}<small>${k.qual}</small></button>`).join("");
+  $("qualName").textContent=KS.find(k=>k.id===state.ks).qual;
+}
+function renderBoards(){
+  $("boards").innerHTML=BOARDS.map(b=>`<button class="board ${state.board===b?"on":""}" data-board="${b}">${b}</button>`).join("");
+}
+function renderSubjects(){
+  $("subjects").innerHTML=SUBJECTS.map(s=>`<button class="subj ${s.tone} ${state.subject===s.id?"on":""}" data-subj="${s.id}"><span class="ic">${ICONS[s.icon]}</span><span class="nm">${s.name}<span class="code">${s.id}</span></span></button>`).join("");
+}
+function renderUnits(){
+  const uk=state.curr==="uk";
+  const spec=uk?SPEC[state.subject]:INTL_SPEC[state.course];
+  const prefix=uk?(SUBJECTS.find(x=>x.id===state.subject)||{name:"SPC"}).name.split(/[ :]/)[0].slice(0,3).toUpperCase():(COURSES.find(x=>x.id===state.course)||{name:"IGC"}).name.slice(0,3).toUpperCase();
+  if(!spec){$("units").innerHTML=`<div class="empty-note">${uk?"Specification outcomes for this subject aren't wired into this trial yet — try Accounting, Biology, Geography or Physics.":"Learning outcomes for this course aren't wired into this trial yet — try Biology."}</div>`;$("ocChips").innerHTML="";$("genBtn").disabled=true;return;}
+  const q=state.q.trim().toLowerCase();
+  const key=(o,i,j)=>`${i}-${j}-${o.c}`;
+  $("units").innerHTML=spec.map((u,i)=>{
+    const rows=u.ocs.map((o,j)=>({o,j})).filter(({o})=>!q||o.t.toLowerCase().includes(q)||u.unit.toLowerCase().includes(q)||o.c.includes(q));
+    if(q&&!rows.length)return"";
+    const open=q?true:state.open.has(i);
+    const sel=u.ocs.filter((o,j)=>state.ocs.has(key(o,i,j))).length;
+    return `<div class="unit ${open?"open":""}">
+      <button class="uhead" data-unit="${i}">${i+1}. ${u.unit}<span class="ucnt">${sel}/${u.ocs.length}</span><span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
+      <div class="ubody">${rows.map(({o,j})=>`
+        <button class="oc ${state.ocs.has(key(o,i,j))?"on":""}" data-oc="${key(o,i,j)}" aria-pressed="${state.ocs.has(key(o,i,j))}">
+          <span class="box"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>
+          <span class="code">${prefix}.${o.c}</span>
+          <span class="tx"><b>${o.t}</b><ul>${o.d.map(x=>`<li>– ${x}</li>`).join("")}</ul></span>
+          ${o.tag?`<span class="octag ${o.tag}">${o.tag==="core"?"Core":"Supplement"}</span>`:""}
+        </button>`).join("")}</div>
+    </div>`;
+  }).join("");
+  const all=[];spec.forEach((u,i)=>u.ocs.forEach((o,j)=>all.push({k:key(o,i,j),o})));
+  $("ocChips").innerHTML=[...state.ocs].map(k=>{const f=all.find(x=>x.k===k);return f?`<span class="chip">${f.o.t.length>44?f.o.t.slice(0,44)+"…":f.o.t}<button data-unchip="${k}" aria-label="Remove"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></span>`:""}).join("");
+  $("genBtn").disabled=state.ocs.size===0;
+}
+function renderAll(){renderCurr();renderKs();renderBoards();renderSubjects();renderYears();renderProgs();renderCourses();renderUnits();}
+
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-curr],[data-ks],[data-board],[data-subj],[data-year],[data-prog],[data-course],[data-unit],[data-oc],[data-unchip],#compQ");
+  if(!t)return;
+  if(t.dataset.curr){if(state.curr!==t.dataset.curr){state.curr=t.dataset.curr;renderCurr();renderUnits();}}
+  else if(t.dataset.ks){state.ks=t.dataset.ks;renderKs();}
+  else if(t.dataset.board){state.board=t.dataset.board;renderBoards();}
+  else if(t.dataset.subj){if(state.subject!==t.dataset.subj){state.subject=t.dataset.subj;state.ocs.clear();state.open=new Set([0]);}renderSubjects();renderUnits();}
+  else if(t.dataset.year){state.year=t.dataset.year;renderYears();}
+  else if(t.dataset.prog){state.prog=t.dataset.prog;renderProgs();}
+  else if(t.dataset.course){if(state.course!==t.dataset.course){state.course=t.dataset.course;state.ocs.clear();state.open=new Set([0]);}renderCourses();renderUnits();}
+  else if(t.dataset.unit!==undefined){const i=+t.dataset.unit;state.open.has(i)?state.open.delete(i):state.open.add(i);renderUnits();}
+  else if(t.dataset.oc){state.ocs.has(t.dataset.oc)?state.ocs.delete(t.dataset.oc):state.ocs.add(t.dataset.oc);renderUnits();}
+  else if(t.dataset.unchip){state.ocs.delete(t.dataset.unchip);renderUnits();}
+  else if(t.id==="compQ"){t.classList.toggle("on");}
+});
+$("ocSearch").addEventListener("input",e=>{state.q=e.target.value;renderUnits();});
+
+renderAll();
+})();
+</script>
+</body>
+</html>
