@@ -1,0 +1,449 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UK Curriculum — Assignment Generator</title>
+<style>
+:root{
+  --orange:#F5883E; --orange-d:#C2621D; --orange-l:#FFF4EA; --orange-b:#F9B984;
+  --bg:#F7F3ED; --surface:#FFFFFF; --s2:#FCF9F4; --s3:#F8F4EE;
+  --text:#251E16; --muted:#9C8E7E; --muted2:#B4A896; --border:#EFE7DC; --border2:#E4DACB;
+  --info-bg:#F3F6FB; --info-tx:#3B5A8F;
+  --green:#10B981; --green-d:#047857; --green-l:#ECFDF5; --green-b:#A7F3D0;
+  --amber:#F59E0B; --amber-d:#B45309; --amber-l:#FFFBEB; --amber-b:#FDE68A;
+  --rose:#F43F5E;  --rose-d:#BE123C;  --rose-l:#FFF1F2;  --rose-b:#FECDD3;
+  --blue:#3B82F6;  --blue-d:#1D4ED8;  --blue-l:#EFF6FF;  --blue-b:#BFDBFE;
+  --violet:#8B5CF6;--violet-d:#6D28D9;--violet-l:#F5F3FF;--violet-b:#DDD6FE;
+  --teal:#14B8A6;  --teal-d:#0F766E;  --teal-l:#F0FDFA;  --teal-b:#99F6E4;
+  --shadow:0 1px 2px rgba(37,30,22,.04),0 8px 28px -12px rgba(37,30,22,.10);
+  --r:16px; --r2:12px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Inter,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;font-size:14px;line-height:1.45}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+svg{display:block}
+
+.frame{display:flex;min-height:100vh}
+/* ── icon rail ── */
+.rail{width:52px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 0;position:sticky;top:0;height:100vh}
+.rail .ri{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.rail .ri.on{background:var(--orange-l);color:var(--orange)}
+.rail .ri:hover{background:var(--s3)}
+@media(max-width:760px){.rail{display:none}}
+
+.main{flex:1;min-width:0;padding:18px clamp(12px,4vw,44px) 120px}
+.crumbs{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;padding:4px 2px 14px}
+.crumbs a{color:var(--muted);text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.crumbs a:hover{color:var(--text)}
+.crumbs .sep{color:var(--muted2)}
+.crumbs .here{color:var(--text);font-weight:700}
+
+.card{max-width:900px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:clamp(16px,3vw,28px)}
+
+.banner{background:var(--info-bg);color:var(--info-tx);border-radius:var(--r2);padding:13px 16px;font-size:13px;font-weight:500;margin-bottom:22px}
+
+.lbl{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.lbl .cnt{margin-left:auto;text-transform:none;letter-spacing:0;font-weight:600;color:var(--muted2)}
+
+/* ── selector grid ── */
+.selgrid{display:grid;grid-template-columns:1fr 1.35fr;gap:0}
+.selgrid>.colL{padding-right:24px;border-right:1px solid var(--border)}
+.selgrid>.colR{padding-left:24px}
+@media(max-width:700px){.selgrid{grid-template-columns:1fr}.selgrid>.colL{padding-right:0;border-right:none;border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:20px}.selgrid>.colR{padding-left:0}}
+.sect{margin-bottom:20px}
+
+.pills{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pill{padding:12px 10px;border:1px solid var(--border2);border-radius:10px;background:var(--surface);font-weight:700;font-size:14px;text-align:center;transition:border-color .15s,background .15s,color .15s}
+.pill:hover{border-color:var(--orange-b)}
+.pill.on{background:var(--orange-l);border-color:var(--orange);color:var(--orange-d)}
+.pill small{display:block;font-size:10.5px;font-weight:600;color:var(--muted);margin-top:2px}
+.pill.on small{color:var(--orange-d);opacity:.75}
+
+.boards{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.board{padding:14px 8px;border:1px solid var(--border2);border-radius:10px;background:var(--surface);font-weight:700;font-size:13.5px;text-align:center;transition:border-color .15s,background .15s,color .15s}
+.board:hover{border-color:var(--orange-b)}
+.board.on{background:var(--orange-l);border-color:var(--orange);color:var(--orange-d)}
+
+.qualnote{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted);background:var(--s3);border-radius:100px;padding:6px 12px;margin-top:12px}
+.qualnote b{color:var(--text)}
+
+/* ── subject cards ── */
+.subjects{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-height:332px;overflow-y:auto;padding:2px}
+.subj{display:flex;align-items:center;gap:8px;padding:10px;border-radius:10px;border:1px solid var(--border2);background:var(--surface);font-weight:700;font-size:12px;line-height:1.2;text-align:left;transition:border-color .15s,background .15s;position:relative}
+.subj .nm{min-width:0}
+.subj .code{display:block;font-size:10px;font-weight:700;color:var(--muted2);margin-top:1px}
+.subj .ic{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.subj:hover{border-color:var(--border)}
+.subj.t-green{background:var(--green-l)}   .subj.t-green .ic{color:var(--green-d)}
+.subj.t-amber{background:var(--amber-l)}   .subj.t-amber .ic{color:var(--amber-d)}
+.subj.t-rose{background:var(--rose-l)}     .subj.t-rose .ic{color:var(--rose-d)}
+.subj.t-blue{background:var(--blue-l)}     .subj.t-blue .ic{color:var(--blue-d)}
+.subj.t-violet{background:var(--violet-l)} .subj.t-violet .ic{color:var(--violet-d)}
+.subj.t-teal{background:var(--teal-l)}     .subj.t-teal .ic{color:var(--teal-d)}
+.subj.t-green.on{border-color:var(--green)}.subj.t-amber.on{border-color:var(--amber)}
+.subj.t-rose.on{border-color:var(--rose)}  .subj.t-blue.on{border-color:var(--blue)}
+.subj.t-violet.on{border-color:var(--violet)}.subj.t-teal.on{border-color:var(--teal)}
+.subj.on::after{content:"";position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.55}
+
+/* ── outcomes ── */
+.outbox{border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--surface);max-height:308px;overflow-y:auto}
+.outcome{display:flex;align-items:flex-start;gap:12px;width:100%;text-align:left;padding:13px 16px;border-bottom:1px solid var(--border);transition:background .12s}
+.outcome:last-child{border-bottom:none}
+.outcome:hover{background:var(--s2)}
+.outcome.on{background:var(--orange-l)}
+.outcome .box{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border2);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;background:var(--surface);color:#fff;transition:background .12s,border-color .12s}
+.outcome.on .box{background:var(--orange);border-color:var(--orange)}
+.outcome .box svg{opacity:0}
+.outcome.on .box svg{opacity:1}
+.outcome .tx b{font-weight:600;font-size:13.5px;display:block}
+.outcome .tx span{font-size:11.5px;color:var(--muted2);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px;min-height:4px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--orange-l);color:var(--orange-d);border:1px solid var(--orange-b);font-size:12px;font-weight:700;padding:5px 8px 5px 11px;border-radius:100px}
+.chip button{display:flex;color:inherit;opacity:.65;border-radius:50%}
+.chip button:hover{opacity:1}
+.empty-note{font-size:12.5px;color:var(--muted2);font-weight:600;padding:22px 16px;text-align:center}
+
+/* ── question types ── */
+.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:560px){.qgrid{grid-template-columns:1fr}}
+.qcard{border-radius:var(--r2);padding:13px 14px;display:flex;flex-direction:column;gap:9px;border:1px solid transparent}
+.qcard.c-green{background:var(--green-l);border-color:var(--green-b)}
+.qcard.c-amber{background:var(--amber-l);border-color:var(--amber-b)}
+.qcard.c-rose{background:var(--rose-l);border-color:var(--rose-b)}
+.qcard.c-blue{background:var(--blue-l);border-color:var(--blue-b)}
+.qtop{display:flex;align-items:center;gap:10px}
+.qic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.c-green .qic{background:var(--green)}.c-amber .qic{background:var(--amber)}
+.c-rose .qic{background:var(--rose)}.c-blue .qic{background:var(--blue)}
+.qname{font-weight:800;font-size:13.5px}
+.c-green .qname{color:var(--green-d)}.c-amber .qname{color:var(--amber-d)}
+.c-rose .qname{color:var(--rose-d)}.c-blue .qname{color:var(--blue-d)}
+.qpts{font-size:11px;font-weight:700;color:var(--muted)}
+.qcount{margin-left:auto;display:flex;align-items:center;gap:2px}
+.step{width:26px;height:26px;border-radius:8px;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--muted);transition:color .12s,border-color .12s}
+.step:hover{color:var(--text);border-color:var(--muted2)}
+.qnum{min-width:26px;text-align:center;font-weight:800;font-size:15px;font-variant-numeric:tabular-nums}
+.aorow{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
+.ao{font-size:10px;font-weight:800;letter-spacing:.04em;padding:3px 7px;border-radius:100px;background:var(--surface);border:1px solid var(--border2);color:var(--muted)}
+.ao.hit{color:inherit;border-color:currentColor;opacity:.9}
+.c-green .ao.hit{color:var(--green-d)}.c-amber .ao.hit{color:var(--amber-d)}
+.c-rose .ao.hit{color:var(--rose-d)}.c-blue .ao.hit{color:var(--blue-d)}
+.aocheck{margin-left:auto;font-size:10.5px;font-weight:800}
+.c-rose .aocheck{color:var(--rose-d)}
+
+.hint{display:flex;align-items:center;gap:9px;border-radius:10px;padding:10px 14px;font-size:12.5px;font-weight:600;margin-top:12px;background:var(--green-l);border:1px solid var(--green-b);color:var(--green-d)}
+.hint.warn{background:var(--amber-l);border-color:var(--amber-b);color:var(--amber-d)}
+
+/* ── command words ── */
+.cwords{display:flex;flex-wrap:wrap;gap:7px}
+.cw{display:inline-flex;align-items:baseline;gap:5px;padding:6px 12px;border-radius:100px;border:1px solid var(--border2);background:var(--surface);font-size:12.5px;font-weight:700;color:var(--text);transition:border-color .12s,background .12s,color .12s}
+.cw i{font-style:normal;font-size:10px;font-weight:700;color:var(--muted2)}
+.cw:hover{border-color:var(--orange-b)}
+.cw.on{background:var(--orange-l);border-color:var(--orange);color:var(--orange-d)}
+.cw.on i{color:var(--orange-d);opacity:.7}
+
+/* ── summary ── */
+.summary{background:var(--s2);border:1px solid var(--border);border-radius:var(--r2);padding:18px 20px;display:grid;grid-template-columns:1fr 1fr;gap:16px 24px}
+@media(max-width:600px){.summary{grid-template-columns:1fr}}
+.sum .k{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted2);margin-bottom:3px}
+.sum .v{font-size:13.5px;font-weight:700}
+.sum .v .dim{color:var(--muted);font-weight:600}
+
+hr.div{border:none;border-top:1px solid var(--border);margin:24px 0}
+
+/* ── bottom bar ── */
+.genbar{position:sticky;bottom:16px;max-width:900px;margin:20px auto 0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);padding:14px 18px;display:flex;align-items:center;gap:26px}
+.gstat .k{font-size:10.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted2)}
+.gstat .v{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.4px}
+.gen{margin-left:auto;display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#FBA34C,#F5762E);color:#fff;font-weight:800;font-size:14.5px;padding:12px 26px;border-radius:12px;box-shadow:0 8px 20px -8px rgba(245,118,46,.6);transition:transform .14s,opacity .14s}
+.gen:hover{transform:translateY(-1px)}
+.gen:active{transform:scale(.98)}
+.gen[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+@media (prefers-reduced-motion:reduce){.gen,.pill,.board,.subj,.cw{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="frame">
+  <nav class="rail" aria-label="App navigation">
+    <button class="ri" title="Home"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></button>
+    <button class="ri on" title="Assignments"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></button>
+    <button class="ri" title="Question bank"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v18M18 3v18M6 8h12M6 16h12"/></svg></button>
+    <button class="ri" title="Chat"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-8 8H4l2-3a8 8 0 1 1 15-5z"/></svg></button>
+    <button class="ri" title="Library"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h13v18H6a2 2 0 0 1-2-2z"/><path d="M9 3v18"/></svg></button>
+    <button class="ri" title="Analytics"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></button>
+  </nav>
+
+  <main class="main">
+    <div class="crumbs">
+      <a href="#"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>Assignment Generator</a>
+      <span class="sep">/</span><span class="here">UK Curriculum</span>
+    </div>
+
+    <div class="card">
+      <div class="banner">Select a key stage, exam board and subject to create specification-aligned questions. Madlen will use the official specification outcomes and command words of your chosen exam board to prepare a comprehensive exam.</div>
+
+      <div class="selgrid">
+        <div class="colL">
+          <div class="sect">
+            <div class="lbl">Key stage</div>
+            <div class="pills" id="ksPills"></div>
+            <div class="qualnote"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>Qualification: <b id="qualName">A-Level</b></div>
+          </div>
+          <div class="sect" style="margin-bottom:0">
+            <div class="lbl">Exam board</div>
+            <div class="boards" id="boards"></div>
+          </div>
+        </div>
+        <div class="colR">
+          <div class="sect" style="margin-bottom:0">
+            <div class="lbl">Select subject</div>
+            <div class="subjects" id="subjects"></div>
+          </div>
+        </div>
+      </div>
+
+      <hr class="div">
+
+      <div class="sect">
+        <div class="lbl">Specification outcomes <span class="cnt" id="outCount">0 selected</span></div>
+        <div style="font-size:12.5px;color:var(--muted);font-weight:600;margin:-4px 0 10px">Select one or more outcomes to align the questions to.</div>
+        <div class="outbox" id="outBox"></div>
+        <div class="chips" id="outChips"></div>
+      </div>
+
+      <hr class="div">
+
+      <div class="sect">
+        <div class="lbl">Question types</div>
+        <div class="qgrid" id="qGrid"></div>
+        <div class="hint" id="aoHint"></div>
+      </div>
+
+      <hr class="div">
+
+      <div class="sect">
+        <div class="lbl">Command words <span class="cnt" id="cwCount"></span></div>
+        <div class="cwords" id="cWords"></div>
+      </div>
+
+      <hr class="div">
+
+      <div class="sect" style="margin-bottom:0">
+        <div class="lbl">Alignment summary</div>
+        <div class="summary">
+          <div class="sum"><div class="k">Key stage</div><div class="v" id="sKs">—</div></div>
+          <div class="sum"><div class="k">Exam board</div><div class="v" id="sBoard">—</div></div>
+          <div class="sum"><div class="k">Subject</div><div class="v" id="sSubj">—</div></div>
+          <div class="sum"><div class="k">Outcomes</div><div class="v" id="sOut">—</div></div>
+          <div class="sum"><div class="k">Question types</div><div class="v" id="sQt">—</div></div>
+          <div class="sum"><div class="k">Command words</div><div class="v" id="sCw">—</div></div>
+          <div class="sum" style="grid-column:1/-1"><div class="k">AO target</div><div class="v" id="sAo">—</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="genbar">
+      <div class="gstat"><div class="k">Questions</div><div class="v" id="tQ">0</div></div>
+      <div class="gstat"><div class="k">Total points</div><div class="v" id="tP">0</div></div>
+      <button class="gen" id="genBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Generate</button>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+
+/* ── data ── */
+const KS=[{id:"KS1",qual:"National Curriculum"},{id:"KS2",qual:"National Curriculum"},{id:"KS3",qual:"National Curriculum"},{id:"KS4",qual:"GCSE"},{id:"KS5",qual:"A-Level"}];
+const BOARDS=["AQA","Edexcel"];
+
+const ICONS={
+  bank:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 4l9 5.5M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/></svg>',
+  brief:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>',
+  dna:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3c0 6 10 6 10 12M17 3c0 6-10 6-10 12M7 15c0 3 2 6 2 6M17 15c0 3-2 6-2 6M8.5 7h7M8.5 17h7"/></svg>',
+  flask:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3v6L4.8 18a2 2 0 0 0 1.8 3h10.8a2 2 0 0 0 1.8-3L14 9V3M8 3h8M7.5 15h9"/></svg>',
+  code:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 8-5 4 5 4M16 8l5 4-5 4M13 5l-2 14"/></svg>',
+  coin:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 6.5c-.8-1.5-2.6-2.5-5-2.5-2.8 0-5 1.6-5 3.5S9.2 11 12 11s5 1.6 5 3.5-2.2 3.5-5 3.5c-2.4 0-4.2-1-5-2.5"/></svg>',
+  globe:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14.5 14.5 0 0 1 0 18 14.5 14.5 0 0 1 0-18"/></svg>',
+  hist:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21h16M5 21V8l7-5 7 5v13M9 21v-6h6v6M12 8h.01"/></svg>',
+  fx:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 15c2 0 2-6 4-6m-3 3h4M9 9h1.5"/></svg>',
+  atom:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/></svg>',
+  brain:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3A3.5 3.5 0 0 0 6 6.5c-2 .5-3 2-3 4 0 1.4.6 2.6 1.6 3.4-.4.7-.6 1.4-.6 2.1A4 4 0 0 0 8 20c.6.6 1.5 1 2.5 1 .5 0 1-.1 1.5-.3.5.2 1 .3 1.5.3 1 0 1.9-.4 2.5-1a4 4 0 0 0 4-4c0-.7-.2-1.4-.6-2.1 1-.8 1.6-2 1.6-3.4 0-2-1-3.5-3-4A3.5 3.5 0 0 0 14.5 3c-1 0-1.9.4-2.5 1.1A3.5 3.5 0 0 0 9.5 3z"/><path d="M12 4v17"/></svg>',
+  book:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6c-2-1.8-4.7-2-8-2v15c3.3 0 6 .2 8 2 2-1.8 4.7-2 8-2V4c-3.3 0-6 .2-8 2zM12 6v15"/></svg>',
+  palette:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21a9 9 0 1 1 9-9c0 2-1.3 3-3 3h-2c-1.2 0-2 1-1.5 2.1.6 1.3-.3 3.9-2.5 3.9z"/><circle cx="7.5" cy="10.5" r=".5"/><circle cx="12" cy="7.5" r=".5"/><circle cx="16.5" cy="10.5" r=".5"/></svg>',
+  camera:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.2"/></svg>',
+  cube:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 8 4.5v9L12 20l-8-4.5v-9L12 2zM12 11l8-4.5M12 11 4 6.5M12 11v9"/></svg>',
+  lang:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h9M8.5 3v2c0 4-2.5 7.5-5.5 9M5.5 8c1.5 3 4 5.5 7 6.5M13 21l4.5-10L22 21M14.8 17h5.4"/></svg>',
+  masks:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 14a4.5 4.5 0 0 0 7 0M9 9.5h.01M15 9.5h.01"/></svg>',
+  music:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l10-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>',
+  scale:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M8 21h8M6 6l6-2 6 2M6 6l-3 6a3 3 0 0 0 6 0L6 6zM18 6l-3 6a3 3 0 0 0 6 0l-3-6z"/></svg>',
+  media:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="15" height="15" rx="2"/><path d="M18 8h2a1 1 0 0 1 1 1v9a2 2 0 0 1-2 2M7 9h7M7 13h7M7 17h4"/></svg>',
+  leaf:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20c0-9 5-14 16-16-1 11-6 16-13 16H4zM4 20c3-5 7-9 12-12"/></svg>',
+  bulb:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 1 4 10.5c-.8.7-1 1.5-1 2.5h-6c0-1-.2-1.8-1-2.5A6 6 0 0 1 12 3z"/></svg>',
+  dumbbell:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>',
+  users:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 5a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-5-6.3"/></svg>'
+};
+
+const SUBJECTS=[
+  {id:"7127",name:"Accounting",                              icon:"bank",    tone:"t-amber"},
+  {id:"7201",name:"Art and Design: Art, craft and design",   icon:"palette", tone:"t-rose"},
+  {id:"7202",name:"Art and Design: Fine art",                icon:"palette", tone:"t-violet"},
+  {id:"7203",name:"Art and Design: Graphic communication",   icon:"palette", tone:"t-blue"},
+  {id:"7206",name:"Art and Design: Photography",             icon:"camera",  tone:"t-teal"},
+  {id:"7204",name:"Art and Design: Textile design",          icon:"palette", tone:"t-amber"},
+  {id:"7205",name:"Art and Design: Three-dimensional design",icon:"cube",    tone:"t-green"},
+  {id:"7637",name:"Bengali",                                 icon:"lang",    tone:"t-rose"},
+  {id:"7402",name:"Biology",                                 icon:"dna",     tone:"t-green"},
+  {id:"7132",name:"Business",                                icon:"brief",   tone:"t-blue"},
+  {id:"7405",name:"Chemistry",                               icon:"flask",   tone:"t-violet"},
+  {id:"7517",name:"Computer Science",                        icon:"code",    tone:"t-teal"},
+  {id:"7237",name:"Dance",                                   icon:"music",   tone:"t-rose"},
+  {id:"7262",name:"Drama and Theatre",                       icon:"masks",   tone:"t-amber"},
+  {id:"7136",name:"Economics",                               icon:"coin",    tone:"t-green"},
+  {id:"7702",name:"English Language",                        icon:"book",    tone:"t-rose"},
+  {id:"7707",name:"English Language and Literature",         icon:"book",    tone:"t-amber"},
+  {id:"7712",name:"English Literature A",                    icon:"book",    tone:"t-violet"},
+  {id:"7717",name:"English Literature B",                    icon:"book",    tone:"t-blue"},
+  {id:"7447",name:"Environmental Science",                   icon:"leaf",    tone:"t-green"},
+  {id:"7652",name:"French",                                  icon:"lang",    tone:"t-blue"},
+  {id:"7367",name:"Further Mathematics",                     icon:"fx",      tone:"t-violet"},
+  {id:"7037",name:"Geography",                               icon:"globe",   tone:"t-teal"},
+  {id:"7662",name:"German",                                  icon:"lang",    tone:"t-amber"},
+  {id:"7042",name:"History",                                 icon:"hist",    tone:"t-amber"},
+  {id:"7252",name:"History of Art",                          icon:"palette", tone:"t-teal"},
+  {id:"7162",name:"Law",                                     icon:"scale",   tone:"t-blue"},
+  {id:"7357",name:"Mathematics",                             icon:"fx",      tone:"t-rose"},
+  {id:"7572",name:"Media Studies",                           icon:"media",   tone:"t-violet"},
+  {id:"7272",name:"Music",                                   icon:"music",   tone:"t-green"},
+  {id:"7172",name:"Philosophy",                              icon:"bulb",    tone:"t-amber"},
+  {id:"7582",name:"Physical Education",                      icon:"dumbbell",tone:"t-green"},
+  {id:"7408",name:"Physics",                                 icon:"atom",    tone:"t-blue"},
+  {id:"7152",name:"Politics",                                icon:"bank",    tone:"t-rose"},
+  {id:"7182",name:"Psychology",                              icon:"brain",   tone:"t-violet"},
+  {id:"7062",name:"Religious Studies",                       icon:"book",    tone:"t-teal"},
+  {id:"7192",name:"Sociology",                               icon:"users",   tone:"t-teal"},
+  {id:"7692",name:"Spanish",                                 icon:"lang",    tone:"t-rose"}
+];
+
+const OUTCOMES={
+  "7127":[["3.1","An introduction to the role of the accountant in business"],["3.2","Types of business organisation"],["3.3","The double entry model"],["3.4","Verification of accounting records"],["3.5","Accounting concepts used in the preparation of accounting records"],["3.6","Preparation of financial statements of sole traders"],["3.7","Limited company accounts"],["3.8","Analysis and evaluation of financial information"],["3.9","Budgeting"],["3.10","Marginal costing"]],
+  "7402":[["3.1","Biological molecules"],["3.2","Cells"],["3.3","Organisms exchange substances with their environment"],["3.4","Genetic information, variation and relationships"],["3.5","Energy transfers in and between organisms"],["3.6","Organisms respond to changes in their environments"],["3.7","Genetics, populations, evolution and ecosystems"],["3.8","The control of gene expression"]],
+  "7132":[["3.1","What is business?"],["3.2","Managers, leadership and decision making"],["3.3","Decision making to improve marketing performance"],["3.4","Decision making to improve operational performance"],["3.5","Decision making to improve financial performance"],["3.6","Decision making to improve human resource performance"],["3.7","Analysing the strategic position of a business"]],
+  "7405":[["3.1","Physical chemistry"],["3.2","Inorganic chemistry"],["3.3","Organic chemistry"],["3.4","Amount of substance"],["3.5","Bonding"],["3.6","Energetics"],["3.7","Kinetics"],["3.8","Chemical equilibria and Le Chatelier's principle"]],
+  "7517":[["4.1","Fundamentals of programming"],["4.2","Fundamentals of data structures"],["4.3","Fundamentals of algorithms"],["4.4","Theory of computation"],["4.5","Fundamentals of data representation"],["4.6","Fundamentals of computer systems"],["4.7","Fundamentals of computer organisation and architecture"],["4.8","Consequences of uses of computing"]],
+  "7136":[["4.1","Individuals, firms, markets and market failure"],["4.2","The national and international economy"],["4.3","The operation of markets and market failure"],["4.4","Financial markets and monetary policy"],["4.5","Fiscal policy and supply-side policies"],["4.6","The international economy"]],
+  "7712":[["A","Love through the ages"],["B","Texts in shared contexts: WW1 and its aftermath"],["C","Texts in shared contexts: Modern times"],["D","Independent critical study: texts across time"],["E","Unseen poetry"]],
+  "7037":[["3.1","Water and carbon cycles"],["3.2","Hot desert systems and landscapes"],["3.3","Coastal systems and landscapes"],["3.4","Glacial systems and landscapes"],["3.5","Hazards"],["3.6","Global systems and global governance"],["3.7","Changing places"],["3.8","Contemporary urban environments"]],
+  "7042":[["1C","The Tudors: England, 1485–1603"],["1F","Industrialisation and the people: Britain, c1783–1885"],["2N","Revolution and dictatorship: Russia, 1917–1953"],["2O","Democracy and Nazism: Germany, 1918–1945"],["2S","The making of modern Britain, 1951–2007"]],
+  "7357":[["A","Proof"],["B","Algebra and functions"],["C","Coordinate geometry"],["D","Sequences and series"],["E","Trigonometry"],["F","Exponentials and logarithms"],["G","Differentiation"],["H","Integration"],["J","Statistical distributions"],["K","Mechanics: kinematics"]],
+  "7408":[["3.1","Measurements and their errors"],["3.2","Particles and radiation"],["3.3","Waves"],["3.4","Mechanics and materials"],["3.5","Electricity"],["3.6","Further mechanics and thermal physics"],["3.7","Fields and their consequences"],["3.8","Nuclear physics"]],
+  "7182":[["4.1","Social influence"],["4.2","Memory"],["4.3","Attachment"],["4.4","Psychopathology"],["4.5","Approaches in psychology"],["4.6","Biopsychology"],["4.7","Research methods"],["4.8","Issues and debates in psychology"]]
+};
+
+const QTYPES=[
+  {id:"oe", name:"Open Ended",       color:"c-rose",  pts:10, aos:[1,2,3], icon:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>', n:3, split:{1:.2,2:.35,3:.45}},
+  {id:"mc", name:"Multiple Choice",  color:"c-amber", pts:5,  aos:[1,2],   icon:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>', n:3, split:{1:.5,2:.5}},
+  {id:"tf", name:"True / False",     color:"c-green", pts:1,  aos:[1],     icon:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>', n:2, split:{1:1}},
+  {id:"fb", name:"Fill in the Blank",color:"c-blue",  pts:2,  aos:[1],     icon:'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16M6 16l10-10 2 2L8 18l-3 1 1-3z"/></svg>', n:2, split:{1:1}}
+];
+
+const CWORDS=[["Analyse","levels"],["Apply",""],["Argue","levels"],["Assess","levels"],["Balance","point"],["Calculate","point"],["Choose",""],["Comment",""],["Compare",""],["Complete","point"],["Consider",""],["Contrast",""],["Convert",""],["Criticise","levels"],["Debate","levels"],["Deduce","point"],["Define","point"],["Describe","point"],["Design",""],["Determine","point"],["Develop",""],["Discuss","levels"],["Draw","point"],["Estimate","point"],["Evaluate","levels"],["Examine","levels"],["Explain","point"],["Explore","levels"],["Extend",""],["Give","point"],["Identify","point"],["Illustrate",""],["Interpret",""],["Justify","levels"],["Label","point"],["Measure","point"],["Name","point"],["Outline","point"],["Plan",""],["Plot","point"],["Predict",""],["Prove",""],["Relate",""],["Review",""],["Show","point"],["Sketch","point"],["State","point"],["Suggest",""],["Summarise",""],["Use",""],["Write",""]];
+
+/* ── state ── */
+const state={ks:"KS5",board:"AQA",subject:"7127",outcomes:new Set(["3.2"]),counts:{oe:3,mc:3,tf:2,fb:2},cwords:new Set()};
+
+/* ── renderers ── */
+function renderKs(){
+  $("ksPills").innerHTML=KS.map(k=>`<button class="pill ${state.ks===k.id?"on":""}" data-ks="${k.id}">${k.id}<small>${k.qual}</small></button>`).join("");
+  $("qualName").textContent=KS.find(k=>k.id===state.ks).qual;
+}
+function renderBoards(){
+  $("boards").innerHTML=BOARDS.map(b=>`<button class="board ${state.board===b?"on":""}" data-board="${b}">${b}</button>`).join("");
+}
+function renderSubjects(){
+  $("subjects").innerHTML=SUBJECTS.map(s=>`<button class="subj ${s.tone} ${state.subject===s.id?"on":""}" data-subj="${s.id}"><span class="ic">${ICONS[s.icon]}</span><span class="nm">${s.name}<span class="code">${s.id}</span></span></button>`).join("");
+}
+function renderOutcomes(){
+  const list=OUTCOMES[state.subject]||[];
+  $("outBox").innerHTML=list.length?list.map(([code,name])=>`
+    <button class="outcome ${state.outcomes.has(code)?"on":""}" data-out="${code}" aria-pressed="${state.outcomes.has(code)}">
+      <span class="box"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></span>
+      <span class="tx"><b>${name}</b><span>${code}</span></span>
+    </button>`).join(""):`<div class="empty-note">Specification outcomes for this subject aren't wired into this trial yet — try Accounting, Biology, Geography or Physics.</div>`;
+  const names=[...state.outcomes].map(c=>(list.find(o=>o[0]===c)||[])[1]).filter(Boolean);
+  $("outChips").innerHTML=names.map((n,i)=>`<span class="chip">${n}<button data-unchip="${[...state.outcomes][i]}" aria-label="Remove ${n}"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></span>`).join("");
+  $("outCount").textContent=state.outcomes.size+" selected";
+}
+function renderQTypes(){
+  $("qGrid").innerHTML=QTYPES.map(q=>`
+    <div class="qcard ${q.color}">
+      <div class="qtop"><span class="qic">${q.icon}</span>
+        <div><div class="qname">${q.name}</div><div class="qpts">${q.pts} pts each</div></div>
+        <div class="qcount"><button class="step" data-dec="${q.id}" aria-label="Fewer ${q.name}">−</button><span class="qnum">${state.counts[q.id]}</span><button class="step" data-inc="${q.id}" aria-label="More ${q.name}">+</button></div>
+      </div>
+      <div class="aorow">${[1,2,3].map(a=>`<span class="ao ${q.aos.includes(a)?"hit":""}">AO${a}</span>`).join("")}${q.id==="oe"?'<span class="aocheck">✓ AO3 source</span>':""}</div>
+    </div>`).join("");
+}
+function renderCWords(){
+  $("cWords").innerHTML=CWORDS.map(([w,t])=>`<button class="cw ${state.cwords.has(w)?"on":""}" data-cw="${w}" aria-pressed="${state.cwords.has(w)}">${w}${t?`<i>${t}</i>`:""}</button>`).join("");
+  $("cwCount").textContent=state.cwords.size?state.cwords.size+" selected":"optional — leave empty to let Madlen choose";
+}
+function aoTarget(){
+  const pts={1:0,2:0,3:0};let total=0;
+  QTYPES.forEach(q=>{const p=state.counts[q.id]*q.pts;total+=p;Object.entries(q.split).forEach(([a,f])=>pts[a]+=p*f);});
+  if(!total)return null;
+  return {total,pct:[1,2,3].map(a=>Math.round(pts[a]/total*100))};
+}
+function renderMeta(){
+  const nQ=QTYPES.reduce((s,q)=>s+state.counts[q.id],0);
+  const nP=QTYPES.reduce((s,q)=>s+state.counts[q.id]*q.pts,0);
+  $("tQ").textContent=nQ;$("tP").textContent=nP;
+  $("genBtn").disabled=!(nQ>0&&state.outcomes.size>0);
+
+  const hasOE=state.counts.oe>0;
+  $("aoHint").className="hint"+(hasOE?"":" warn");
+  $("aoHint").innerHTML=(hasOE
+    ?'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5"/></svg>Full AO balance is possible; AO3 comes from open-ended questions.'
+    :'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 16.5h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>No AO3 coverage — add at least one open-ended question for full AO balance.');
+
+  const subj=SUBJECTS.find(s=>s.id===state.subject);
+  const qual=KS.find(k=>k.id===state.ks).qual;
+  $("sKs").textContent=state.ks+" · "+qual;
+  $("sBoard").textContent=state.board;
+  $("sSubj").textContent=subj?subj.name+" · "+subj.id:"—";
+  const list=OUTCOMES[state.subject]||[];
+  const names=[...state.outcomes].map(c=>(list.find(o=>o[0]===c)||[])[1]).filter(Boolean);
+  $("sOut").innerHTML=names.length?names.join(", "):'<span class="dim">None selected</span>';
+  const qparts=QTYPES.filter(q=>state.counts[q.id]>0).map(q=>`${q.name} ×${state.counts[q.id]}`);
+  $("sQt").innerHTML=qparts.length?qparts.join(", "):'<span class="dim">None</span>';
+  $("sCw").innerHTML=state.cwords.size?[...state.cwords].join(", "):'<span class="dim">MCQ / auto-scored</span>';
+  const ao=aoTarget();
+  $("sAo").textContent=ao?`AO1 ${ao.pct[0]}% · AO2 ${ao.pct[1]}% · AO3 ${ao.pct[2]}%`:"—";
+}
+function renderAll(){renderKs();renderBoards();renderSubjects();renderOutcomes();renderQTypes();renderCWords();renderMeta();}
+
+/* ── events ── */
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-ks],[data-board],[data-subj],[data-out],[data-unchip],[data-inc],[data-dec],[data-cw],#genBtn");
+  if(!t)return;
+  if(t.dataset.ks){state.ks=t.dataset.ks;renderKs();renderMeta();}
+  else if(t.dataset.board){state.board=t.dataset.board;renderBoards();renderMeta();}
+  else if(t.dataset.subj){if(state.subject!==t.dataset.subj){state.subject=t.dataset.subj;state.outcomes.clear();}renderSubjects();renderOutcomes();renderMeta();}
+  else if(t.dataset.out){state.outcomes.has(t.dataset.out)?state.outcomes.delete(t.dataset.out):state.outcomes.add(t.dataset.out);renderOutcomes();renderMeta();}
+  else if(t.dataset.unchip){state.outcomes.delete(t.dataset.unchip);renderOutcomes();renderMeta();}
+  else if(t.dataset.inc){state.counts[t.dataset.inc]=Math.min(20,state.counts[t.dataset.inc]+1);renderQTypes();renderMeta();}
+  else if(t.dataset.dec){state.counts[t.dataset.dec]=Math.max(0,state.counts[t.dataset.dec]-1);renderQTypes();renderMeta();}
+  else if(t.dataset.cw){state.cwords.has(t.dataset.cw)?state.cwords.delete(t.dataset.cw):state.cwords.add(t.dataset.cw);renderCWords();renderMeta();}
+  else if(t.id==="genBtn"&&!t.disabled){t.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>Queued for generation';setTimeout(()=>{t.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>Generate';},1600);}
+});
+
+renderAll();
+})();
+</script>
+</body>
+</html>
