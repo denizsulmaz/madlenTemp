@@ -398,6 +398,49 @@ body[data-band="pathfinder"] .node.bonus{box-shadow:0 4px 14px rgba(180,83,9,.28
 body[data-band="pathfinder"] .start-bubble{animation:none}
 body[data-band="pathfinder"] .chk-btn{box-shadow:0 3px 0 var(--lilac-d);border-radius:12px}
 
+/* ── Product tour (coach marks) ── */
+.tour{position:absolute;inset:0;z-index:250;border-radius:calc(var(--pr) - 9px);opacity:0;pointer-events:none;transition:opacity .3s ease}
+.tour.on{opacity:1;pointer-events:auto}
+.tour-catch{position:absolute;inset:0;transition:background .3s ease}
+.tour.dim .tour-catch{background:rgba(18,12,6,.7)}
+.tour-spot{position:absolute;left:50%;top:50%;width:0;height:0;border-radius:18px;pointer-events:none;
+  box-shadow:0 0 0 9999px rgba(18,12,6,.68);border:2px solid rgba(255,255,255,.9);
+  transition:left .38s cubic-bezier(.32,.72,0,1),top .38s cubic-bezier(.32,.72,0,1),width .38s cubic-bezier(.32,.72,0,1),height .38s cubic-bezier(.32,.72,0,1),border-radius .3s ease,opacity .25s ease}
+.tour-spot.hide{opacity:0;border-color:transparent}
+.tour-tip{position:absolute;width:262px;background:var(--surface);border-radius:18px;padding:15px 16px 13px;
+  box-shadow:0 22px 48px -14px rgba(20,12,4,.55),0 2px 8px rgba(0,0,0,.16);
+  transition:left .38s cubic-bezier(.32,.72,0,1),top .38s cubic-bezier(.32,.72,0,1)}
+.tour-tip.center{width:290px;text-align:center;padding:22px 20px 16px}
+.tour-tip.center .tour-step{justify-content:center}
+.tour-tip.center .tour-foot{flex-wrap:wrap;justify-content:center;gap:10px;margin-top:18px}
+.tour-tip.center .tour-dots{flex:0 0 100%;justify-content:center;margin-bottom:3px}
+.tour-tip.center .tour-btn.next{padding:11px 22px}
+.tour-tip.center .tour-b{padding:0 4px}
+.tour-arrow{position:absolute;width:14px;height:14px;background:var(--surface);transform:rotate(45deg);border-radius:3px}
+.tour-step{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--lilac-d);display:flex;align-items:center;gap:6px}
+.tour-t{font-size:16.5px;font-weight:800;color:var(--text);letter-spacing:-.3px;margin:7px 0 5px;line-height:1.22}
+.tour-b{font-size:13px;font-weight:500;color:var(--muted);line-height:1.5}
+.tour-foot{display:flex;align-items:center;gap:9px;margin-top:14px}
+.tour-dots{flex:1;display:flex;gap:4px;align-items:center}
+.tour-dot{width:5px;height:5px;border-radius:50%;background:var(--border);transition:all .25s}
+.tour-dot.on{background:var(--lilac);width:15px;border-radius:100px}
+.tour-btn{border:none;font-family:inherit;font-size:13px;font-weight:800;border-radius:100px;padding:9px 15px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:transform .12s;display:inline-flex;align-items:center;gap:6px}
+.tour-btn:active{transform:scale(.95)}
+.tour-btn.next{background:var(--lilac);color:#fff;box-shadow:0 3px 0 var(--lilac-d)}
+.tour-btn.next:active{transform:translateY(2px);box-shadow:0 1px 0 var(--lilac-d)}
+.tour-btn.ghost{background:transparent;color:var(--muted);padding:9px 4px}
+.tour-skip{position:absolute;left:0;top:0;z-index:2;background:none;border:none;
+  color:rgba(255,255,255,.82);font-family:inherit;font-size:12.5px;font-weight:700;padding:8px 6px;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:left .38s cubic-bezier(.32,.72,0,1),top .38s cubic-bezier(.32,.72,0,1),opacity .15s}
+.tour-skip:active{opacity:.6}
+.tour-welcome{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 30px;text-align:center;pointer-events:none}
+.tour-hero-ic{width:76px;height:76px;border-radius:24px;background:var(--grad);display:flex;align-items:center;justify-content:center;
+  box-shadow:0 16px 34px -10px rgba(150,90,40,.6);margin:0 auto 18px;animation:sealPop .5s cubic-bezier(.34,1.56,.64,1)}
+.tour.nofx .tour-spot,.tour.nofx .tour-tip,.tour.nofx .tour-skip{transition:none}
+@media (prefers-reduced-motion:reduce){.tour-spot,.tour-tip,.tour-skip{transition:none}}
+
 /* dev panel */
 .dev{width:256px;flex-shrink:0;padding-top:6px}
 .dev-eyebrow{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--lilac-d);margin-bottom:11px;padding:0 4px}
@@ -481,6 +524,12 @@ body[data-band="pathfinder"] .chk-btn{box-shadow:0 3px 0 var(--lilac-d);border-r
         </div>
 
       </div>
+      <div class="tour" id="tour">
+        <div class="tour-catch" id="tour-catch"></div>
+        <div class="tour-spot hide" id="tour-spot"></div>
+        <button class="tour-skip" id="tour-skip" onclick="tourEnd()">Turu atla</button>
+        <div class="tour-tip" id="tour-tip"></div>
+      </div>
       <div class="toast" id="toast"></div>
     </div>
   </div>
@@ -504,6 +553,13 @@ body[data-band="pathfinder"] .chk-btn{box-shadow:0 3px 0 var(--lilac-d);border-r
       </div>
       <button class="dev-btn" onclick="devCourse()">Course Path</button>
       <button class="dev-btn" onclick="openCerts()">Certificates</button>
+    </div>
+  </div>
+  <div class="dev-card">
+    <div class="dev-ttl">Onboarding</div>
+    <div class="dev-grp">
+      <button class="dev-btn" onclick="tourStart()"><span class="dev-dot" style="background:#F5883E"></span>Product Tour</button>
+      <div class="dev-note">8 adım · ilk açılışta otomatik başlar. Boşluğa dokunmak ilerletir.</div>
     </div>
   </div>
   <div class="dev-card">
@@ -546,6 +602,7 @@ const ICONS={
   send:'<path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/>',
   clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   sparkles:'<path d="M12 3l1.7 4.5L18 9l-4.3 1.5L12 15l-1.7-4.5L6 9l4.3-1.5z"/><path d="M19 13.5l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/>',
+  compass:'<circle cx="12" cy="12" r="9"/><path d="M15.6 8.4l-2.1 5.1-5.1 2.1 2.1-5.1z"/>',
   arrow:'<path d="M5 12h14M13 6l6 6-6 6"/>',
   back:'<path d="M15 6l-6 6 6 6"/>',
   share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>',
@@ -828,6 +885,7 @@ let validateFn=null, MQ={};
 // ── Navigation ──
 function nav(to,forward=true){
   const cur=stack[stack.length-1]; if(to===cur)return;
+  if(tourOn)tourEnd();
   if(MQ.timer){clearInterval(MQ.timer);MQ.timer=null;}
   document.querySelectorAll('.screen').forEach(s=>{
     s.classList.remove('active','behind');
@@ -1365,7 +1423,7 @@ function fireConfetti(){ const cv=document.getElementById('confetti'),ctx=cv.get
   let f=0,max=90;(function draw(){ ctx.clearRect(0,0,cv.width,cv.height); pts.forEach(p=>{ p.x+=p.vx;p.y+=p.vy;p.vy+=.18;p.a+=p.sp; ctx.globalAlpha=Math.max(0,1-f/max); ctx.fillStyle=p.c; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); if(p.sq)ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r); else{ctx.beginPath();ctx.arc(0,0,p.r,0,Math.PI*2);ctx.fill();} ctx.restore(); }); ctx.globalAlpha=1; f++; if(f<max)requestAnimationFrame(draw); else ctx.clearRect(0,0,cv.width,cv.height); })(); }
 
 // ── Band switch + dev ──
-function setBand(band){ currentBand=band; stack=['s-catalog']; curCourse=null; curModInfo=null;
+function setBand(band){ if(tourOn)tourEnd(); currentBand=band; stack=['s-catalog']; curCourse=null; curModInfo=null;
   const t=THEME[band]; document.body.dataset.band=band; document.body.style.background=t.bg;
   const r=document.body.style; r.setProperty('--lilac',t.accent); r.setProperty('--lilac-d',t.d); r.setProperty('--lilac-l',t.l); r.setProperty('--lilac-m',t.m); r.setProperty('--grad',t.grad); r.setProperty('--bg',t.bg);
   document.querySelectorAll('.dev-btn[data-band]').forEach(b=>b.classList.toggle('on',b.dataset.band===band));
@@ -1381,12 +1439,153 @@ function devType(key,label){ curModInfo={cid:'_demo',mid:key,type:label,title:la
   renderQuestion(label,label,'Component preview · '+label,null);
   if(!onMod){ document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active','behind');s.style.transform='translateX(100%)';}); const cat=document.getElementById('s-catalog'); cat.style.transform=''; cat.classList.add('active'); stack=['s-catalog']; nav('s-module'); } }
 
+// ── Product tour (home / Kurslarım only) ──
+const TOUR=[
+  {center:true,ic:'compass',t:'Kurslarına hoş geldin',
+   b:'Öğrenme yolculuğun burada. Kısaca gezdirelim.'},
+  {sel:'#xp-pill',r:100,t:'XP puanların',
+   b:'Her tamamladığın modül XP kazandırır.'},
+  {sel:'.hero-continue',r:24,t:'Kaldığın yerden devam et',
+   b:'Son çalıştığın kurs her zaman en üstte.'},
+  {sel:'.create-course',r:100,t:'Kendi kursunu oluştur',
+   b:'Konuyu yaz, Madlen sana özel kurs üretir.'},
+  {sel:'.lib-banner',r:100,t:'AstroLearn Kütüphanesi',
+   b:'Müfredatla hizalı hazır ve YZ ile ürettiğin kurslar.'},
+  {selAll:'.cat-scroll .cc',r:18,t:'Madlen Kursları',
+   b:'Müfredat dışı kurslar. Halka ilerlemeni gösterir.'},
+  {sel:'.cert-pill',r:100,t:'Sertifikaların',
+   b:'Kursu bitirince kazandığın sertifikalar burada.'},
+  {center:true,ic:'bolt',t:'Hazırsın!',
+   b:'Sıradaki modülden devam edebilirsin.'}
+];
+let tourI=0, tourOn=false, tourT=null, tourRAF=0;
+
+function tourStart(){
+  if(stack[stack.length-1]!=='s-catalog'){ setBand(currentBand); }
+  const sc=document.getElementById('cat-scroll'); if(sc) sc.scrollTop=0;
+  tourI=0; tourOn=true;
+  const el=document.getElementById('tour'); el.classList.add('on','nofx');
+  document.getElementById('tour-catch').onclick=()=>tourGo(1);
+  setTimeout(tourRender,120);
+}
+function tourEnd(){
+  tourOn=false; clearTimeout(tourT); cancelAnimationFrame(tourRAF);
+  const el=document.getElementById('tour'); el.classList.remove('on','dim');
+  setTimeout(()=>{ document.getElementById('tour-tip').innerHTML=''; document.getElementById('tour-spot').classList.add('hide'); },300);
+}
+function tourGo(d){ const n=tourI+d; if(n<0)return; if(n>=TOUR.length){ tourEnd(); return; } tourI=n; tourRender(); }
+
+// birden fazla hedefi saran tek dikdörtgen
+function tourUnion(els){
+  const r=els.map(e=>e.getBoundingClientRect());
+  return {left:Math.min(...r.map(b=>b.left)),top:Math.min(...r.map(b=>b.top)),
+          right:Math.max(...r.map(b=>b.right)),bottom:Math.max(...r.map(b=>b.bottom))};
+}
+// spotlight geçişiyle birebir aynı easing/süre → kaydırma ile ışık birlikte hareket eder
+const TOUR_MS=380;
+function tourEase(x){ // cubic-bezier(.32,.72,0,1)
+  const bx=t=>{const u=1-t;return 3*u*u*t*.32+3*u*t*t*0+t*t*t;};
+  const by=t=>{const u=1-t;return 3*u*u*t*.72+3*u*t*t*1+t*t*t;};
+  let lo=0,hi=1,t=x;
+  for(let i=0;i<18;i++){ t=(lo+hi)/2; bx(t)<x?lo=t:hi=t; }
+  return by(t);
+}
+// hedefi ortalamak için gereken kaydırmayı uygular, uygulanan farkı (px) döner
+function tourScrollTo(els){
+  const box=els[0].closest('.cat-scroll'); if(!box) return 0;
+  const u=tourUnion(els), bb=box.getBoundingClientRect(), uh=u.bottom-u.top;
+  const want=box.scrollTop+(u.top-bb.top)-Math.max(12,(bb.height-uh)/2);
+  const max=box.scrollHeight-box.clientHeight, from=box.scrollTop, next=Math.max(0,Math.min(max,want));
+  const delta=next-from;
+  if(Math.abs(delta)<2) return 0;
+  cancelAnimationFrame(tourRAF);
+  const t0=performance.now();
+  (function step(now){
+    const p=Math.min(1,(now-t0)/TOUR_MS);
+    box.scrollTop=from+delta*tourEase(p);
+    if(p<1&&tourOn) tourRAF=requestAnimationFrame(step);
+  })(t0);
+  return delta;
+}
+function tourRender(){
+  if(!tourOn)return;
+  const s=TOUR[tourI];
+  const els=(s.selAll?[...document.querySelectorAll(s.selAll)]:s.sel?[document.querySelector(s.sel)]:[]).filter(Boolean);
+  clearTimeout(tourT);
+  // kaydırma ve boyama aynı karede başlar; hedefin kaydırma sonrası konumu baştan hesaplanır
+  const shift=els.length?tourScrollTo(els):0;
+  tourPaint(s,els,shift);
+}
+function tourPaint(s,els,shift){
+  shift=shift||0;
+  const target=els&&els.length?els:null;
+  if(!tourOn)return;
+  const tour=document.getElementById('tour'), spot=document.getElementById('tour-spot'), tip=document.getElementById('tour-tip');
+  const scr=document.querySelector('.phone-screen').getBoundingClientRect();
+  const W=scr.width, H=scr.height, t=THEME[currentBand];
+  const last=tourI===TOUR.length-1;
+
+  tip.className='tour-tip'+(target?'':' center');
+  tip.innerHTML=`
+    ${s.center&&s.ic?`<div class="tour-hero-ic">${icon(s.ic,'#fff',34,2.2)}</div>`:''}
+    <div class="tour-step">${iconFill('bolt',t.d,11)} Adım ${tourI+1} / ${TOUR.length}</div>
+    <div class="tour-t">${s.t}</div>
+    <div class="tour-b">${s.b}</div>
+    <div class="tour-foot">
+      <div class="tour-dots">${TOUR.map((_,i)=>`<span class="tour-dot${i===tourI?' on':''}"></span>`).join('')}</div>
+      ${tourI>0?`<button class="tour-btn ghost" onclick="tourGo(-1)">Geri</button>`:''}
+      <button class="tour-btn next" onclick="tourGo(1)">${last?'Bitir':'İleri'} ${last?icon('check','#fff',15,2.6):icon('arrow','#fff',15)}</button>
+    </div>
+    ${target?'<div class="tour-arrow" id="tour-arw"></div>':''}`;
+
+  // "Turu atla" yalnızca açılış kartında görünür
+  const skip=document.getElementById('tour-skip');
+  skip.style.display=tourI===0?'':'none';
+
+  if(!target){
+    tour.classList.add('dim'); spot.classList.add('hide');
+    spot.style.left=W/2+'px'; spot.style.top=H/2+'px'; spot.style.width='0px'; spot.style.height='0px';
+    const cl=(W-tip.offsetWidth)/2, ct=(H-tip.offsetHeight)/2;
+    tip.style.left=cl+'px'; tip.style.top=ct+'px';
+    tourPlaceSkip(skip,cl,ct,tip.offsetWidth,tip.offsetHeight,H);
+    return;
+  }
+
+  tour.classList.remove('dim'); spot.classList.remove('hide');
+  const u=tourUnion(els), pad=6;
+  const x=u.left-scr.left-pad, y=u.top-scr.top-shift-pad, w=(u.right-u.left)+pad*2, h=(u.bottom-u.top)+pad*2;
+  spot.style.left=x+'px'; spot.style.top=y+'px'; spot.style.width=w+'px'; spot.style.height=h+'px';
+  spot.style.borderRadius=(s.r||18)+pad+'px';
+
+  const tw=tip.offsetWidth, th=tip.offsetHeight, gap=13, m=14;
+  const below=(y+h+gap+th)<=(H-m);
+  const top=below?(y+h+gap):(y-gap-th);
+  const left=Math.max(m,Math.min(W-m-tw,x+w/2-tw/2));
+  tip.style.left=left+'px'; tip.style.top=Math.max(m,Math.min(H-m-th,top))+'px';
+
+  const tipTop=Math.max(m,Math.min(H-m-th,top));
+  tourPlaceSkip(skip,left,tipTop,tw,th,H);
+
+  const arw=document.getElementById('tour-arw');
+  if(arw){ arw.style.left=Math.max(18,Math.min(tw-32,x+w/2-left-7))+'px'; arw.style.top=(below?-6:th-8)+'px'; }
+}
+// "Turu atla" ipucu kartının hemen altında (yer yoksa üstünde) durur
+function tourPlaceSkip(skip,tipL,tipT,tw,th,H){
+  const sw=skip.offsetWidth, sh=skip.offsetHeight, gap=10;
+  const under=(tipT+th+gap+sh)<=(H-10);
+  skip.style.left=(tipL+tw/2-sw/2)+'px';
+  skip.style.top=(under?tipT+th+gap:tipT-gap-sh)+'px';
+  const tour=document.getElementById('tour');
+  if(tour.classList.contains('nofx')) requestAnimationFrame(()=>tour.classList.remove('nofx'));
+}
+
 const sty=document.createElement('style');
 sty.textContent='@keyframes nodeShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px) rotate(-4deg)}75%{transform:translateX(5px) rotate(4deg)}}';
 document.head.appendChild(sty);
 
 buildDevTypes();
 setBand('builder');
+setTimeout(tourStart,700);
 </script>
 </body>
 </html>
