@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Competitor AppCheck · madlen</title>
+<style>
+  :root{
+    --bg:#0b0b0c; --panel:#141416; --panel2:#1b1b1e; --line:#2a2a2e;
+    --ink:#f2efe9; --dim:#8d8d95; --dim2:#5f5f66;
+    --accent:#ff7a29; --accent2:#7ad1a8; --warn:#ffd166; --us:#a78bfa;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;overflow:hidden;
+  }
+  ::selection{background:var(--accent);color:#0b0b0c}
+
+  #deck{height:100vh;width:100vw;position:relative}
+  .slide{
+    position:absolute;inset:0;display:none;flex-direction:column;
+    padding:clamp(1.1rem,2.6vw,2.6rem) clamp(1.1rem,3.4vw,3.6rem) clamp(3.2rem,5vw,4rem);
+    overflow-y:auto;overflow-x:hidden;
+  }
+  .slide.on{display:flex;animation:in .28s ease both}
+  @keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  .bar{
+    position:fixed;left:0;right:0;bottom:0;height:2.6rem;
+    display:flex;align-items:center;gap:1rem;
+    padding:0 clamp(1.1rem,3.4vw,3.6rem);
+    background:linear-gradient(to top,var(--bg) 60%,transparent);
+    font-size:12px;color:var(--dim2);z-index:20;
+  }
+  .bar .ttl{color:var(--dim)}
+  .bar .sp{flex:1}
+  .bar kbd{color:var(--dim);background:#1a1a1e;border:1px solid #2c2c32;border-radius:3px;padding:1px 5px;font-family:inherit;font-size:11px}
+  .prog{position:fixed;top:0;left:0;height:2px;background:var(--accent);z-index:30;transition:width .25s ease}
+
+  /* title */
+  .title-wrap{
+    margin:0;max-width:1000px;flex:1;min-height:0;
+    display:flex;flex-direction:column;padding-top:clamp(.5rem,4vh,2.6rem)
+  }
+  .eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:1.2rem}
+  h1{font-size:clamp(2.6rem,8vw,6rem);line-height:1;letter-spacing:-.035em;font-weight:650}
+  h1 em{font-style:normal;color:var(--accent)}
+  .toc{margin-top:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.5rem 1.4rem;font-size:13px}
+  .toc div{color:var(--dim);border-top:1px solid var(--line);padding-top:.45rem}
+  .toc div b{display:block;color:var(--ink);font-weight:550;font-size:14px}
+  .src-note{
+    margin-top:1.9rem;display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;
+    font-size:12.5px;padding-top:.9rem;border-top:1px solid var(--line)
+  }
+  .src-note span{font-size:11px;letter-spacing:.17em;text-transform:uppercase;color:var(--ink)}
+  .src-note a{
+    display:inline-flex;align-items:center;gap:.45rem;
+    color:var(--ink);text-decoration:none;font-size:13.5px;
+    border:1px solid var(--line);border-radius:6px;padding:.34rem .6rem;
+    transition:border-color .15s ease,color .15s ease
+  }
+  .src-note a svg{width:15px;height:15px;flex-shrink:0}
+  .src-note a:hover{color:var(--accent);border-color:var(--accent)}
+
+  /* header */
+  .hdr{display:flex;align-items:flex-start;gap:1rem;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:.85rem;margin-bottom:1.05rem}
+  .num{font-size:12px;color:var(--dim2);letter-spacing:.14em;padding-top:.5rem;min-width:2.6rem}
+  .hdr h2{font-size:clamp(1.45rem,3.1vw,2.15rem);letter-spacing:-.02em;line-height:1.1;font-weight:640}
+  .hdr h2 span{color:var(--dim2);font-weight:400}
+  .hdr .tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.45rem}
+  .tag{
+    font-size:11.5px;padding:.2rem .55rem;border:1px solid var(--line);
+    border-radius:99px;color:var(--dim);display:inline-flex;align-items:center;gap:.35rem
+  }
+  .tag svg{width:12px;height:12px;flex-shrink:0}
+  .tag.play{color:var(--accent);border-color:#4a2c14;background:#1d1208}
+  .tag.play b{color:var(--accent);font-weight:650}
+  .tag.price{color:var(--ink)}
+  .tag.hq{color:var(--dim2);letter-spacing:.08em}
+
+  /* body grid */
+  .grid{display:grid;grid-template-columns:1.45fr minmax(180px,.6fr);gap:clamp(.9rem,2.2vw,2.2rem);flex:1;min-height:0}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}.col-shots{flex-direction:row!important;flex-wrap:wrap}}
+
+  .col-main{min-width:0;overflow:auto;padding-right:.3rem}
+  .block{margin-bottom:1.2rem}
+  .lbl{font-size:11.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--dim2);margin-bottom:.55rem}
+  .lbl.accent{color:var(--accent)}
+  ul.spec li.acc{color:#ffb87a}
+  ul.spec li.acc::before{background:var(--accent)}
+
+  ul.spec{list-style:none;font-size:15.6px;line-height:1.44}
+  ul.spec li{margin-bottom:.55rem;padding-left:1.05rem;position:relative;color:#c6c6cd}
+  ul.spec li::before{content:"";position:absolute;left:0;top:.58em;width:5px;height:5px;border-radius:99px;background:#4a4a52}
+  ul.spec li b{color:var(--ink);font-weight:600}
+  ul.spec li.hit::before{background:var(--accent2)}
+  ul.spec li.gap::before{background:var(--warn)}
+  ul.spec li.us::before{background:var(--us)}
+  ul.spec li code{font-family:"SFMono-Regular",Menlo,monospace;font-size:13.5px;color:#d9d9e0;background:#1a1a1f;border:1px solid #26262c;border-radius:3px;padding:.05rem .3rem}
+
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:.34rem .9rem;font-size:15px;line-height:1.4}
+  .kv dt{color:var(--dim2);white-space:nowrap}
+  .kv dd{color:var(--ink)}
+
+  .callout{
+    font-size:15.6px;line-height:1.44;color:#d3d3da;background:var(--panel);
+    border:1px solid var(--line);border-left:2px solid var(--accent);
+    border-radius:0 6px 6px 0;padding:.78rem .95rem;margin-bottom:1.1rem
+  }
+  .callout b{color:var(--warn);font-weight:600}
+  .callout.us{border-left-color:var(--us)}
+  .callout.us b{color:#c4b1ff}
+
+  /* shots */
+  .col-shots{display:flex;flex-direction:column;gap:.55rem;min-width:0;overflow:auto}
+  .shot{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel2);cursor:zoom-in;transition:border-color .15s ease;flex-shrink:0}
+  .shot:hover{border-color:var(--accent)}
+  .shot img{width:100%;display:block;object-fit:cover;object-position:top}
+  .shotcap{font-size:10.5px;color:var(--dim2);margin-top:-.3rem;line-height:1.35;flex-shrink:0}
+
+  /* stacked layout with tab strip */
+  .stack{display:flex;flex-direction:column;flex:1;min-height:0;gap:.9rem}
+  .stack .body{display:grid;grid-template-columns:1fr 1fr;gap:clamp(.9rem,2.2vw,2.2rem);flex:1;min-height:0}
+  @media(max-width:860px){.stack .body{grid-template-columns:1fr}}
+  .stack .body > div{overflow:auto;min-width:0}
+  /* single flowing column: blocks reflow into two columns without splitting */
+  .stack .body.one{grid-template-columns:1fr}
+  .stack .body.one > div{columns:2;column-gap:clamp(1.2rem,2.6vw,2.6rem)}
+  @media(max-width:860px){.stack .body.one > div{columns:1}}
+  .stack .body.one .block,.stack .body.one .callout{break-inside:avoid}
+  .stack .body.one .callout{margin-top:0}
+
+  .tabstrip{flex-shrink:0;border-top:1px solid var(--line);padding-top:.75rem}
+  .tabstrip .lbl{margin-bottom:.5rem}
+  .tabgrid{display:flex;gap:.55rem;overflow-x:auto;padding-bottom:.25rem}
+  .tabthumb{width:96px;flex-shrink:0}
+  .tabthumb .shot img{height:142px}
+  .tabthumb figcaption{font-size:11px;color:var(--dim);margin-top:.32rem;text-align:center;line-height:1.25}
+  .tabthumb.sub .shot{border-style:dashed}
+  .tabthumb.sub figcaption{color:var(--dim2)}
+
+  /* lightbox */
+  #lb{position:fixed;inset:0;z-index:100;display:none;background:rgba(6,6,8,.95);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:3rem clamp(1rem,6vw,6rem);cursor:zoom-out}
+  #lb.on{display:flex;animation:in .18s ease both}
+  #lb img{max-width:100%;max-height:86vh;object-fit:contain;border-radius:10px;box-shadow:0 24px 80px rgba(0,0,0,.7);cursor:default}
+  #lb .nav{position:absolute;top:50%;transform:translateY(-50%);width:2.8rem;height:2.8rem;border-radius:99px;border:1px solid var(--line);background:#141416;color:var(--ink);font-size:17px;display:flex;align-items:center;justify-content:center;cursor:pointer;user-select:none}
+  #lb .nav:hover{border-color:var(--accent);color:var(--accent)}
+  #lb .prev{left:clamp(.6rem,2vw,2rem)} #lb .next{right:clamp(.6rem,2vw,2rem)}
+  #lb .cap{position:absolute;bottom:1.3rem;left:0;right:0;text-align:center;font-size:12px;color:var(--dim)}
+  #lb .x{position:absolute;top:1.1rem;right:1.3rem;font-size:12px;color:var(--dim2);letter-spacing:.14em;text-transform:uppercase}
+
+  /* matrix */
+  .scroll{overflow:auto;flex:1;min-height:0}
+  table.mx{width:100%;border-collapse:collapse;font-size:14px;line-height:1.38}
+  table.mx th{text-align:left;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--dim2);font-weight:500;padding:.55rem .6rem;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:2;white-space:nowrap}
+  table.mx th.me{color:var(--us)}
+  table.mx td{padding:.55rem .6rem;border-bottom:1px solid #1e1e22;color:#c6c6cd;vertical-align:top}
+  table.mx td:first-child{color:var(--dim);white-space:nowrap;font-size:13px}
+  table.mx td.me{color:#c4b1ff;background:#131024}
+  table.mx td b{color:var(--ink);font-weight:600}
+  table.mx tr:hover td{background:#131317}
+  table.mx tr:hover td.me{background:#171334}
+  .yes{color:var(--accent2)} .no{color:#e07a7a} .part{color:var(--warn)}
+
+  /* steal list */
+  .acts{display:flex;flex-direction:column;gap:.5rem;flex:1;min-height:0;overflow:auto;margin-top:.2rem}
+  .act{display:grid;grid-template-columns:5.4rem 1fr;gap:1rem;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:.7rem .9rem}
+  @media(max-width:720px){.act{grid-template-columns:1fr;gap:.3rem}}
+  .act .verd{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;padding-top:.24rem;font-weight:600}
+  .act.adopt .verd{color:var(--accent2)}
+  .act.adapt .verd{color:var(--warn)}
+  .act.ignore .verd{color:#7c7c85}
+  .act.op .verd{color:var(--accent)}
+  .act.adopt{border-left:2px solid var(--accent2)}
+  .act.adapt{border-left:2px solid var(--warn)}
+  .act.ignore{border-left:2px solid #3a3a42;opacity:.72}
+  .act.op{border-left:2px solid var(--accent)}
+  .act h4{font-size:15.5px;font-weight:600;color:var(--ink);margin-bottom:.15rem}
+  .act h4 .src{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim2);font-weight:500;margin-left:.5rem}
+  .act p{font-size:14.5px;line-height:1.42;color:#b4b4bc}
+  .act p em{font-style:normal;color:#dcdce2}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(.9rem,2.2vw,2.2rem);flex:1;min-height:0}
+  @media(max-width:860px){.two{grid-template-columns:1fr}}
+  .two.solo{grid-template-columns:1fr;max-width:62rem}
+  .pane{overflow:auto;min-width:0}
+</style>
+</head>
+<body>
+
+<div class="prog" id="prog"></div>
+<div id="deck">
+
+<!-- 00 -->
+<section class="slide on">
+  <div class="title-wrap">
+    <div class="eyebrow">Madlen · Ürün Araştırması · Ağustos 2026</div>
+    <h1>Competitor<br><em>AppCheck</em></h1>
+    <div class="toc">
+      <div><b>01-02</b> Knowunity</div>
+      <div><b>03-04</b> Astra AI</div>
+      <div><b>05-06</b> Vaia</div>
+      <div><b>07</b> Eksen matrisi</div>
+      <div><b>08-09</b> Steal list</div>
+    </div>
+    <p class="src-note">
+      <span>Ham notlar</span>
+      <a href="https://app.notion.com/p/Product-Research-App-3b4acfe73f7280bfad1aef3cb61175b9?source=copy_link" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="1.6" y="1.6" width="20.8" height="20.8" rx="4.6" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8.3 16.9V7.1l7.4 9.8V7.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Product Research ↗
+      </a>
+    </p>
+  </div>
+</section>
+
+<!-- 01 kapsam -->
+<section class="slide">
+  <div class="hdr">
+    <div class="num">00</div>
+    <div><h2>Kapsam</h2>
+      <div class="tags"><span class="tag">3 ürün</span><span class="tag">30 ekran</span><span class="tag">cihazda test</span></div>
+    </div>
+  </div>
+  <div class="two solo">
+    <div class="pane">
+      <div class="block">
+        <div class="lbl">Neden bu üçü</div>
+        <ul class="spec">
+          <li><b>Knowunity</b>: tasarım sistemi ve onboarding olgunluğunda en ileri olan.</li>
+          <li><b>Astra AI</b>: palet ve konumlandırma bize en yakın; navigasyonu bize en uygulanabilir.</li>
+          <li><b>Vaia</b>: materyalden çalışma planı akışını uçtan uca kuran tek ürün.</li>
+        </ul>
+      </div>
+      <div class="block">
+        <div class="lbl accent">Test edildi, rapora girmedi</div>
+        <ul class="spec">
+          <li class="acc">Pakodemy, Gauth: bu üçüyle aynı kategoride değil.</li>
+        </ul>
+      </div>
+      <div class="callout">
+        <b>Renk kodu.</b> Yeşil: güçlü uygulama. Sarı: boşluk. Mor: Madlen Okul'a doğrudan dokunan tespit.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 knowunity A -->
+<section class="slide">
+  <div class="hdr">
+    <div class="num">01</div>
+    <div><h2>Knowunity <span>· marka ve onboarding</span></h2>
+      <div class="tags"><span class="tag play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.06 2.53a1.5 1.5 0 0 0-.44 1.06v16.82c0 .42.16.79.44 1.06l.06.05 9.42-9.42v-.11L3.12 2.47z" fill="#00A0FF"/><path d="M16.1 15.24l-3.14-3.14v-.11l3.14-3.14.07.04 3.72 2.11c1.06.6 1.06 1.59 0 2.2l-3.72 2.11z" fill="#FFBC00"/><path d="M16.17 15.17L12.96 12l-9.9 9.9c.35.37.92.42 1.57.05l11.54-6.78z" fill="#FF3A44"/><path d="M16.17 8.83L4.63 2.05c-.65-.37-1.22-.32-1.57.05l9.9 9.9z" fill="#00C853"/></svg><b>4,7 ★</b> · 124B değerlendirme · 10M+ indirme</span><span class="tag price">₺100/ay</span><span class="tag hq">HQ DE</span></div>
+    </div>
+  </div>
+  <div class="stack">
+    <div class="body one">
+    <div>
+      <div class="callout">
+        <b>Üçünün de tasarım sistemi var; en tutarlı uygulanan bu.</b> Renk, radius, kart ve karakter hiçbir ekranda sapmıyor.
+      </div>
+      <div class="block">
+        <div class="lbl">Karakter: "Knowie"</div>
+        <ul class="spec">
+          <li>Mor, iki büyük gözlü amorf figür. Kenarlar kasıtlı el çizimi pürüzlü.</li>
+          <li class="hit"><b>Her onboarding adımında konuşma balonuyla eşlik ediyor.</b> Soru, form etiketi değil replik. Vurgulu kelime mor.</li>
+          <li class="hit"><b>Onboarding içinde uygulama ikonu seçtiriyor:</b> <code>OG</code> ve <code>Knowie</code> yan yana, el yazısı okla "Way cuter, right?". Amaç ikon değil, <b>markayı ana ekrana taşımak.</b></li>
+        </ul>
+      </div>
+      <div class="block">
+        <div class="lbl">Onboarding akışı</div>
+        <ul class="spec">
+          <li>4 sayfalık değer karuseli: kamera + <code>Translate / Explain / Solve</code>, "Turn your notes into quizzes".</li>
+          <li class="hit"><b>Okul tipi: gerçek TR kademe taksonomisi.</b> İlkokul, İmam Hatip, Anadolu/Fen/Meslek Lisesi, Üniversite. Lokalizasyon veri modeline kadar inmiş.</li>
+          <li>Hedef sorusu ve engel sorusu (procrastination, exam stress, memorising).</li>
+          <li class="hit"><b>iOS widget kurulumu onboarding'in içinde.</b> Chat + kamera + mikrofon önizlemesi, birincil buton "Add Widget".</li>
+        </ul>
+      </div>
+      <div class="block">
+        <div class="lbl">İkon sistemi: iki katmanlı</div>
+        <ul class="spec">
+          <li class="hit"><b>Karar ekranlarında satır bazlı renkli outline</b>, navigasyonda nötr tek renk. Kural: <em style="color:#dcdce2;font-style:normal">seçim yaptığın yerde renkli, gezindiğin yerde nötr.</em></li>
+        </ul>
+      </div>
+    </div>
+    </div>
+    <div class="tabstrip">
+      <div class="lbl">Ekranlar <span style="text-transform:none;letter-spacing:0;color:#4d4d55">· tab ekranları Notion'da yok, galeriden</span></div>
+      <div class="tabgrid">
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/knowunity-06.png" alt="Knowunity app ikonu"></div><figcaption>App ikonu</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/knowunity-05.png" alt="Knowunity okul tipi"></div><figcaption>Okul tipi</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/knowunity-04.png" alt="Knowunity hedef sorusu"></div><figcaption>Hedef sorusu</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/knowunity-01.png" alt="Knowunity widget kurulumu"></div><figcaption>Widget kurulumu</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/knowunity-02.png" alt="Knowunity chat çekmecesi"></div><figcaption>Chat çekmecesi</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/knowunity-11.png" alt="Knowunity sticky island"></div><figcaption>Sticky island</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 knowunity B -->
+<section class="slide">
+  <div class="hdr">
+    <div class="num">02</div>
+    <div><h2>Knowunity <span>· nav, bileşen, fiyat</span></h2>
+      <div class="tags"><span class="tag play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.06 2.53a1.5 1.5 0 0 0-.44 1.06v16.82c0 .42.16.79.44 1.06l.06.05 9.42-9.42v-.11L3.12 2.47z" fill="#00A0FF"/><path d="M16.1 15.24l-3.14-3.14v-.11l3.14-3.14.07.04 3.72 2.11c1.06.6 1.06 1.59 0 2.2l-3.72 2.11z" fill="#FFBC00"/><path d="M16.17 15.17L12.96 12l-9.9 9.9c.35.37.92.42 1.57.05l11.54-6.78z" fill="#FF3A44"/><path d="M16.17 8.83L4.63 2.05c-.65-.37-1.22-.32-1.57.05l9.9 9.9z" fill="#00C853"/></svg><b>4,7 ★</b> · 124B değerlendirme · 10M+ indirme</span><span class="tag price">₺100/ay</span><span class="tag hq">HQ DE</span></div>
+    </div>
+  </div>
+  <div class="stack">
+    <div class="body one">
+    <div>
+      <div class="block">
+        <div class="lbl">5 sekme</div>
+        <ul class="spec">
+          <li><b>Chat</b>: tüm AI yetenekleri tek giriş noktasında. Ayrı "araçlar" sekmesi yok.</li>
+          <li><b>Learning Path</b>: Madlen Courses mantığı. <b>Leaderboard</b>: ayrı sekme. <b>Profile</b>: Instagram'a yakın.</li>
+          <li class="gap"><b>Search</b>: topluluk içeriği ama <b>yalnızca tüketim.</b> Öğrenci yükleyemiyor, UGC değil.</li>
+        </ul>
+      </div>
+      <div class="block">
+        <div class="lbl">Bileşenler</div>
+        <ul class="spec">
+          <li class="us"><b>Sticky unit island:</b> yüzen pill, sağında ayrı bölmede tamamlanma işareti. Bizde de sticky var; eksik olan davranış değil <b>form</b>.</li>
+          <li class="hit"><b>Study Timer + odak modu:</b> diğer uygulamaları bloklayabiliyor. Üçü içinde sadece burada var.</li>
+          <li>Chat çekmecesi: Study Timer, Uploaded Files, Created Things, Personalization, Past Chats.</li>
+          <li>Sınıf seçimi tek sefer, sonra sadece Profil &gt; Ayarlar.</li>
+        </ul>
+      </div>
+      <div class="block">
+        <div class="lbl">Gamification ve fiyat</div>
+        <ul class="spec">
+          <li class="part">Streak + XP + Leaderboard canlı, <b>ama Duolingo kadar merkezde değil.</b> Bilinçli bir dozaj tercihi.</li>
+          <li>Freemium sınırı hearts yerine <b>energy</b>, 25 birimle başlıyor.</li>
+          <li class="hit"><b>₺100/ay, ₺430/yıl.</b> Aylıkta Vaia'nın 1/7'si, Astra Plus'ın 1/8'i. Öğrencinin kendi cebinden ödeyebileceği tek fiyat.</li>
+        </ul>
+      </div>
+    </div>
+    </div>
+    <div class="tabstrip">
+      <div class="lbl">Ekranlar <span style="text-transform:none;letter-spacing:0;color:#4d4d55">· tab ekranları Notion'da yok, galeriden</span></div>
+      <div class="tabgrid">
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/knowunity-06.png" alt="App ikonu"></div><figcaption>App ikonu</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/knowunity-05.png" alt="Okul tipi"></div><figcaption>Okul tipi</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/knowunity-04.png" alt="Hedef sorusu"></div><figcaption>Hedef sorusu</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/knowunity-01.png" alt="Widget kurulumu"></div><figcaption>Widget kurulumu</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/knowunity-02.png" alt="Chat çekmecesi"></div><figcaption>Chat çekmecesi</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/knowunity-11.png" alt="Sticky island"></div><figcaption>Sticky island</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 astra A -->
+<section class="slide">
+  <div class="hdr">
+    <div class="num">03</div>
+    <div><h2>Astra AI <span>· navigasyon</span></h2>
+      <div class="tags"><span class="tag play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.06 2.53a1.5 1.5 0 0 0-.44 1.06v16.82c0 .42.16.79.44 1.06l.06.05 9.42-9.42v-.11L3.12 2.47z" fill="#00A0FF"/><path d="M16.1 15.24l-3.14-3.14v-.11l3.14-3.14.07.04 3.72 2.11c1.06.6 1.06 1.59 0 2.2l-3.72 2.11z" fill="#FFBC00"/><path d="M16.17 15.17L12.96 12l-9.9 9.9c.35.37.92.42 1.57.05l11.54-6.78z" fill="#FF3A44"/><path d="M16.17 8.83L4.63 2.05c-.65-.37-1.22-.32-1.57.05l9.9 9.9z" fill="#00C853"/></svg><b>4,6 ★</b> · 86,1B değerlendirme · 1M+ indirme</span><span class="tag price">₺770/ay</span><span class="tag hq">HQ SI</span></div>
+    </div>
+  </div>
+  <div class="stack">
+    <div class="body">
+      <div>
+        <div class="callout us">
+          <b>Bize en uygulanabilir navigasyon bu.</b> Üç sekme + bir taşma butonu. Madlen Okul'da tab bar hiç yok; bu yapı sıfırdan tab bar kurmadan hiyerarşi kazandırır.
+        </div>
+        <div class="block">
+          <div class="lbl">Alt bar</div>
+          <ul class="spec">
+            <li><b>Sor · Sınavlar · Sınıf</b> tek pill kapsayıcı içinde, aktif olan koyu dolgu alıyor.</li>
+            <li class="hit"><b>Sağda ayrı duran ⠿ butonu.</b> Sekme değil, alt sayfa açıyor: Öğrenme uygulamaları, Aktivitelerim, Takvimim. Üç ana iş dışındaki her şey burada.</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="block">
+          <div class="lbl">Sabit üst bar</div>
+          <ul class="spec">
+            <li>Solda streak pill'i, ortada <b>"Satın al ✦"</b>, sağda avatar.</li>
+            <li class="part">Satın alma butonu navigasyonun tam merkezinde. Agresif ama konumu hiç değişmiyor.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <div class="lbl">Composer</div>
+          <ul class="spec">
+            <li class="hit"><b>Ders seçici pill composer'ın üstüne çentik gibi oturuyor.</b> Bağlamın mesajın parçası olduğunu söylüyor.</li>
+            <li>İçinde <code>+</code>, dolu mavi kamera, mikrofon ve ayrı bir <b>"Konuş"</b> butonu.</li>
+            <li>14 ders iki sütunda; "Düzenle" ve "+ Ekle" ile kullanıcı kendi dersini ekleyebiliyor.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="tabstrip">
+      <div class="lbl">Tab ekranları</div>
+      <div class="tabgrid">
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-astra-sor.png" alt="Sor"></div><figcaption>Sor</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-astra-sinavlar.png" alt="Sınavlar"></div><figcaption>Sınavlar</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-astra-siniflar.png" alt="Sınıflar"></div><figcaption>Sınıflar</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-astra-others-1.png" alt="Others: menü"></div><figcaption>Others: menü</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-astra-others-2.png" alt="Others: öğrenme uyg."></div><figcaption>Others: öğrenme uyg.</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-astra-others-3.png" alt="Others: aktiviteler"></div><figcaption>Others: aktiviteler</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-astra-others-4.png" alt="Others: konu seç"></div><figcaption>Others: konu seç</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 astra B -->
+<section class="slide">
+  <div class="hdr">
+    <div class="num">04</div>
+    <div><h2>Astra AI <span>· değer önerisi, boşluk, fiyat</span></h2>
+      <div class="tags"><span class="tag play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.06 2.53a1.5 1.5 0 0 0-.44 1.06v16.82c0 .42.16.79.44 1.06l.06.05 9.42-9.42v-.11L3.12 2.47z" fill="#00A0FF"/><path d="M16.1 15.24l-3.14-3.14v-.11l3.14-3.14.07.04 3.72 2.11c1.06.6 1.06 1.59 0 2.2l-3.72 2.11z" fill="#FFBC00"/><path d="M16.17 15.17L12.96 12l-9.9 9.9c.35.37.92.42 1.57.05l11.54-6.78z" fill="#FF3A44"/><path d="M16.17 8.83L4.63 2.05c-.65-.37-1.22-.32-1.57.05l9.9 9.9z" fill="#00C853"/></svg><b>4,6 ★</b> · 86,1B değerlendirme · 1M+ indirme</span><span class="tag price">₺770/ay</span><span class="tag hq">HQ SI</span></div>
+    </div>
+  </div>
+  <div class="stack">
+    <div class="body one">
+    <div>
+      <div class="callout">
+        <b>En güçlü parça, navigasyonda en derine gömülmüş yerde.</b> "Öğrenme uygulamaları" hiçbir sekmede değil, ızgaranın açtığı alt sayfada.
+      </div>
+      <div class="block">
+        <div class="lbl">Öğrenme uygulamaları</div>
+        <ul class="spec">
+          <li>Dört kart: Mini oyunlar (10), Simülasyonlar (26), Araçlar (5), <b>Uygulamalarınız (0)</b>.</li>
+          <li class="hit"><b>Dördüncü karttaki "0" kaza değil, kurgu.</b> Hazır içerik kütüphane değil <em>kapasite göstergesi</em>. Asıl odak öğrencinin kendi üretmesinde, boş sayaç davetin kendisi.</li>
+        </ul>
+      </div>
+      <div class="block">
+        <div class="lbl">Boşluk (doğrulandı)</div>
+        <ul class="spec">
+          <li class="gap"><b>Materyal yüklemeden sınav oluşturulamıyor.</b> "Yeni test oluştur" dosya yüklemeye zorluyor; konu veya kazanım seçme yolu yok.</li>
+          <li class="us">Madlen'in <b>müfredat ve kazanım tabanlı üretimi</b> burada net üstünlük.</li>
+          <li class="part">Sınıfları <b>öğrenciler</b> kuruyor, öğretmen rolü yok. Saf B2C sosyal katman.</li>
+        </ul>
+      </div>
+      <div class="block">
+        <div class="lbl">Marka ve fiyat</div>
+        <ul class="spec">
+          <li class="part">Sistemi var ama Knowunity kadar disiplinli uygulanmamış: kart yapıları ve boşluklar ekranlar arasında oynuyor.</li>
+          <li class="part">Ton yüzeyde: <b>"Sınavdan önceki gece…"</b>, <b>"Söyle bakalım…"</b>. Sonradan lokalize edildiği için kabul edilebilir; TR'de doğmuş rakip için fark alanı.</li>
+          <li class="us"><b>Renk paleti bizimle aynı aile:</b> mavi-mor + turuncu. Ayrışmayı zorlaştıran yakınlık.</li>
+          <li class="hit"><b>"Ebeveynden ödeme iste"</b> ve <b>"Notlarını yükselt ya da tam para iadesi al"</b>: ödeme kararını ve sonucu akışa yediren tek ürün.</li>
+        </ul>
+      </div>
+    </div>
+    </div>
+    <div class="tabstrip">
+      <div class="lbl">Tab ekranları</div>
+      <div class="tabgrid">
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-astra-sor.png" alt="Sor"></div><figcaption>Sor</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-astra-sinavlar.png" alt="Sınavlar"></div><figcaption>Sınavlar</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-astra-siniflar.png" alt="Sınıflar"></div><figcaption>Sınıflar</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-astra-others-1.png" alt="Others: menü"></div><figcaption>Others: menü</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-astra-others-2.png" alt="Others: öğrenme uyg."></div><figcaption>Others: öğrenme uyg.</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-astra-others-3.png" alt="Others: aktiviteler"></div><figcaption>Others: aktiviteler</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-astra-others-4.png" alt="Others: konu seç"></div><figcaption>Others: konu seç</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 vaia A -->
+<section class="slide">
+  <div class="hdr">
+    <div class="num">05</div>
+    <div><h2>Vaia <span>· yapı ve çalışma planı</span></h2>
+      <div class="tags"><span class="tag play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.06 2.53a1.5 1.5 0 0 0-.44 1.06v16.82c0 .42.16.79.44 1.06l.06.05 9.42-9.42v-.11L3.12 2.47z" fill="#00A0FF"/><path d="M16.1 15.24l-3.14-3.14v-.11l3.14-3.14.07.04 3.72 2.11c1.06.6 1.06 1.59 0 2.2l-3.72 2.11z" fill="#FFBC00"/><path d="M16.17 15.17L12.96 12l-9.9 9.9c.35.37.92.42 1.57.05l11.54-6.78z" fill="#FF3A44"/><path d="M16.17 8.83L4.63 2.05c-.65-.37-1.22-.32-1.57.05l9.9 9.9z" fill="#00C853"/></svg><b>4,4 ★</b> · 31,6B değerlendirme · 10M+ indirme</span><span class="tag price">₺699,99/ay</span><span class="tag hq">HQ DE</span></div>
+    </div>
+  </div>
+  <div class="stack">
+    <div class="body">
+      <div>
+        <div class="callout">
+          <b>Onboarding doğrudan değer önerisine bağlanıyor.</b> Basics → <b>ürün turu</b> (tur veren tek ürün) → materyal yükle → uygulamayı gezmeden ilk quiz.
+        </div>
+        <div class="block">
+          <div class="lbl">Dört sekme</div>
+          <ul class="spec">
+            <li><b>Home</b>: sohbet + üç aksiyon kartı (Flashcards, Homework Helper, Study Plan / <code>Recommended</code> rozetli).</li>
+            <li><b>Library</b>: kendi materyalin. <b>Explore</b>: Study Sets / Flashcards / Textbooks. <b>Profile</b>: Info / Statistics.</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <div class="block">
+          <div class="lbl">Study Plan: en güçlü bileşen</div>
+          <ul class="spec">
+            <li>%75 halka + tarihli takvim, her güne bağlı görevler. Tamamlananlar üstü çizili.</li>
+            <li>"Day 2 of 7" rozeti ve düzenleme kalemi: plan değiştirilebiliyor.</li>
+            <li class="hit"><b>Sabit alt CTA: "▶ Review 1 flashcard +5XP".</b> Ödül ayrı rozet değil, butonun içinde.</li>
+          </ul>
+        </div>
+        <div class="block">
+          <div class="lbl">Marka ve gamification</div>
+          <ul class="spec">
+            <li>Karakter: mavi ışıklı damla, Library ve Explore'da <b>kalıcı yüzen buton</b>.</li>
+            <li><b>Tema cihaz ayarını izliyor, varsayılan açık.</b> Ekranlar koyu görünüyor çünkü test cihazı koyu modda. Koyu varyantta lacivert-mavi gradient.</li>
+            <li>Outline mono ikonografi. Streak + Level.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="tabstrip">
+      <div class="lbl">Tab ekranları <span style="text-transform:none;letter-spacing:0;color:#4d4d55">· paywall tab dışı, galeriden</span></div>
+      <div class="tabgrid">
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-vaia-home.png" alt="Home"></div><figcaption>Home</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-vaia-library.png" alt="Library"></div><figcaption>Library</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-vaia-library-sub-1.png" alt="Library: study plan"></div><figcaption>Library: study plan</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-vaia-library-sub-2.png" alt="Library: material"></div><figcaption>Library: material</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-vaia-explore.png" alt="Explore"></div><figcaption>Explore</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-vaia-explore-sub.png" alt="Explore: textbooks"></div><figcaption>Explore: textbooks</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-vaia-profile.png" alt="Profile"></div><figcaption>Profile</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/vaia-08.png" alt="Paywall"></div><figcaption>Paywall</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 vaia B -->
+<section class="slide">
+  <div class="hdr">
+    <div class="num">06</div>
+    <div><h2>Vaia <span>· paywall yerleşimi</span></h2>
+      <div class="tags"><span class="tag play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.06 2.53a1.5 1.5 0 0 0-.44 1.06v16.82c0 .42.16.79.44 1.06l.06.05 9.42-9.42v-.11L3.12 2.47z" fill="#00A0FF"/><path d="M16.1 15.24l-3.14-3.14v-.11l3.14-3.14.07.04 3.72 2.11c1.06.6 1.06 1.59 0 2.2l-3.72 2.11z" fill="#FFBC00"/><path d="M16.17 15.17L12.96 12l-9.9 9.9c.35.37.92.42 1.57.05l11.54-6.78z" fill="#FF3A44"/><path d="M16.17 8.83L4.63 2.05c-.65-.37-1.22-.32-1.57.05l9.9 9.9z" fill="#00C853"/></svg><b>4,4 ★</b> · 31,6B değerlendirme · 10M+ indirme</span><span class="tag price">₺699,99/ay</span><span class="tag hq">HQ DE</span></div>
+    </div>
+  </div>
+  <div class="stack">
+    <div class="body one">
+    <div>
+      <div class="callout">
+        <b>Kilit, değerin göründüğü yere konmuş, önüne değil.</b> Hiçbir yerde "bu ücretli" demiyor.
+      </div>
+      <div class="block">
+        <div class="lbl">Kilidin sırası</div>
+        <ul class="spec">
+          <li class="hit"><b>Boş durum → değer açıklaması → kilit.</b> "Podcasts 0" → "Turn your flashcards into a podcast…" → ve ancak sonra <b>"Generate 🔒"</b>. Kullanıcı neyi kaçırdığını tam biliyor.</li>
+          <li>Aramaya izin var, sonuçların tamamına yok: "Show all results 🔒".</li>
+        </ul>
+      </div>
+      <div class="block">
+        <div class="lbl">Paywall ekranı</div>
+        <ul class="spec">
+          <li>8 sayfalık karusel, her sayfa ayrı bir vaat. Üst yarı mavi gradient, alt yarı koyu: fiyat görsel olarak ayrılmış.</li>
+          <li class="hit"><b>Yıllık aylığa bölünmüş gösteriliyor:</b> ₺208,33/ay + "SAVE 70%", toplam ₺2.499,99 küçük puntoda. Karşısında Monthly ₺699,99.</li>
+          <li>"7 gün ücretsiz deneme" + "bitmeden bildirim göndereceğiz".</li>
+        </ul>
+      </div>
+    </div>
+    </div>
+    <div class="tabstrip">
+      <div class="lbl">Tab ekranları <span style="text-transform:none;letter-spacing:0;color:#4d4d55">· paywall tab dışı, galeriden</span></div>
+      <div class="tabgrid">
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-vaia-home.png" alt="Home"></div><figcaption>Home</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-vaia-library.png" alt="Library"></div><figcaption>Library</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-vaia-library-sub-1.png" alt="Library: study plan"></div><figcaption>Library: study plan</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-vaia-library-sub-2.png" alt="Library: material"></div><figcaption>Library: material</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-vaia-explore.png" alt="Explore"></div><figcaption>Explore</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/tab-vaia-explore-sub.png" alt="Explore: textbooks"></div><figcaption>Explore: textbooks</figcaption></figure>
+        <figure class="tabthumb"><div class="shot"><img src="assets/focused-scan/tab-vaia-profile.png" alt="Profile"></div><figcaption>Profile</figcaption></figure>
+        <figure class="tabthumb sub"><div class="shot"><img src="assets/focused-scan/vaia-08.png" alt="Paywall"></div><figcaption>Paywall</figcaption></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 matrix -->
+<section class="slide">
+  <div class="hdr">
+    <div class="num">07</div>
+    <div><h2>Eksen matrisi</h2></div>
+  </div>
+  <div class="scroll">
+    <table class="mx">
+      <thead><tr>
+        <th>Eksen</th><th>Knowunity</th><th>Astra AI</th><th>Vaia</th><th class="me">Madlen Okul</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Navigasyon</td><td><b>5 sekme</b></td><td><b>3 sekme + ızgara</b></td><td><b>4 sekme</b></td><td class="me"><b>Tab bar yok</b></td></tr>
+        <tr><td>AI yerleşimi</td><td>Tek sekmede (Chat)</td><td>Sor + composer bağlamı</td><td>Home sohbet + yüzen karakter</td><td class="me">Araç bazlı dağılmış</td></tr>
+        <tr><td>Karakter</td><td class="yes">Knowie, her adımda konuşuyor</td><td class="no">Yok, yerine emoji</td><td class="yes">Mavi damla, kalıcı yüzen</td><td class="me">Var, ağırlıklı Kurslar'da</td></tr>
+        <tr><td>Onboarding</td><td class="yes">8+ adım, hedef + engel + widget + app ikonu</td><td class="yes">Temel + okul + hedef, üstüne Harvard sosyal kanıtı</td><td class="yes">Basics → tur → materyal → ilk quiz</td><td class="me">Yok. B2B, bilgi okuldan</td></tr>
+        <tr><td>Gamification</td><td>Streak + XP + Leaderboard + Energy</td><td>Streak + davet coin'i</td><td>Streak + Level + <b>XP butonun içinde</b></td><td class="me">Level (Status) + XP</td></tr>
+        <tr><td>İkonografi</td><td>Karar ekranında <b>satır bazlı renkli</b>, navigasyonda nötr</td><td>Dekoratifte emoji, çekirdekte outline</td><td>Outline, mono</td><td class="me">Outline</td></tr>
+        <tr><td>Tema</td><td>Koyu lacivert</td><td>Siyah + gradient</td><td class="yes"><b>Cihaza uyumlu</b>, varsayılan açık</td><td class="me">Warm-cream / açık</td></tr>
+        <tr><td>Widget</td><td class="yes"><b>Var</b>, onboarding'de kuruluyor (chat + kamera + mic)</td><td class="no">Yok</td><td class="no">Yok</td><td class="me"><b>Yok</b></td></tr>
+        <tr><td>Materyalsiz üretim</td><td class="yes">Var</td><td class="no"><b>Yok</b>, dosya zorunlu</td><td class="yes">Var</td><td class="me"><b>Var</b>, kazanım tabanlı</td></tr>
+        <tr><td>Topluluk / UGC</td><td class="part">Yalnızca tüketim</td><td class="part">Öğrencilerin kurduğu sınıflar</td><td class="part">Community study sets</td><td class="me">Yok</td></tr>
+        <tr><td>Öğretmen bağı</td><td class="no">Yok</td><td class="no">Yok</td><td class="no">Yok</td><td class="me"><b>Var</b>, ürünün temeli</td></tr>
+        <tr><td>Aylık fiyat</td><td class="yes"><b>₺100</b></td><td>₺770 / ₺2.550</td><td>₺699,99</td><td class="me">B2B</td></tr>
+        <tr><td>Yıllık fiyat</td><td class="yes"><b>₺430</b></td><td>%58 indirim</td><td>₺2.499,99</td><td class="me">B2B</td></tr>
+        <tr><td>Deneme / garanti</td><td>yok</td><td>Para iadesi + ebeveynden ödeme</td><td>7 gün deneme</td><td class="me">yok</td></tr>
+        <tr><td>Odak yönetimi</td><td class="yes">Study Timer + uygulama bloklama</td><td class="part">Odaklanma Modu (Plus)</td><td class="part">Sadece istatistik</td><td class="me">Yok</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 09 steal list AL -->
+<section class="slide">
+  <div class="hdr">
+    <div class="num">08</div>
+    <div><h2>Steal list <span>· al</span></h2>
+      <div class="tags"><span class="tag">etki sırasına göre</span></div>
+    </div>
+  </div>
+  <div class="acts">
+    <div class="act adopt"><div class="verd">AL</div><div>
+      <h4>Question solver widget'ı<span class="src">Knowunity</span></h4>
+      <p>Knowunity ana ekran widget'ını <em>onboarding'in içinde</em> kurduruyor: chat, kamera, mikrofon. Bizde hiç yok. <em>Kamera kısayolu doğrudan soru çözücüye açılsın</em> ki öğrenci uygulamayı açmadan soruyu fotoğraflasın. Üç rakipten sadece birinde var, en yüksek görünürlük kazancı.</p>
+    </div></div>
+    <div class="act adopt"><div class="verd">AL</div><div>
+      <h4>XP'yi CTA'nın içine taşı<span class="src">Vaia</span></h4>
+      <p><em>"▶ Review 1 flashcard +5XP"</em>: ödül ayrı rozet değil, butonun parçası. Bizde XP zaten var ama kazanç anı görünmüyor. Yeni sistem gerekmiyor, mevcut XP'yi mevcut butonlara yazmak yeterli.</p>
+    </div></div>
+    <div class="act adopt"><div class="verd">AL</div><div>
+      <h4>Sticky başlığı island formuna çevir<span class="src">Knowunity</span></h4>
+      <p>Bizde sticky davranış zaten var; eksik olan <em>form</em>. Onlarınki içeriğin üstünde yüzen, kenarlardan kopmuş pill, sağında tamamlanma bölmesi. Salt görsel değişiklik, mantık dokunulmadan.</p>
+    </div></div>
+    <div class="act adopt"><div class="verd">AL</div><div>
+      <h4>Izgara butonu ile ikincil alanları topla<span class="src">Astra AI</span></h4>
+      <p>Üç sekme + ⠿ butonu; ikincil her şey tek alt sayfada. Madlen Okul'da tab bar hiç yok, bu yapı <em>sıfırdan tab bar kurmadan</em> hiyerarşi kazandırır.</p>
+    </div></div>
+    <div class="act adopt"><div class="verd">AL</div><div>
+      <h4>Tek bir tasarım sistemi, istisnasız her ekranda<span class="src">Knowunity</span></h4>
+      <p>Knowunity'nin asıl üstünlüğü tek tek bileşenleri değil, <em>hiçbir ekranın sistemden sapmaması</em>: aynı renk, aynı radius, aynı kart, aynı karakter. Astra'da bu disiplin yok ve kart yapıları ile boşluklar ekran ekran oynuyor, fark hemen görülüyor. <em>Madlen Okul'da da bütün ekranların tek ve tutarlı bir tasarım sisteminde olması gerekiyor</em>; aşağıdaki maddelerin hiçbiri bu zemin oturmadan kalıcı kazanç vermez.</p>
+    </div></div>
+    <div class="act adopt"><div class="verd">AL</div><div>
+      <h4>Boş durum → değer → kilit sırası<span class="src">Vaia</span></h4>
+      <p>Önce boş durum, sonra özelliğin ne yaptığı, kilit en son ve tam eylem butonunun üstünde. Kilitli özelliklerimizde aynı sıra doğrudan uygulanabilir.</p>
+    </div></div>
+  </div>
+</section>
+
+<!-- 10 steal list UYARLA/ALMA/FIRSAT -->
+<section class="slide">
+  <div class="hdr">
+    <div class="num">09</div>
+    <div><h2>Steal list <span>· uyarla, alma, fırsat</span></h2></div>
+  </div>
+  <div class="acts">
+    <div class="act adapt"><div class="verd">UYARLA</div><div>
+      <h4>Karakteri Kurslar'ın dışına çıkar<span class="src">Knowunity</span></h4>
+      <p>Karakterimiz var ama ağırlıklı Kurslar'da. Uyarlama tüm ekranları doldurmak değil: <em>kullanıcının seçim yaptığı her ekranda</em> karakteri konuşturmak.</p>
+    </div></div>
+    <div class="act adapt"><div class="verd">UYARLA</div><div>
+      <h4>Çalışma planını tarihli takvime bağla<span class="src">Vaia</span></h4>
+      <p>Plan liste değil takvim: güne bağlı görev, "Day 2 of 7" rozeti, düzenleme kalemi. Planı dayatma olmaktan çıkarıp taahhüde çeviren detay.</p>
+    </div></div>
+    <div class="act adapt"><div class="verd">UYARLA</div><div>
+      <h4>"Uygulamalarınız: 0" vitrin mantığı<span class="src">Astra AI</span></h4>
+      <p>Hazır içerik kütüphane değil <em>kapasite göstergesi</em>, boş sayaç davetin kendisi. Üretim araçlarımızda aynı kurgu kullanılabilir.</p>
+    </div></div>
+    <div class="act ignore"><div class="verd">ALMA</div><div>
+      <h4>Energy / hearts, ayrı Leaderboard sekmesi, app ikonu değiştirme</h4>
+      <p>Energy: okulun satın aldığı üründe öğrenciyi kısıtlamak ters sinyal. Leaderboard sekmesi: sınıf içi açık karşılaştırma okul bağlamında hassas, ayrıca en pahalı yeri en az kullanılana vermek. App ikonu: saf B2C taktiği, okul dağıtımında karşılığı yok.</p>
+    </div></div>
+    <div class="act op"><div class="verd">FIRSAT</div><div>
+      <h4>Materyalsiz üretim</h4>
+      <p>Astra'da imkansız. <em>Müfredat ve kazanım tabanlı üretimimiz net ve savunulabilir üstünlük</em>, ama şu an ürün anlatısında bu netlikte durmuyor.</p>
+    </div></div>
+    <div class="act op"><div class="verd">FIRSAT</div><div>
+      <h4>Öğretmen ve öğrenci bağı</h4>
+      <p>Üçü de saf B2C. Astra'da "Sınıf" var ama sınıfları öğrenciler kuruyor. Üçünün de yapısal olarak giremeyeceği alan, çünkü girmek iş modelini değiştirmek demek.</p>
+    </div></div>
+    <div class="act op"><div class="verd">FIRSAT</div><div>
+      <h4>B2B'de kaybolan onboarding işlevi</h4>
+      <p>Bilgi okuldan geldiği için onboarding'imiz yok ve bu avantaj. Ama Knowunity'nin topladığı şey bilgi değil <em>niyet</em>: hedef, engel, taahhüt. Bunlar okuldan gelmiyor.</p>
+    </div></div>
+  </div>
+</section>
+
+</div>
+
+<div id="lb">
+  <span class="x">esc</span>
+  <div class="nav prev">‹</div>
+  <img id="lbimg" alt="">
+  <div class="nav next">›</div>
+  <div class="cap" id="lbcap"></div>
+</div>
+
+<div class="bar">
+  <span class="sp"></span>
+  <span id="cnt"></span>
+  <kbd>←</kbd><kbd>→</kbd>
+</div>
+
+<script>
+const slides = [...document.querySelectorAll('.slide')];
+const prog = document.getElementById('prog');
+const cnt = document.getElementById('cnt');
+let i = 0;
+
+function show(n){
+  i = Math.max(0, Math.min(slides.length - 1, n));
+  slides.forEach((s, k) => s.classList.toggle('on', k === i));
+  slides[i].scrollTop = 0;
+  prog.style.width = ((i + 1) / slides.length * 100) + '%';
+  cnt.textContent = (i + 1) + ' / ' + slides.length;
+  location.hash = i ? i : '';
+}
+
+const lb = document.getElementById('lb');
+const lbimg = document.getElementById('lbimg');
+const lbcap = document.getElementById('lbcap');
+let group = [], gi = 0;
+
+function capFor(img){
+  const shot = img.closest('.shot');
+  const thumb = img.closest('.tabthumb');
+  if (thumb) { const f = thumb.querySelector('figcaption'); return f ? f.textContent : ''; }
+  const next = shot.nextElementSibling;
+  return (next && next.classList.contains('shotcap')) ? next.textContent : '';
+}
+function paint(){
+  lbimg.src = group[gi].src;
+  const c = capFor(group[gi]);
+  lbcap.textContent = (c ? c + '  ·  ' : '') + (gi + 1) + ' / ' + group.length;
+}
+function openLb(img){
+  // keep the tab strip and the side shots as separate browsable groups
+  const strip = img.closest('.tabgrid');
+  group = strip
+    ? [...strip.querySelectorAll('img')]
+    : [...slides[i].querySelectorAll('.shot img')];
+  if (!group.length) group = [img];
+  gi = Math.max(0, group.indexOf(img));
+  paint();
+  lb.classList.add('on');
+}
+function stepLb(d){ gi = (gi + d + group.length) % group.length; paint(); }
+function closeLb(){ lb.classList.remove('on'); }
+
+document.addEventListener('click', e => {
+  const s = e.target.closest('.shot');
+  if (s && !lb.classList.contains('on')) openLb(s.querySelector('img'));
+});
+lb.addEventListener('click', e => {
+  if (e.target.classList.contains('next')) { stepLb(1); return; }
+  if (e.target.classList.contains('prev')) { stepLb(-1); return; }
+  if (e.target !== lbimg) closeLb();
+});
+
+document.addEventListener('keydown', e => {
+  if (lb.classList.contains('on')) {
+    if (e.key === 'Escape') closeLb();
+    if (e.key === 'ArrowRight') stepLb(1);
+    if (e.key === 'ArrowLeft') stepLb(-1);
+    return;
+  }
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); show(i + 1); }
+  if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); show(i - 1); }
+  if (e.key === 'Home') show(0);
+  if (e.key === 'End') show(slides.length - 1);
+});
+
+let x0 = null;
+addEventListener('touchstart', e => x0 = e.touches[0].clientX, {passive:true});
+addEventListener('touchend', e => {
+  if (x0 === null || lb.classList.contains('on')) return;
+  const dx = e.changedTouches[0].clientX - x0;
+  if (Math.abs(dx) > 60) show(i + (dx < 0 ? 1 : -1));
+  x0 = null;
+}, {passive:true});
+
+show(parseInt(location.hash.slice(1)) || 0);
+</script>
+</body>
+</html>

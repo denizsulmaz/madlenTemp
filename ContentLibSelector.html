@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Müfredat Tabanlı İçerik Kütüphanesi — Trial</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          warm: {
+            100: "#F5F2EC",
+            400: "#DCD7CC",
+            600: "#6B6660",
+            700: "#514D47",
+            900: "#1F1D1A",
+          },
+          primary: { 500: "#D17A3B", 600: "#BC6A2F" },
+        },
+      },
+    },
+  };
+</script>
+<style>
+  body { font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  .premium { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+  .grade-btn { flex: 1 1 0; min-width: 52px; }
+  .fade-in { animation: fi 0.28s ease both; }
+  @keyframes fi { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #DCD7CC; border-radius: 999px; }
+</style>
+</head>
+<body class="bg-[#FBF7F1] text-warm-900 antialiased">
+
+<div class="mx-auto max-w-[1120px] px-5 py-10 sm:px-8 sm:py-14">
+
+  <!-- Header -->
+  <header class="mb-7 flex items-start gap-4">
+    <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#F0D9C4] bg-[#FDF1E7]">
+      <svg class="h-[22px] w-[22px] text-[#D17A3B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 6l4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/>
+      </svg>
+    </div>
+    <div>
+      <h1 class="text-[26px] font-semibold leading-tight tracking-[-0.01em] sm:text-[30px]">Müfredat Tabanlı İçerik Kütüphanesi</h1>
+      <p class="mt-1 text-[15px] text-warm-600">Sınıf ve dersinizi seçin; tüm araçlardan kazanım odaklı hazır içerikleri tek yerden listeleyin.</p>
+    </div>
+  </header>
+
+  <!-- A / B switcher — sol altta sabit -->
+  <div class="fixed bottom-5 left-5 z-[60] inline-flex items-center gap-1 rounded-full border border-[#EBEAE4] bg-white/95 p-1 shadow-lg backdrop-blur-sm">
+    <button data-view="a" class="premium h-8 w-8 rounded-full text-xs font-semibold">A</button>
+    <button data-view="b" class="premium h-8 w-8 rounded-full text-xs font-semibold">B</button>
+  </div>
+
+  <!-- ============ OPTION A ============ -->
+  <section id="view-a" class="rounded-2xl border border-[#EBEAE4] bg-white p-5 shadow-[0_1px_2px_rgba(60,45,20,0.03)] sm:p-7">
+
+    <!-- Sınıf Seviyesi -->
+    <div class="mb-6">
+      <label class="mb-2.5 block text-xs font-semibold uppercase tracking-wide text-warm-600">Sınıf Seviyesi</label>
+      <div id="grade-row" class="flex flex-wrap gap-2"></div>
+    </div>
+
+    <!-- Ders -->
+    <div class="mb-6">
+      <label class="mb-2.5 block text-xs font-semibold uppercase tracking-wide text-warm-600">Ders</label>
+      <div id="course-grid" class="grid grid-cols-2 gap-2 md:grid-cols-3"></div>
+    </div>
+
+    <!-- Çıktı Dili + TYMM -->
+    <div class="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-warm-400/50 bg-warm-100 px-3 py-2">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-warm-600">Çıktı Dili</span>
+        <div class="relative">
+          <button id="lang-trigger" type="button"
+            class="premium flex w-[104px] items-center justify-between gap-1.5 rounded-lg border border-warm-400 bg-white/60 px-3 py-1.5 text-gray-600 backdrop-blur-sm hover:bg-white">
+            <span class="flex items-center gap-2">
+              <span id="lang-flag" class="block h-4 w-4 shrink-0 overflow-hidden rounded-full shadow-sm"></span>
+              <span id="lang-code" class="text-sm font-medium uppercase">TR</span>
+            </span>
+            <svg id="lang-chev" class="premium h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div id="lang-menu" class="custom-scrollbar absolute left-0 top-full z-50 mt-1 hidden w-[104px] overflow-hidden rounded-lg border border-gray-100 bg-white shadow-xl"></div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-1.5">
+        <span class="text-sm font-semibold text-warm-600">Türkiye Yüzyılı Maarif Modeli</span>
+        <label class="relative inline-flex cursor-pointer items-center">
+          <input id="tymm" type="checkbox" checked class="peer sr-only" />
+          <div id="tymm-track" class="relative h-[18px] w-8 rounded-full bg-orange-400 transition-colors duration-300"></div>
+          <div id="tymm-knob" class="absolute start-[2px] top-[2px] h-3.5 w-3.5 translate-x-3.5 rounded-full border border-gray-300 bg-white transition-transform duration-300"></div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Kazanımlar -->
+    <div id="oc-a" class="hidden"></div>
+
+    <!-- Hint / preview -->
+    <div id="hint" class="border-t border-[#EBEAE4] pt-5 text-sm text-warm-600">Öneri görmek için sınıf ve ders seçin.</div>
+
+    <!-- CTA -->
+    <div class="mt-6 flex justify-end">
+      <button id="cta" disabled
+        class="premium flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#E29A63] to-[#D17A3B] px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-50">
+        <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        Kütüphane İçeriklerini Sorgula
+      </button>
+    </div>
+  </section>
+
+  <!-- ============ OPTION B ============ -->
+  <section id="view-b" class="hidden rounded-2xl border border-[#EBEAE4] bg-white p-5 shadow-[0_1px_2px_rgba(60,45,20,0.03)] sm:p-7">
+    <div id="b-row" class="flex flex-wrap items-end gap-3"></div>
+    <div id="oc-b" class="hidden"></div>
+    <div id="hint-b" class="mt-5 border-t border-[#EBEAE4] pt-5 text-sm text-warm-600"></div>
+    <div id="b-cta" class="mt-6 flex justify-end"></div>
+  </section>
+</div>
+
+<script>
+/* ---------- Icons (lucide-style, currentColor) ---------- */
+const I = {
+  landmark: '<path d="M3 22h18"/><path d="M6 18V11"/><path d="M10 18V11"/><path d="M14 18V11"/><path d="M18 18V11"/><path d="M12 2l9 5H3l9-5z"/>',
+  books:    '<path d="M4 6.5h13a2 2 0 0 1 0 4H4"/><path d="M4 12h13a2 2 0 0 1 0 4H4"/><path d="M4 17.5h13a2 2 0 0 1 0 4H4"/><path d="M4 2.5h13a2 2 0 0 1 0 4"/>',
+  globe:    '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18z"/>',
+  palette:  '<circle cx="13.5" cy="6.5" r="1.2"/><circle cx="17.5" cy="10.5" r="1.2"/><circle cx="8.5" cy="7.5" r="1.2"/><circle cx="6.5" cy="12.5" r="1.2"/><path d="M12 22a10 10 0 1 1 0-20c5.5 0 10 3.6 10 8 0 2.5-2 4-4 4h-2.2a2 2 0 0 0-1.5 3.3 1.9 1.9 0 0 1-1.5 3.2 3 3 0 0 1-.8.5z"/>',
+  flask:    '<path d="M10 2v6.5L4.5 18A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-3L14 8.5V2"/><path d="M8.5 2h7"/><circle cx="12" cy="16" r="1.4"/>',
+  atom:     '<circle cx="12" cy="12" r="2"/><path d="M12 2v6"/><path d="M9.5 5.5L12 8l2.5-2.5"/><path d="M6 20c-2-2-2.5-5-1-7"/><path d="M18 20c2-2 2.5-5 1-7"/><path d="M8 19h8"/>',
+  math:     '<path d="M4 8l5 5"/><path d="M9 8l-5 5"/><path d="M14 7h6"/><path d="M17 4v6"/><path d="M14 16h6"/>',
+  sprout:   '<path d="M12 21v-8"/><path d="M12 13c0-4 3-6 7-6 0 4-3 6-7 6z"/><path d="M12 15C9 15 6 13 6 9c3 0 6 2 6 6z"/>',
+  bookOpen: '<path d="M2 4.5h6a3 3 0 0 1 3 3V20a2.5 2.5 0 0 0-2.5-2.5H2z"/><path d="M22 4.5h-6a3 3 0 0 0-3 3V20a2.5 2.5 0 0 1 2.5-2.5H22z"/>',
+  book:     '<path d="M5 3h11a2 2 0 0 1 2 2v16H7a2 2 0 0 1-2-2z"/><path d="M5 17h13"/>',
+  activity: '<path d="M3 12h3l3 8 4-16 3 8h5"/>',
+  music:    '<circle cx="7" cy="18" r="2.5"/><circle cx="18" cy="15.5" r="2.5"/><path d="M9.5 18V6l11-2v11.5"/>',
+  cpu:      '<rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 2v3M14 2v3M10 19v3M14 19v3M2 10h3M2 14h3M19 10h3M19 14h3"/>',
+};
+
+/* ---------- Palette: production course colors ---------- */
+const P = {
+  amber:   { bg:"bg-amber-50/70",   border:"border-amber-200/60",   text:"text-amber-700",   hover:"hover:bg-amber-50",   aBg:"bg-amber-100/80",   aBorder:"border-amber-300",   aText:"text-amber-900" },
+  rose:    { bg:"bg-rose-50/70",    border:"border-rose-200/60",    text:"text-rose-700",    hover:"hover:bg-rose-50",    aBg:"bg-rose-100/80",    aBorder:"border-rose-300",    aText:"text-rose-900" },
+  sky:     { bg:"bg-sky-50/70",     border:"border-sky-200/60",     text:"text-sky-700",     hover:"hover:bg-sky-50",     aBg:"bg-sky-100/80",     aBorder:"border-sky-300",     aText:"text-sky-900" },
+  indigo:  { bg:"bg-indigo-50/70",  border:"border-indigo-200/60",  text:"text-indigo-700",  hover:"hover:bg-indigo-50",  aBg:"bg-indigo-100/80",  aBorder:"border-indigo-300",  aText:"text-indigo-900" },
+  emerald: { bg:"bg-emerald-50/70", border:"border-emerald-200/60", text:"text-emerald-700", hover:"hover:bg-emerald-50", aBg:"bg-emerald-100/80", aBorder:"border-emerald-300", aText:"text-emerald-900" },
+  orange:  { bg:"bg-orange-50/70",  border:"border-orange-200/60",  text:"text-orange-700",  hover:"hover:bg-orange-50",  aBg:"bg-orange-100/80",  aBorder:"border-orange-300",  aText:"text-orange-900" },
+  teal:    { bg:"bg-teal-50/70",    border:"border-teal-200/60",    text:"text-teal-700",    hover:"hover:bg-teal-50",    aBg:"bg-teal-100/80",    aBorder:"border-teal-300",    aText:"text-teal-900" },
+  purple:  { bg:"bg-purple-50/70",  border:"border-purple-200/60",  text:"text-purple-700",  hover:"hover:bg-purple-50",  aBg:"bg-purple-100/80",  aBorder:"border-purple-300",  aText:"text-purple-900" },
+  cyan:    { bg:"bg-cyan-50/70",    border:"border-cyan-200/60",    text:"text-cyan-700",    hover:"hover:bg-cyan-50",    aBg:"bg-cyan-100/80",    aBorder:"border-cyan-300",    aText:"text-cyan-900" },
+  lime:    { bg:"bg-lime-50/70",    border:"border-lime-200/60",    text:"text-lime-700",    hover:"hover:bg-lime-50",    aBg:"bg-lime-100/80",    aBorder:"border-lime-300",    aText:"text-lime-900" },
+  violet:  { bg:"bg-violet-50/70",  border:"border-violet-200/60",  text:"text-violet-700",  hover:"hover:bg-violet-50",  aBg:"bg-violet-100/80",  aBorder:"border-violet-300",  aText:"text-violet-900" },
+  pink:    { bg:"bg-pink-50/70",    border:"border-pink-200/60",    text:"text-pink-700",    hover:"hover:bg-pink-50",    aBg:"bg-pink-100/80",    aBorder:"border-pink-300",    aText:"text-pink-900" },
+  gray:    { bg:"bg-gray-50/80",    border:"border-gray-200/50",    text:"text-gray-700",    hover:"hover:bg-gray-100",   aBg:"bg-gray-100/80",    aBorder:"border-gray-300",    aText:"text-gray-900" },
+};
+
+/* ---------- Grades & grade-dependent course sets ---------- */
+const GRADES = [1,2,3,4,5,6,7,8,9,10,11,12].map(n => ({ id:String(n), label:String(n) }));
+
+const PRIMARY = [ // 1–4
+  { id:"turkce",    name:"Türkçe",                tone:"rose",    icon:"books" },
+  { id:"matematik", name:"Matematik",             tone:"orange",  icon:"math" },
+  { id:"hayat",     name:"Hayat Bilgisi",         tone:"sky",     icon:"globe" },
+  { id:"fen",       name:"Fen Bilimleri",         tone:"emerald", icon:"atom" },
+  { id:"dkab",      name:"DKAB",                  tone:"purple",  icon:"bookOpen", info:true },
+  { id:"english",   name:"English",               tone:"cyan",    icon:"book" },
+  { id:"gorsel",    name:"Görsel Sanatlar",       tone:"amber",   icon:"palette" },
+  { id:"muzik",     name:"Müzik",                 tone:"pink",    icon:"music" },
+  { id:"beden",     name:"Beden Eğitimi ve Spor", tone:"lime",    icon:"activity" },
+  { id:"diger",     name:"Diğer",                 tone:"gray",    icon:"book" },
+];
+
+const MIDDLE = [ // 5–8
+  { id:"sosyal",    name:"Sosyal Bilgiler",       tone:"amber",   icon:"landmark" },
+  { id:"turkce",    name:"Türkçe",                tone:"rose",    icon:"books" },
+  { id:"fen",       name:"Fen Bilimleri",         tone:"emerald", icon:"atom" },
+  { id:"matematik", name:"Matematik",             tone:"orange",  icon:"math" },
+  { id:"dkab",      name:"DKAB",                  tone:"purple",  icon:"bookOpen", info:true },
+  { id:"english",   name:"English",               tone:"cyan",    icon:"book" },
+  { id:"beden",     name:"Beden Eğitimi ve Spor", tone:"lime",    icon:"activity" },
+  { id:"gorsel",    name:"Görsel Sanatlar",       tone:"amber",   icon:"palette" },
+  { id:"bilisim",   name:"Bilişim Teknolojileri", tone:"sky",     icon:"cpu" },
+  { id:"diger",     name:"Diğer",                 tone:"gray",    icon:"book" },
+];
+
+const HIGH = [ // 9–12
+  { id:"tarih",     name:"Tarih",                 tone:"amber",   icon:"landmark" },
+  { id:"tde",       name:"TDE",                   tone:"rose",    icon:"books", info:true },
+  { id:"cografya",  name:"Coğrafya",              tone:"sky",     icon:"globe" },
+  { id:"gorsel",    name:"Görsel Sanatlar",       tone:"amber",   icon:"palette" },
+  { id:"kimya",     name:"Kimya",                 tone:"indigo",  icon:"flask" },
+  { id:"fizik",     name:"Fizik",                 tone:"emerald", icon:"atom" },
+  { id:"matematik", name:"Matematik",             tone:"orange",  icon:"math" },
+  { id:"biyoloji",  name:"Biyoloji",              tone:"teal",    icon:"sprout" },
+  { id:"dkab",      name:"DKAB",                  tone:"purple",  icon:"bookOpen", info:true },
+  { id:"english",   name:"English",               tone:"cyan",    icon:"book" },
+  { id:"beden",     name:"Beden Eğitimi ve Spor", tone:"lime",    icon:"activity" },
+  { id:"diger",     name:"Diğer",                 tone:"gray",    icon:"book" },
+];
+
+/* Daireyi tamamen dolduran bayraklar (viewBox 0 0 32 32, clip circle) */
+const FLAG_SVG = {
+  TR: `<circle cx="16" cy="16" r="16" fill="#E30A17"/>
+       <circle cx="13.6" cy="16" r="7" fill="#fff"/><circle cx="15.9" cy="16" r="5.6" fill="#E30A17"/>
+       <path fill="#fff" d="M22.1 16l-2.6.85.02-2.73-1.6 2.21-1.6-2.21.02 2.73L13.7 16l2.64.85-.02 2.73 1.6-2.21 1.6 2.21-.02-2.73z" transform="translate(3.2 0)"/>`,
+  EN: `<rect width="32" height="32" fill="#012169"/>
+       <path stroke="#fff" stroke-width="6" d="M0 0l32 32M32 0L0 32"/>
+       <path stroke="#C8102E" stroke-width="3.4" d="M0 0l32 32M32 0L0 32"/>
+       <path stroke="#fff" stroke-width="10" d="M16 0v32M0 16h32"/>
+       <path stroke="#C8102E" stroke-width="6" d="M16 0v32M0 16h32"/>`,
+  DE: `<rect width="32" height="32" fill="#FFCE00"/><rect width="32" height="21.4" fill="#D00"/><rect width="32" height="10.7" fill="#000"/>`,
+  FR: `<rect width="32" height="32" fill="#ED2939"/><rect width="21.4" height="32" fill="#fff"/><rect width="10.7" height="32" fill="#002395"/>`,
+};
+
+function flag(id, px) {
+  return `<svg viewBox="0 0 32 32" width="${px}" height="${px}" style="display:block;border-radius:999px">
+    <defs><clipPath id="fc-${id}-${px}"><circle cx="16" cy="16" r="16"/></clipPath></defs>
+    <g clip-path="url(#fc-${id}-${px})">${FLAG_SVG[id]}</g></svg>`;
+}
+
+const LANGS = [{ id:"TR" }, { id:"EN" }, { id:"DE" }, { id:"FR" }];
+
+/* ---------- Kazanımlar / Öğrenme Çıktıları ----------
+   Prototip: tüm sınıf/ders kombinasyonları için tek placeholder kazanım seti. */
+const OUTCOMES = [
+    { theme:"1. Tema: Sözün İnceliği", ocs:[
+      { code:"TDE1.2.", text:"“Sözün İnceliği” temasında ele alınan metinlerde anlam oluşturabilme" },
+      { code:"TDE2.2.", text:"“Sözün İnceliği” temasında ele alınan metinlerde anlam oluşturabilme" },
+      { code:"TDE3.2.", text:"Muhatabını ikna etmek için söyleyiş inceliklerine yer veren bir konuşma içeriği oluşturabilme" },
+      { code:"TDE3.3.", text:"Muhatabını ikna etmek için söyleyiş inceliklerine yer veren bir konuşmada kural uygulayabilme" },
+      { code:"TDE4.2.", text:"Edebî söyleyişin inceliğini yansıtan metinlerden edindiği söz varlığını kullanarak yazısına içerik oluşturabilme" },
+      { code:"TDE4.3.", text:"Edebî söyleyişin inceliğini yansıttığı yazısında kural uygulayabilme" },
+    ]},
+    { theme:"2. Tema: Anlam Arayışı", ocs:[
+      { code:"TDE1.3.", text:"“Anlam Arayışı” temasında ele alınan metinlerde anlam oluşturabilme" },
+      { code:"TDE2.3.", text:"“Anlam Arayışı” temasında ele alınan metinleri çözümleyebilme" },
+      { code:"TDE4.4.", text:"“Anlam Arayışı” temasından hareketle bir yazı planı oluşturabilme" },
+    ]},
+    { theme:"3. Tema: Anlamın Yapı Taşları", ocs:[
+      { code:"TDE1.4.", text:"“Anlamın Yapı Taşları” temasında ele alınan metinlerde anlam oluşturabilme" },
+      { code:"TDE2.4.", text:"Sözcük, cümle ve metin düzeyinde anlam ilişkilerini çözümleyebilme" },
+    ]},
+    { theme:"4. Tema: Dilin Zenginliği", ocs:[
+      { code:"TDE1.5.", text:"“Dilin Zenginliği” temasında ele alınan metinlerde anlam oluşturabilme" },
+      { code:"TDE3.4.", text:"Dilin zenginliğini yansıtan bir konuşma içeriği oluşturabilme" },
+    ]},
+];
+
+/* ---------- State ---------- */
+const state = {
+  view:"a", grade:null, course:null, lang:"TR", tymm:true, langOpen:false, openB:null,
+  ocOpen:new Set([0]), ocSel:null, ocQuery:"", ocCollapsed:false,
+};
+
+function coursesFor(grade) {
+  if (!grade) return MIDDLE; // hiçbir sınıf seçilmeden de dersler görünür
+  const g = Number(grade);
+  return g <= 4 ? PRIMARY : g <= 8 ? MIDDLE : HIGH;
+}
+
+/* ---------- Render ---------- */
+function renderGrades() {
+  document.getElementById("grade-row").innerHTML = GRADES.map(g => {
+    const on = state.grade === g.id;
+    return `<button data-grade="${g.id}" class="grade-btn premium rounded-xl border py-3 text-[15px] font-semibold ${
+      on ? "border-2 border-[#D17A3B] bg-[#D17A3B]/[0.06] text-[#D17A3B] shadow-sm"
+         : "border-[#EBEAE4] bg-white text-warm-700 hover:border-[#DCD7CC] hover:bg-[#FBF7F1]"
+    }">${g.label}</button>`;
+  }).join("");
+}
+
+function renderCourses() {
+  const grid = document.getElementById("course-grid");
+  const list = coursesFor(state.grade);
+
+  grid.innerHTML = list.map(c => {
+    const p = P[c.tone];
+    const on = state.course === c.id;
+    const size = c.name.length > 20 ? "text-[11px]" : c.name.length > 7 ? "text-xs" : "text-sm";
+    return `<button data-course="${c.id}" class="premium fade-in relative flex min-h-[52px] items-center gap-2.5 rounded-xl border p-3 text-left font-medium ${size} ${
+      on ? `border-2 scale-[1.02] shadow-md ${p.aBg} ${p.aBorder} ${p.aText}`
+         : `${p.bg} ${p.border} ${p.text} ${p.hover} hover:shadow-sm`
+    }">
+      <svg class="h-5 w-5 min-w-[20px] shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${I[c.icon]}</svg>
+      <span class="leading-tight">${c.name}</span>
+      ${c.info ? `<svg class="absolute right-2 top-2 h-3.5 w-3.5 opacity-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5"/><path d="M12 8h.01"/></svg>` : ""}
+    </button>`;
+  }).join("");
+}
+
+function renderLang() {
+  document.getElementById("lang-code").textContent = state.lang;
+  document.getElementById("lang-flag").innerHTML = flag(state.lang, 16);
+  document.getElementById("lang-chev").classList.toggle("rotate-180", state.langOpen);
+
+  const menu = document.getElementById("lang-menu");
+  menu.classList.toggle("hidden", !state.langOpen);
+  menu.innerHTML = LANGS.map(l => `<button data-lang="${l.id}" class="premium flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${
+    state.lang === l.id ? "bg-gradient-to-r from-primary-500 to-primary-600 font-medium text-white" : "text-warm-700 hover:bg-warm-100"
+  }"><span class="block h-4 w-4 shrink-0 overflow-hidden rounded-full shadow-sm">${flag(l.id, 16)}</span>${l.id}</button>`).join("");
+}
+
+function renderTymm() {
+  const track = document.getElementById("tymm-track");
+  const knob = document.getElementById("tymm-knob");
+  track.className = `relative h-[18px] w-8 rounded-full transition-colors duration-300 ${state.tymm ? "bg-orange-400" : "bg-warm-400"}`;
+  knob.className = `absolute start-[2px] top-[2px] h-3.5 w-3.5 rounded-full border border-gray-300 bg-white transition-transform duration-300 ${state.tymm ? "translate-x-3.5" : ""}`;
+}
+
+function renderHint(hintId, ctaId) {
+  const hint = document.getElementById(hintId);
+  const cta = document.getElementById(ctaId);
+  const ready = state.grade && state.course;
+  if (cta) cta.disabled = !ready;
+
+  // seçim yapıldığında alt satır tamamen kalkar
+  hint.classList.toggle("hidden", !!ready);
+  hint.innerHTML = ready ? "" : `<span class="text-sm text-warm-600">Öneri görmek için sınıf ve ders seçin.</span>`;
+}
+
+/* ---------- Kazanım listesi (iki opsiyonda ortak) ---------- */
+const radio = on => `<span class="mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full border ${
+  on ? "border-[#D17A3B] border-[5px]" : "border-warm-400 bg-white"
+}"></span>`;
+
+function filteredOutcomes() {
+  const q = state.ocQuery.trim().toLowerCase();
+  if (!q) return OUTCOMES.map((t, i) => ({ ...t, i }));
+  return OUTCOMES
+    .map((t, i) => ({ ...t, i, ocs: t.ocs.filter(o => (o.code + " " + o.text).toLowerCase().includes(q)) }))
+    .filter(t => t.ocs.length || t.theme.toLowerCase().includes(q));
+}
+
+function renderOutcomes(id) {
+  const box = document.getElementById(id);
+  const ready = state.grade && state.course;
+  box.classList.toggle("hidden", !ready);
+  if (!ready) { box.innerHTML = ""; return; }
+
+  const q = state.ocQuery.trim().toLowerCase();
+  const themes = filteredOutcomes();
+
+  // Option B: kazanım seçilince liste kapanır, yerine özet satırı gelir
+  if (id === "oc-b" && state.ocSel && state.ocCollapsed) {
+    const sel = OUTCOMES.flatMap(t => t.ocs.map(o => ({ ...o, theme:t.theme }))).find(o => o.code === state.ocSel);
+    box.innerHTML = `
+      <div class="mt-6">
+        <label class="mb-2.5 block text-xs font-semibold uppercase tracking-wide text-warm-600">Kazanımlar ve Öğrenme Çıktıları</label>
+        <div class="fade-in flex items-center gap-3 rounded-xl border border-[#F0D9C4] bg-[#FDFBF8] px-4 py-3">
+          <svg class="h-[18px] w-[18px] shrink-0 text-[#D17A3B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+          <span class="shrink-0 rounded-md bg-[#FDF1E7] px-2 py-0.5 text-xs font-semibold text-[#D17A3B]">${sel.code}</span>
+          <span class="min-w-0 flex-1 truncate text-sm text-warm-900" title="${sel.text}">${sel.text}</span>
+          <span class="hidden shrink-0 text-xs text-warm-600 sm:block">${sel.theme}</span>
+          <button data-oc-edit class="premium shrink-0 rounded-lg border border-warm-400 bg-white px-3 py-1.5 text-xs font-semibold text-warm-700 hover:bg-[#FBF7F1]">Değiştir</button>
+        </div>
+      </div>`;
+    return;
+  }
+
+  box.innerHTML = `
+    <div class="mt-6">
+      <label class="mb-2.5 block text-xs font-semibold uppercase tracking-wide text-warm-600">Kazanımlar ve Öğrenme Çıktıları</label>
+      <input data-ocq="${id}" value="${state.ocQuery.replace(/"/g, "&quot;")}" placeholder="Ünite/Tema/Öğrenme Alanı ara..."
+        class="premium mb-2.5 w-full rounded-xl border border-[#EBEAE4] bg-white px-4 py-3 text-sm text-warm-900 placeholder:text-warm-600/70 focus:border-[#D17A3B] focus:outline-none" />
+
+      <div class="divide-y divide-[#EBEAE4] overflow-hidden rounded-xl border border-[#EBEAE4]">
+        ${themes.length === 0 ? `<div class="px-4 py-6 text-center text-sm text-warm-600">Eşleşen kazanım bulunamadı.</div>` : ""}
+        ${themes.map(t => {
+          const open = q ? true : state.ocOpen.has(t.i);
+          const themeOn = t.ocs.length > 0 && t.ocs.every(o => state.ocSel === o.code) && t.ocs.length === 1;
+          return `
+          <div>
+            <button data-theme="${t.i}" class="premium flex w-full items-center gap-3 px-4 py-3.5 text-left ${open ? "bg-[#FDFBF8]" : "bg-white hover:bg-[#FBF7F1]"}">
+              ${radio(themeOn)}
+              <span class="flex-1 text-[15px] text-warm-900">${t.theme}</span>
+              <svg class="premium h-4 w-4 text-warm-600 ${open ? "rotate-180" : ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            ${open ? `<div class="fade-in space-y-1 border-t border-[#EBEAE4] bg-white px-4 pb-3 pt-2">
+              ${t.ocs.map(o => {
+                const on = state.ocSel === o.code;
+                return `<button data-oc="${o.code}" class="premium flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left ${on ? "bg-[#FDF1E7]" : "hover:bg-[#FBF7F1]"}">
+                  ${radio(on)}
+                  <span class="shrink-0 rounded-md bg-[#FDF1E7] px-2 py-0.5 text-xs font-semibold text-[#D17A3B]">${o.code}</span>
+                  <span class="text-sm leading-snug text-warm-900">${o.text}</span>
+                </button>`;
+              }).join("")}
+            </div>` : ""}
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`;
+}
+
+/* ---------- OPTION B: tek satır, hepsi dropdown + TYMM toggle ---------- */
+const FIELD_LABEL = "mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-warm-600";
+const TRIGGER = "premium flex w-full items-center justify-between gap-2 rounded-lg border border-warm-400 bg-white px-3 py-2.5 text-left hover:bg-[#FBF7F1]";
+const MENU = "custom-scrollbar absolute left-0 top-full z-50 mt-1 max-h-[280px] w-full overflow-y-auto rounded-lg border border-gray-100 bg-white shadow-xl";
+const chev = open => `<svg class="premium h-4 w-4 shrink-0 text-warm-600 ${open ? "rotate-180" : ""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>`;
+const cIcon = (c, cls) => `<svg class="h-[18px] w-[18px] shrink-0 ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${I[c.icon]}</svg>`;
+
+function renderB() {
+  const list = coursesFor(state.grade);
+  const course = list.find(c => c.id === state.course);
+  const open = state.openB;
+
+  document.getElementById("b-row").innerHTML = `
+    <!-- Sınıf -->
+    <div class="min-w-[132px] flex-[0.8]">
+      <label class="${FIELD_LABEL}">Sınıf Seviyesi</label>
+      <div class="relative">
+        <button data-bopen="grade" class="${TRIGGER}">
+          <span class="text-sm font-medium ${state.grade ? "text-warm-900" : "text-warm-600"}">${state.grade ? state.grade + ". Sınıf" : "Seçiniz"}</span>
+          ${chev(open === "grade")}
+        </button>
+        <div class="${MENU} ${open === "grade" ? "" : "hidden"}">
+          ${GRADES.map(g => `<button data-bgrade="${g.id}" class="premium block w-full px-3 py-2 text-left text-sm ${
+            state.grade === g.id ? "bg-gradient-to-r from-primary-500 to-primary-600 font-medium text-white" : "text-warm-700 hover:bg-warm-100"
+          }">${g.label}. Sınıf</button>`).join("")}
+        </div>
+      </div>
+    </div>
+
+    <!-- Ders -->
+    <div class="min-w-[210px] flex-[1.4]">
+      <label class="${FIELD_LABEL}">Ders</label>
+      <div class="relative">
+        <button data-bopen="course" class="${TRIGGER}">
+          <span class="flex min-w-0 items-center gap-2">
+            ${course ? cIcon(course, P[course.tone].text) : ""}
+            <span class="truncate text-sm font-medium ${course ? P[course.tone].text : "text-warm-600"}">${course ? course.name : "Seçiniz"}</span>
+          </span>
+          ${chev(open === "course")}
+        </button>
+        <div class="${MENU} ${open === "course" ? "" : "hidden"}">
+          ${list.map(c => `<button data-bcourse="${c.id}" class="premium flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${
+            state.course === c.id ? `font-semibold ${P[c.tone].aBg} ${P[c.tone].aText}` : `${P[c.tone].text} hover:bg-warm-100`
+          }">${cIcon(c, "")}<span class="truncate">${c.name}</span></button>`).join("")}
+        </div>
+      </div>
+    </div>
+
+    <!-- Çıktı Dili -->
+    <div class="min-w-[118px]">
+      <label class="${FIELD_LABEL}">Çıktı Dili</label>
+      <div class="relative">
+        <button data-bopen="lang" class="${TRIGGER}">
+          <span class="flex items-center gap-2">
+            <span class="block h-4 w-4 shrink-0 overflow-hidden rounded-full shadow-sm">${flag(state.lang, 16)}</span>
+            <span class="text-sm font-medium uppercase text-warm-900">${state.lang}</span>
+          </span>
+          ${chev(open === "lang")}
+        </button>
+        <div class="${MENU} ${open === "lang" ? "" : "hidden"}">
+          ${LANGS.map(l => `<button data-blang="${l.id}" class="premium flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${
+            state.lang === l.id ? "bg-gradient-to-r from-primary-500 to-primary-600 font-medium text-white" : "text-warm-700 hover:bg-warm-100"
+          }"><span class="block h-4 w-4 shrink-0 overflow-hidden rounded-full shadow-sm">${flag(l.id, 16)}</span>${l.id}</button>`).join("")}
+        </div>
+      </div>
+    </div>
+
+    <!-- TYMM toggle -->
+    <div class="flex items-center gap-1.5 rounded-lg border border-warm-400/50 bg-warm-100 px-3 py-[11px]">
+      <span class="text-sm font-semibold text-warm-600">TYMM</span>
+      <label class="relative inline-flex cursor-pointer items-center">
+        <input id="tymm-b" type="checkbox" ${state.tymm ? "checked" : ""} class="peer sr-only" />
+        <div class="relative h-[18px] w-8 rounded-full transition-colors duration-300 ${state.tymm ? "bg-orange-400" : "bg-warm-400"}"></div>
+        <div class="absolute start-[2px] top-[2px] h-3.5 w-3.5 rounded-full border border-gray-300 bg-white transition-transform duration-300 ${state.tymm ? "translate-x-3.5" : ""}"></div>
+      </label>
+    </div>`;
+
+  // CTA kazanım listesinin altında — her şey seçildikten sonra
+  document.getElementById("b-cta").innerHTML = `
+    <button id="cta-b"
+      class="premium flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#E29A63] to-[#D17A3B] px-6 py-3.5 text-[15px] font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-50">
+      <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      Kütüphane İçeriklerini Sorgula
+    </button>`;
+
+  renderOutcomes("oc-b");
+  renderHint("hint-b", "cta-b");
+}
+
+function renderView() {
+  document.getElementById("view-a").classList.toggle("hidden", state.view !== "a");
+  document.getElementById("view-b").classList.toggle("hidden", state.view !== "b");
+  document.querySelectorAll("[data-view]").forEach(b => {
+    b.className = `premium h-8 w-8 rounded-full text-xs font-semibold ${
+      b.dataset.view === state.view ? "bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-sm" : "text-warm-600 hover:bg-warm-100"
+    }`;
+  });
+}
+
+function renderAll() {
+  renderGrades(); renderCourses(); renderLang(); renderTymm();
+  renderOutcomes("oc-a"); renderHint("hint", "cta");
+  renderB(); renderView();
+}
+
+/* ---------- Events ---------- */
+function resetOutcomes() {
+  state.ocSel = null; state.ocCollapsed = false; state.ocQuery = ""; state.ocOpen = new Set([0]);
+}
+
+function setGrade(next) {
+  state.grade = next;
+  // yeni sınıfın ders setinde yoksa ders seçimi düşer
+  if (state.course && !coursesFor(next).some(c => c.id === state.course)) state.course = null;
+  resetOutcomes();
+}
+
+document.addEventListener("click", e => {
+  const v = e.target.closest("[data-view]");
+  if (v) { state.view = v.dataset.view; state.langOpen = false; state.openB = null; return renderAll(); }
+
+  /* --- Option A --- */
+  const g = e.target.closest("[data-grade]");
+  if (g) { setGrade(g.dataset.grade); return renderAll(); }
+
+  const c = e.target.closest("[data-course]");
+  if (c) { state.course = state.course === c.dataset.course ? null : c.dataset.course; resetOutcomes(); return renderAll(); }
+
+  if (e.target.closest("#lang-trigger")) { state.langOpen = !state.langOpen; return renderLang(); }
+
+  const l = e.target.closest("[data-lang]");
+  if (l) { state.lang = l.dataset.lang; state.langOpen = false; return renderAll(); }
+
+  /* --- Option B --- */
+  /* --- Kazanımlar (ortak) --- */
+  const th = e.target.closest("[data-theme]");
+  if (th) {
+    const i = Number(th.dataset.theme);
+    state.ocOpen.has(i) ? state.ocOpen.delete(i) : state.ocOpen.add(i);
+    renderOutcomes("oc-a"); renderOutcomes("oc-b");
+    return;
+  }
+
+  if (e.target.closest("[data-oc-edit]")) {
+    state.ocCollapsed = false;
+    renderOutcomes("oc-b");
+    return;
+  }
+
+  const oc = e.target.closest("[data-oc]");
+  if (oc) {
+    state.ocSel = state.ocSel === oc.dataset.oc ? null : oc.dataset.oc;
+    renderOutcomes("oc-a"); renderOutcomes("oc-b");
+    return;
+  }
+
+  const bo = e.target.closest("[data-bopen]");
+  if (bo) { state.openB = state.openB === bo.dataset.bopen ? null : bo.dataset.bopen; return renderB(); }
+
+  const bg = e.target.closest("[data-bgrade]");
+  if (bg) { setGrade(bg.dataset.bgrade); state.openB = null; return renderAll(); }
+
+  const bc = e.target.closest("[data-bcourse]");
+  if (bc) { state.course = bc.dataset.bcourse; state.openB = null; resetOutcomes(); return renderAll(); }
+
+  const bl = e.target.closest("[data-blang]");
+  if (bl) { state.lang = bl.dataset.blang; state.openB = null; return renderAll(); }
+
+  if (e.target.closest("#cta-b")) {
+    // Option B: sorgudan sonra kazanım listesi tek satıra iner
+    if (state.ocSel) { state.ocCollapsed = true; renderOutcomes("oc-b"); }
+    return;
+  }
+
+  if (e.target.closest("#cta")) {
+    const course = coursesFor(state.grade).find(c => c.id === state.course);
+    if (course) alert(`Sorgu\n\nSınıf: ${state.grade}\nDers: ${course.name}\nDil: ${state.lang}\nMaarif: ${state.tymm ? "Açık" : "Kapalı"}\nKazanım: ${state.ocSel || "—"}`);
+    return;
+  }
+
+  /* dışarı tıklayınca açık menüleri kapat */
+  if (state.langOpen) { state.langOpen = false; renderLang(); }
+  if (state.openB) { state.openB = null; renderB(); }
+});
+
+document.addEventListener("input", e => {
+  const q = e.target.closest("[data-ocq]");
+  if (!q) return;
+  state.ocQuery = q.value;
+  const id = q.dataset.ocq;
+  renderOutcomes("oc-a"); renderOutcomes("oc-b");
+  const again = document.querySelector(`[data-ocq="${id}"]`);
+  if (again) { again.focus(); again.setSelectionRange(again.value.length, again.value.length); }
+});
+
+document.addEventListener("change", e => {
+  if (e.target.id === "tymm" || e.target.id === "tymm-b") {
+    state.tymm = e.target.checked;
+    renderTymm(); renderHint("hint", "cta"); renderB();
+  }
+});
+
+renderAll();
+</script>
+</body>
+</html>
