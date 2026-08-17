@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home — Duyuru Banner Alternatifleri</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FDFAF4;
+    --cream-2:#FBF6EC;
+    --ink:#2B2A27;
+    --ink-soft:#6B6A63;
+    --line:#EDE6D8;
+    --orange:#E07A3F;
+    --green:#1F6B4A;
+    --green-soft:#EAF3ED;
+    --yellow:#FCE9A8;
+    --card:#FFFFFF;
+    --radius:16px;
+    --shadow:0 1px 2px rgba(43,42,39,.04), 0 8px 24px rgba(43,42,39,.05);
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,#FDF8F0 0%, #FBF3E7 100%);
+    font-family:'Instrument Sans',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+    color:var(--ink);
+    padding:40px 24px 120px;
+  }
+  .page{max-width:1200px;margin:0 auto}
+
+  /* ---------- prompt bar (context, unchanged) ---------- */
+  .prompt{
+    background:var(--card);border:1px solid var(--line);border-radius:20px;
+    padding:20px 22px 16px;box-shadow:var(--shadow);margin-bottom:32px;
+  }
+  .prompt .ph{color:#9A968C;font-size:17px;margin-bottom:22px}
+  .prompt .row{display:flex;align-items:center;gap:14px}
+  .chip{
+    display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;
+    font-size:13.5px;color:var(--ink-soft);border:1px solid transparent;
+  }
+  .chip.active{background:#FDEEE4;color:var(--orange);border-color:#F6D9C6;font-weight:600}
+  .prompt .send{
+    margin-left:auto;width:38px;height:38px;border-radius:10px;background:#EFEBE2;
+    display:grid;place-items:center;color:#A8A49A;
+  }
+
+  /* ---------- section headers ---------- */
+  .sec-head{display:flex;align-items:center;gap:9px;margin:0 0 14px}
+  .sec-head h2{font-size:19px;margin:0;letter-spacing:-.2px}
+  .sec-head .more{
+    margin-left:auto;font-size:13.5px;color:var(--orange);font-weight:600;
+    display:inline-flex;align-items:center;gap:5px
+  }
+  .ico{width:19px;height:19px;flex:0 0 auto;color:var(--ink-soft)}
+
+  /* ---------- bottom layout ---------- */
+  .bottom{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap:28px;
+    align-items:stretch;
+  }
+  .tool-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  .tool{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:14px 14px;display:flex;align-items:center;gap:11px;
+    box-shadow:0 1px 2px rgba(43,42,39,.03);
+    min-width:0;
+  }
+  .tool .name{font-size:14.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tool .star{margin-left:auto;width:26px;height:26px;border-radius:999px;display:grid;place-items:center;flex:0 0 auto}
+  .tool .star.on{background:var(--yellow);color:#B8860B}
+  .tool .star.off{border:1px solid var(--line);color:#C4BFB4}
+  .tool .lead{width:22px;height:22px;flex:0 0 auto}
+  .c-green{color:var(--green)} .c-blue{color:#3A6EA5} .c-red{color:#C0492F}
+  .c-orange{color:var(--orange)} .c-teal{color:#2F7E77} .c-purple{color:#6B4E9E}
+
+  .stack-gap{height:30px}
+
+  /* ---------- time saved card ---------- */
+  .saved{
+    background:linear-gradient(160deg,#EFF6F0 0%, #F6F1E6 100%);
+    border:1px solid #DFEBE1;border-radius:20px;overflow:hidden;
+    box-shadow:var(--shadow);
+    display:flex;flex-direction:column;height:100%;
+  }
+  .saved-top{padding:26px 26px 22px;display:flex;align-items:center;gap:18px;flex:1}
+  .saved-top .label{
+    font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:#4F7A62;font-weight:700;margin-bottom:10px
+  }
+  .saved-top .big{font-size:56px;line-height:1;font-weight:700;color:var(--green);letter-spacing:-2px}
+  .saved-top .big span{font-size:22px;font-weight:600;margin-left:6px;letter-spacing:0}
+  .saved-top .sub{font-size:13.5px;color:#5E7A69;margin-top:10px}
+  .clock{margin-left:auto;font-size:64px;line-height:1}
+
+  .saved-bar{
+    background:#FDF4DE;border-top:1px solid #F0E3C2;
+    display:flex;align-items:center;gap:14px;padding:16px 20px;
+  }
+  .saved-bar .badge{
+    width:40px;height:40px;border-radius:12px;background:#FCE9A8;display:grid;place-items:center;font-size:19px
+  }
+  .saved-bar .t1{font-size:15px;font-weight:700}
+  .saved-bar .t2{font-size:12.5px;color:var(--ink-soft)}
+  .saved-bar .arrow{margin-left:auto;color:var(--orange);font-size:18px}
+  .saved-bar .send{
+    border-left:1px solid #F0E3C2;padding-left:18px;margin-left:14px;text-align:center;
+  }
+  .saved-bar .send .circle{
+    width:38px;height:38px;border-radius:999px;background:#FDEEE4;display:grid;place-items:center;
+    color:var(--orange);margin:0 auto 4px;font-size:16px
+  }
+  .saved-bar .send .cap{font-size:11.5px;color:var(--ink-soft)}
+
+  @media (max-width:900px){
+    .bottom{grid-template-columns:1fr}
+  }
+
+  /* ---------- greeting ---------- */
+  .greet{display:flex;align-items:flex-start;gap:34px;margin-bottom:30px}
+  .greet .avatar{font-size:52px;line-height:1}
+  .greet h1{font-family:'Instrument Serif',Georgia,serif;font-size:44px;font-weight:400;margin:2px 0 6px;letter-spacing:-.5px}
+  .greet .sub{font-size:15px;color:var(--ink-soft)}
+
+  /* =========================================================
+     ANNOUNCEMENT BANNER — 3 ALTERNATIVES (no left border)
+     ========================================================= */
+  .banner-slot{margin-left:auto;max-width:540px;width:100%}
+  .banner-variant{display:none}
+  .banner-variant.show{display:block}
+
+  /* slider: tek slide görünür, dots ile geçiş */
+  .banner-variant .slide{display:none}
+  .banner-variant:not([data-variant="C"]) .slide.active{animation:slideIn .25s ease}
+  .ban-a.slide.active{display:flex}
+  .ban-b.slide.active{display:block}
+  @keyframes slideIn{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+  .dots i{cursor:pointer}
+
+  .cta-btn{
+    display:inline-flex;align-items:center;gap:7px;
+    border:none;cursor:pointer;font-family:inherit;text-decoration:none;
+    font-size:13.5px;font-weight:600;border-radius:999px;
+    padding:9px 18px;transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .cta-btn:hover{transform:translateY(-1px)}
+
+  /* uniform card sizing: A kartı referans — hiçbir kart onu aşmasın */
+  .ban-a,.ban-b,.ban-d{max-height:180px;overflow:hidden}
+  .ban-a h3,.ban-b h3,.ban-d h3{line-height:1.15}
+  .ban-a p,.ban-b p,.ban-d p{
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  /* dot slider her zaman solda, CTA her zaman sağda */
+  .ban-a .foot .dots,.ban-b .foot .dots,.ban-d .foot .dots{margin-right:auto;margin-left:0}
+  .ban-a .foot .cta-btn,.ban-b .foot .cta-btn,.ban-d .foot .cta-btn{margin-left:0}
+
+  /* ---- A: Soft green card with icon badge ---- */
+  .ban-a{
+    background:linear-gradient(140deg,#F0F7F1 0%, #FBF6EC 100%);
+    border:1px solid #DCEAE0;border-radius:18px;
+    padding:20px 22px;box-shadow:var(--shadow);
+    display:flex;gap:16px;align-items:flex-start;position:relative;
+  }
+  .ban-a .icon{
+    width:44px;height:44px;border-radius:14px;flex:0 0 auto;
+    background:#fff;border:1px solid #DCEAE0;
+    display:grid;place-items:center;font-size:21px;
+    box-shadow:0 2px 6px rgba(31,107,74,.08);
+  }
+  .ban-a h3{font-family:'Instrument Serif',Georgia,serif;font-size:21px;font-weight:400;margin:0 0 6px;color:var(--green)}
+  .ban-a p{margin:0 0 12px;font-size:13.5px;color:var(--ink-soft);line-height:1.5}
+  .ban-a .cta-btn{
+    background:var(--green-soft);color:var(--green);
+    border:1px solid #D6E7DC;
+  }
+  .ban-a .cta-btn:hover{background:#DFEEE4}
+  .ban-a .foot{display:flex;align-items:center;margin-top:2px}
+  .ban-a .cta-btn{margin-left:auto}
+  .ban-a .dots{display:flex;gap:5px}
+  .ban-a .dots i{width:7px;height:7px;border-radius:999px;background:#D4E3D8}
+  .ban-a .dots i.on{width:20px;background:var(--green)}
+
+  /* ---- B: Editorial paper — light, serif italic, restrained ---- */
+  .ban-b{
+    background:linear-gradient(135deg,#FFF9F0 0%, #FDF0E0 55%, #FAE4CB 100%);
+    border:1px solid #F2E2CB;border-radius:20px;
+    padding:18px 22px;position:relative;overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  .ban-b::before{
+    content:"";position:absolute;top:-60px;right:-40px;width:220px;height:220px;
+    border-radius:999px;pointer-events:none;
+    background:radial-gradient(circle, rgba(224,122,63,.14), transparent 65%);
+  }
+  .ban-b .wm{
+    position:absolute;top:16px;right:18px;
+    width:46px;height:46px;border-radius:999px;
+    background:#FFF9F0;border:1px solid #F2E2CB;
+    display:grid;place-items:center;font-size:21px;
+  }
+  .ban-b .kicker{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:10.5px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;
+    color:#B0763F;margin-bottom:9px;position:relative;
+  }
+  .ban-b h3{
+    font-family:'Instrument Serif',Georgia,serif;font-style:italic;font-size:24px;margin:0 0 6px;
+    color:var(--ink);letter-spacing:.2px;font-weight:400;max-width:82%;
+  }
+  .ban-b p{margin:0 0 13px;font-size:13.5px;line-height:1.5;color:var(--ink-soft);max-width:88%}
+  .ban-b .foot{display:flex;align-items:center;gap:14px;position:relative}
+  .ban-b .cta-btn{
+    background:#FDEEE4;color:var(--orange);
+    border:1px solid #F6D9C6;
+    margin-left:auto;
+  }
+  .ban-b .cta-btn:hover{background:#FBE3D2}
+  .ban-b .dots{display:flex;gap:5px}
+  .ban-b .dots i{width:7px;height:7px;border-radius:999px;background:#E5DBC6}
+  .ban-b .dots i.on{width:20px;background:var(--orange)}
+
+  /* ---- D: Card deck — stacked announcements, click to cycle ---- */
+  .banner-variant[data-variant="C"]{position:relative;height:178px}
+  .banner-variant[data-variant="C"] .slide{
+    display:block;position:absolute;left:0;right:0;top:24px;
+    transition:transform .45s cubic-bezier(.2,.8,.2,1), opacity .3s ease;
+    cursor:pointer;
+  }
+  .banner-variant[data-variant="C"] .slide[data-pos="0"]{transform:none;z-index:3}
+  .banner-variant[data-variant="C"] .slide[data-pos="1"]{transform:translateY(-12px) scale(.955);z-index:2;opacity:.9}
+  .banner-variant[data-variant="C"] .slide[data-pos="2"]{transform:translateY(-24px) scale(.91);z-index:1;opacity:.7}
+  .ban-d{
+    background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:18px 22px;box-shadow:var(--shadow);
+    position:relative;
+  }
+  .ban-d .txt{min-width:0;padding-right:56px}
+  /* her deste kartına kendi hafif tonu */
+  .banner-variant[data-variant="C"] .slide:nth-child(1){background:#F8FBF8;border-color:#E4EEE6}
+  .banner-variant[data-variant="C"] .slide:nth-child(2){background:#FEF8F1;border-color:#F6E7D6}
+  .banner-variant[data-variant="C"] .slide:nth-child(3){background:#FDF9EE;border-color:#F0E8D2}
+  .banner-variant[data-variant="C"] .slide:nth-child(2) .label{color:#C0492F}
+  .banner-variant[data-variant="C"] .slide:nth-child(3) .label{color:#8A6D1F}
+  .banner-variant[data-variant="C"] .slide:nth-child(2) .cta-btn{background:#FDEEE4;border-color:#F6D9C6;color:var(--orange)}
+  .banner-variant[data-variant="C"] .slide:nth-child(3) .cta-btn{background:#FCF0CE;border-color:#EFDFAC;color:#8A6D1F}
+  .ban-d .label{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:10.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--orange);margin-bottom:8px;
+  }
+  .ban-d .label .i{width:14px;height:14px;display:inline-block}
+  .ban-d .label .i svg{width:100%;height:100%;display:block}
+  .ban-d h3{font-family:'Instrument Serif',Georgia,serif;font-size:24px;font-weight:400;margin:0 0 6px;color:var(--ink)}
+  .ban-d p{margin:0;font-size:13.5px;line-height:1.5;color:var(--ink-soft)}
+  .ban-d .cta-btn{
+    position:absolute;top:50%;right:22px;transform:translateY(-50%);
+    width:52px;height:52px;padding:0;
+    border-radius:999px;display:grid;place-items:center;
+    background:var(--green-soft);color:var(--green);
+    border:1px solid #D6E7DC;font-size:24px;
+  }
+  .ban-d .cta-btn:hover{background:#DFEEE4;transform:translateY(-50%)}
+
+  /* compact overrides so B & C never exceed A card height */
+  .ban-b{padding:16px 20px}
+  .ban-b .kicker{margin-bottom:7px}
+  .ban-b h3{margin-bottom:5px}
+  .ban-b p{margin-bottom:11px}
+
+  /* ---------- TOP ROW ---------- */
+  .top{
+    display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start;margin-bottom:44px;
+  }
+  .hero{
+    position:relative;border-radius:18px;overflow:hidden;height:290px;
+    background:linear-gradient(150deg,#8C8672 0%, #6F6A59 55%, #58543F 100%);
+    box-shadow:var(--shadow);display:flex;align-items:flex-end
+  }
+  .hero .art{
+    position:absolute;inset:0;opacity:.5;
+    background:
+      radial-gradient(circle at 78% 30%, rgba(255,255,255,.18), transparent 45%),
+      repeating-linear-gradient(180deg, rgba(255,255,255,.10) 0 10px, transparent 10px 46px);
+  }
+  .hero .scrim{position:absolute;inset:0;background:linear-gradient(0deg, rgba(30,28,22,.75) 0%, rgba(30,28,22,0) 62%)}
+  .hero .txt{position:relative;padding:22px 24px;color:#fff}
+  .hero .txt h3{font-family:'Instrument Serif',Georgia,serif;font-size:30px;font-weight:400;margin:0 0 8px}
+  .hero .txt p{margin:0 0 12px;font-size:14px;opacity:.9;max-width:80%}
+  .hero .txt .cta{font-size:14px;font-weight:600;display:inline-flex;gap:6px;align-items:center}
+  .hero .pager{position:absolute;right:20px;bottom:20px;display:flex;gap:6px;align-items:center}
+  .hero .pager i{width:7px;height:7px;border-radius:999px;background:rgba(255,255,255,.5)}
+  .hero .pager i.on{width:22px;background:#fff}
+
+  .resume-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .rcard{
+    background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 1px 2px rgba(43,42,39,.03)
+  }
+  .rcard .thumb{height:150px;background:#F3EADA}
+  .rcard .thumb.a{background:
+      radial-gradient(circle at 25% 60%, #C9D8BE 0 26px, transparent 27px),
+      linear-gradient(160deg,#F6EDDD,#EADFC9)}
+  .rcard .thumb.b{background:
+      repeating-linear-gradient(90deg,#E9A97C 0 26px, transparent 26px 66px),
+      linear-gradient(160deg,#F7EFE0,#E9DFC9)}
+  .rcard .body{padding:14px 16px 16px}
+  .rcard .tag{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+    display:flex;align-items:center;gap:7px;margin-bottom:8px;color:#5B5648}
+  .rcard .tag b{width:7px;height:7px;border-radius:999px;display:inline-block}
+  .rcard .desc{font-size:13.5px;color:var(--ink-soft);line-height:1.45;margin-bottom:12px;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .rcard .go{font-size:13.5px;color:var(--orange);font-weight:600}
+  .pill{
+    margin-left:auto;background:var(--green-soft);border:1px solid #D6E7DC;color:var(--green);
+    border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;display:inline-flex;gap:6px;align-items:center
+  }
+  .sec-sub{font-size:14px;color:var(--ink-soft);margin:-6px 0 14px}
+
+  /* ---------- bottom centered variant selector ---------- */
+  .switcher{
+    position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:50;
+    background:#fff;border:1px solid var(--line);border-radius:999px;
+    padding:5px;display:flex;gap:4px;align-items:center;
+    box-shadow:0 6px 24px rgba(43,42,39,.14);
+  }
+  .switcher button{
+    border:none;background:transparent;cursor:pointer;font-family:inherit;
+    font-size:13.5px;font-weight:600;color:var(--ink-soft);
+    border-radius:999px;padding:8px 18px;transition:all .15s ease;
+  }
+  .switcher button:hover{color:var(--ink)}
+  .switcher button.active{background:var(--green);color:#fff}
+
+  @media (max-width:900px){
+    .top{grid-template-columns:1fr}
+    .greet{flex-direction:column;gap:20px}
+    .banner-slot{margin-left:0;max-width:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- greeting + banner variants -->
+  <div class="greet">
+    <div>
+      <h1>Günaydın, Deniz</h1>
+      <div class="sub">Haftanın son iş gününde verimli çalışmalar dileriz.</div>
+    </div>
+
+    <div class="banner-slot">
+
+      <!-- A: soft green card with icon badge — 3 cards -->
+      <div class="banner-variant show" data-variant="A">
+        <div class="ban-a slide">
+          <div class="icon">🎙</div>
+          <div style="flex:1;min-width:0">
+            <h3>Metin seslendirici aracımızı denediniz mi?</h3>
+            <p>Metinlerinizi saniyeler içinde doğal konuşmaya dönüştürün.</p>
+            <div class="foot">
+              <div class="dots"><i class="on"></i><i></i><i></i></div>
+              <button class="cta-btn">Hemen Dene →</button>
+            </div>
+          </div>
+        </div>
+        <div class="ban-a slide">
+          <div class="icon">🎨</div>
+          <div style="flex:1;min-width:0">
+            <h3>Eğitsel Çizim ve Video Oluşturucu (Çok Yakında!)</h3>
+            <p>Fikirlerinizi eğitsel çizim ve videolarla görselleştirin.</p>
+            <div class="foot">
+              <div class="dots"><i></i><i class="on"></i><i></i></div>
+              <button class="cta-btn">Keşfet →</button>
+            </div>
+          </div>
+        </div>
+        <div class="ban-a slide">
+          <div class="icon">🎧</div>
+          <div style="flex:1;min-width:0">
+            <h3>Derslerinizi podcast'e dönüştürün</h3>
+            <p>Konu anlatımlarınızı iki sunuculu bir sohbete çevirin.</p>
+            <div class="foot">
+              <div class="dots"><i></i><i></i><i class="on"></i></div>
+              <button class="cta-btn">Oluştur →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- B: warm sunset card with emoji watermark — 3 cards -->
+      <div class="banner-variant" data-variant="B">
+        <div class="ban-b slide">
+          <span class="wm">🎙</span>
+          <span class="kicker">Yeni Araç</span>
+          <h3>Metin seslendirici aracımızı denediniz mi?</h3>
+          <p>Metinlerinizi saniyeler içinde doğal konuşmaya dönüştürün.</p>
+          <div class="foot">
+            <div class="dots"><i class="on"></i><i></i><i></i></div>
+            <button class="cta-btn">Keşfet →</button>
+          </div>
+        </div>
+        <div class="ban-b slide">
+          <span class="wm">🎨</span>
+          <span class="kicker">Çok Yakında</span>
+          <h3>Eğitsel Çizim ve Video Oluşturucu</h3>
+          <p>Fikirlerinizi eğitsel çizim ve videolarla görselleştirin.</p>
+          <div class="foot">
+            <div class="dots"><i></i><i class="on"></i><i></i></div>
+            <button class="cta-btn">Haberdar Ol →</button>
+          </div>
+        </div>
+        <div class="ban-b slide">
+          <span class="wm">🎧</span>
+          <span class="kicker">Popüler</span>
+          <h3>Derslerinizi podcast'e dönüştürün</h3>
+          <p>Konu anlatımlarınızı iki sunuculu bir sohbete çevirin.</p>
+          <div class="foot">
+            <div class="dots"><i></i><i></i><i class="on"></i></div>
+            <button class="cta-btn">Oluştur →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- D: card deck — stacked announcements, click to cycle -->
+      <div class="banner-variant" data-variant="C">
+        <div class="ban-d slide">
+          <div class="txt">
+            <span class="label"><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.6L19.5 10.5l-5.6 1.9L12 18l-1.9-5.6L4.5 10.5l5.6-1.9z"/></svg></span>Yeni Araç</span>
+            <h3>Metin seslendirici ile tanışın</h3>
+            <p>Metinlerinizi saniyeler içinde doğal konuşmaya dönüştürün.</p>
+          </div>
+          <a class="cta-btn" href="#metin-seslendirici">→</a>
+        </div>
+        <div class="ban-d slide">
+          <div class="txt">
+            <span class="label"><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.2"/><path d="M12 8v4.2l2.6 1.6"/></svg></span>Çok Yakında</span>
+            <h3>Eğitsel Çizim ve Video Oluşturucu</h3>
+            <p>Fikirlerinizi eğitsel çizim ve videolarla görselleştirin.</p>
+          </div>
+          <a class="cta-btn" href="#cizim-video">→</a>
+        </div>
+        <div class="ban-d slide">
+          <div class="txt">
+            <span class="label"><span class="i"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5c1.2 3.4 5 5.2 5 9a5 5 0 0 1-10 0c0-2 .9-3.4 2-4.6.3 1.2.9 2.2 2.1 2.8C11.2 8.6 11.1 5.8 12 3.5z"/></svg></span>Popüler</span>
+            <h3>Derslerinizi podcast'e dönüştürün</h3>
+            <p>Konu anlatımlarınızı iki sunuculu bir sohbete çevirin.</p>
+          </div>
+          <a class="cta-btn" href="#podcast">→</a>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- prompt bar for context -->
+  <div class="prompt">
+    <div class="ph">Bugün size nasıl yardımcı olabilirim?</div>
+    <div class="row">
+      <div class="chip">🌐 Web Araması</div>
+      <div class="chip">📄 Dosya</div>
+      <div class="chip active">🛡 Sınıf Yönetimi</div>
+      <div class="chip">▦ Tüm araçlar ⌄</div>
+      <div class="send">➤</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- centered bottom variant selector -->
+<div class="switcher">
+  <button class="active" data-target="A">A · Yumuşak Kart</button>
+  <button data-target="B">B · Spotlight</button>
+  <button data-target="C">C · Deste</button>
+</div>
+
+<script>
+  // A/B/C varyant switcher
+  const buttons = document.querySelectorAll('.switcher button');
+  const variants = document.querySelectorAll('.banner-variant');
+  buttons.forEach(btn => btn.addEventListener('click', () => {
+    buttons.forEach(b => b.classList.toggle('active', b === btn));
+    variants.forEach(v => v.classList.toggle('show', v.dataset.variant === btn.dataset.target));
+  }));
+
+  // her varyant kendi içinde bir slider: tek slide görünür, dots ile geçiş + auto-rotate
+  variants.forEach(variant => {
+    const slides = [...variant.querySelectorAll('.slide')];
+    let idx = 0, timer;
+
+    const isDeck = variant.dataset.variant === 'C';
+
+    function go(i){
+      idx = (i + slides.length) % slides.length;
+      slides.forEach((s, k) => s.classList.toggle('active', k === idx));
+      if (isDeck){
+        slides.forEach((s, k) => s.dataset.pos = (k - idx + slides.length) % slides.length);
+        return;
+      }
+      // aktif slide'ın dots'unu senkronla
+      const dots = slides[idx].querySelectorAll('.dots i');
+      dots.forEach((d, k) => d.classList.toggle('on', k === idx));
+    }
+
+    function restartTimer(){
+      clearInterval(timer);
+      timer = setInterval(() => go(idx + 1), 5000);
+    }
+
+    // dot tıklamaları
+    slides.forEach(slide => {
+      slide.querySelectorAll('.dots i').forEach((dot, k) => {
+        dot.addEventListener('click', () => { go(k); restartTimer(); });
+      });
+      if (isDeck){
+        slide.addEventListener('click', e => {
+          if (e.target.closest('.cta-btn')) return;
+          go(idx + 1); restartTimer();
+        });
+      }
+    });
+
+    go(0);
+    restartTimer();
+  });
+</script>
+
+</body>
+</html>
