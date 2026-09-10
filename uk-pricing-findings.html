@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Madlen UK Pricing Findings</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+  :root{
+    --bg:#faf8f5; --bg2:#f4eee6; --card:#ffffff; --line:#e6ded4; --line-strong:#d3c8bb;
+    --fg:#1f2937; --fg2:#6f645e; --fg3:#9a8f88;
+    --accent:#d97757; --accent-deep:#b35a3e; --accent-tint:rgba(217,119,87,.12);
+    --ink:#181f2a; --ink-fg:#f5f1eb; --ink-fg2:#b9b1a8;
+    --good:#2f7a5b; --good-tint:rgba(47,122,91,.12);
+    --warn:#a56a1c; --warn-tint:rgba(165,106,28,.12);
+    --lock:#7a6f68;
+    --serif:'Instrument Serif',Georgia,serif;
+    --sans:'Instrument Sans',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --bg:#15191f; --bg2:#1b2029; --card:#1f2632; --line:#2d3644; --line-strong:#3b4657;
+      --fg:#ece7e0; --fg2:#b4aba2; --fg3:#7f7770;
+      --accent:#e89a82; --accent-deep:#f0b19d; --accent-tint:rgba(232,154,130,.14);
+      --ink:#0f1319; --ink-fg:#f0ebe4; --ink-fg2:#a49b92;
+      --good:#6dbd98; --good-tint:rgba(109,189,152,.14);
+      --warn:#d9a35a; --warn-tint:rgba(217,163,90,.14);
+      --lock:#9a9088;
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:16px;line-height:1.55}
+  .layout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:48px;max-width:1240px;margin:0 auto;padding:0 clamp(16px,4vw,40px) 96px}
+  nav.toc{position:sticky;top:0;align-self:start;padding-top:56px;font-size:13px}
+  nav.toc .t{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--fg3);margin-bottom:10px;font-weight:600}
+  nav.toc a{display:block;color:var(--fg2);text-decoration:none;padding:5px 0 5px 12px;border-left:2px solid var(--line)}
+  nav.toc a:hover{color:var(--fg);border-left-color:var(--accent)}
+  nav.toc a.sub{padding-left:24px;font-size:12px;color:var(--fg3)}
+  main{min-width:0}
+  @media (max-width:900px){.layout{grid-template-columns:1fr;gap:0}nav.toc{position:static;padding-top:32px;display:flex;flex-wrap:wrap;gap:6px}nav.toc .t{width:100%}nav.toc a{border:1px solid var(--line);border-radius:999px;padding:4px 10px}nav.toc a.sub{display:none}}
+
+  h1,h2,h3{font-family:var(--serif);font-weight:400;line-height:1.1;text-wrap:balance;margin:0}
+  h1{font-size:clamp(40px,6vw,64px);letter-spacing:-.01em}
+  h2{font-size:clamp(28px,3.2vw,36px);margin:72px 0 6px;padding-top:8px}
+  h2 .num{color:var(--accent);font-style:italic;margin-right:10px}
+  h3{font-size:21px;margin:32px 0 8px}
+  p{margin:0 0 14px;max-width:72ch}
+  .lede{font-size:19px;color:var(--fg2);max-width:64ch}
+  .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-deep);font-weight:600;margin-bottom:10px}
+  header{padding:56px 0 28px;border-bottom:1px solid var(--line)}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 20px;color:var(--fg3);font-size:13px;margin-top:18px}
+  .meta b{color:var(--fg2);font-weight:500}
+
+  .tablewrap{overflow-x:auto;margin:16px 0 6px;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+  table{border-collapse:collapse;width:100%;min-width:620px;font-size:14px}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--fg2);background:var(--bg2)}
+  tr:last-child td{border-bottom:0}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .hl td{background:var(--accent-tint)}
+  .cap{font-size:13px;color:var(--fg3);margin:6px 0 0}
+  .tag{display:inline-block;font-size:11px;border-radius:6px;padding:2px 7px;font-weight:600;letter-spacing:.03em;vertical-align:middle}
+  .tag.uk{background:var(--good-tint);color:var(--good)}
+  .tag.intl{background:var(--accent-tint);color:var(--accent-deep)}
+  .tag.warn{background:var(--warn-tint);color:var(--warn)}
+  .tag.lock{background:var(--bg2);color:var(--lock);border:1px solid var(--line)}
+
+  .decided{margin-top:36px;background:var(--ink);color:var(--ink-fg);border-radius:20px;padding:clamp(22px,3.5vw,36px)}
+  .decided h2{margin-top:0;color:var(--ink-fg);font-size:28px}
+  .decided ol{margin:16px 0 0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px 28px}
+  .decided li{display:grid;grid-template-columns:auto 1fr;gap:12px;padding:10px 0;border-top:1px solid rgba(255,255,255,.1);font-size:15px}
+  .decided li span.k{color:var(--ink-fg2);font-size:13px;letter-spacing:.04em;text-transform:uppercase;padding-top:2px;min-width:104px}
+  @media (max-width:760px){.decided ol{grid-template-columns:1fr}}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+  @media (max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+  .box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .box h4{margin:0 0 6px;font-family:var(--serif);font-weight:400;font-size:20px}
+  .box p{font-size:14px;color:var(--fg2);margin-bottom:8px}
+  .box ul{margin:0;padding-left:18px;font-size:14px;color:var(--fg2)}
+  .box li{margin-bottom:4px}
+  .kpi{font-family:var(--serif);font-size:40px;line-height:1;font-variant-numeric:tabular-nums}
+  .kpi small{font-family:var(--sans);font-size:13px;color:var(--fg3);display:block;margin-top:8px;line-height:1.4}
+  .note{border-left:3px solid var(--accent);background:var(--card);padding:12px 18px;border-radius:0 12px 12px 0;margin:18px 0}
+  .note p:last-child{margin-bottom:0}
+  .finding{display:grid;grid-template-columns:28px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+  .finding:last-of-type{border-bottom:1px solid var(--line)}
+  .finding .n{font-family:var(--serif);font-size:22px;color:var(--accent);line-height:1.1}
+  .finding p{margin:0;font-size:15px}
+  .finding b{font-weight:600}
+  .finding .so{color:var(--fg2);font-size:14px;margin-top:4px}
+
+  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px}
+  .plan{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:6px;position:relative}
+  .plan.hot{border:2px solid var(--accent)}
+  .plan .pill{position:absolute;top:-11px;left:18px;background:var(--accent);color:#fff;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;border-radius:999px;padding:3px 9px}
+  .plan .name{font-family:var(--serif);font-size:26px}
+  .plan .price{font-size:30px;font-variant-numeric:tabular-nums;line-height:1.1}
+  .plan .price small{font-size:13px;color:var(--fg3)}
+  .plan .sub{font-size:13px;color:var(--fg3)}
+  .plan ul{margin:8px 0 0;padding:0;list-style:none;font-size:14px;display:grid;gap:5px}
+  .plan li{padding-left:16px;position:relative;color:var(--fg2)}
+  .plan li::before{content:"";position:absolute;left:0;top:.6em;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+  .plan li.lk::before{background:var(--line-strong)}
+  .plan li.lk{color:var(--fg3)}
+  @media (max-width:760px){.plans{grid-template-columns:1fr}}
+
+  .wire{background:var(--bg2);border:1px dashed var(--line-strong);border-radius:18px;padding:22px;margin-top:18px;font-size:13px}
+  .wire .blk{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:10px;color:var(--fg2)}
+  .wire .blk b{color:var(--fg);font-weight:600}
+  .wire .blk.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:10px}
+  .wire .blk.cards div{border:1px solid var(--line);border-radius:8px;padding:10px;text-align:center}
+  .wire .blk.cards div.hot{border-color:var(--accent);background:var(--accent-tint)}
+  @media (max-width:760px){.wire .blk.cards{grid-template-columns:1fr}}
+  ul.plain{padding-left:20px}
+  ul.plain li{margin-bottom:6px}
+  footer{margin-top:72px;padding-top:20px;border-top:1px solid var(--line);color:var(--fg3);font-size:13px}
+  footer p{max-width:none}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;background:var(--bg2);padding:1px 5px;border-radius:5px}
+  a{color:var(--accent-deep)}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+  <div class="t">Contents</div>
+  <a href="#decided">Decisions so far</a>
+  <a href="#market">1 · UK market</a>
+  <a href="#intl">2 · International</a>
+  <a href="#usage">3 · Real usage</a>
+  <a href="#plans">4 · Proposed plans</a>
+  <a class="sub" href="#matrix">Gating matrix</a>
+  <a class="sub" href="#price">Prices and launch discount</a>
+  <a href="#rules">5 · Rules of the road</a>
+  <a href="#page">6 · Page structure</a>
+  <a href="#open">7 · Open items</a>
+</nav>
+
+<main>
+<header>
+  <div class="eyebrow">Research findings · madlen.io/uk/pricing · v2</div>
+  <h1>Madlen UK Pricing Findings</h1>
+  <p class="lede">What UK and international teacher tools charge, how Madlen teachers actually use the toolbox, and the three paid individual plans plus free trial that follow from both. Updated with the decisions taken on 10 September.</p>
+  <div class="meta">
+    <span><b>Updated</b> 10 Sep 2026</span>
+    <span><b>Scope</b> B2C page only. Schools stay on /uk/schools with the pilot form.</span>
+    <span><b>Status</b> Local draft, iterating with the team</span>
+    <span><b>Linear</b> MAD-7147 · MAD-7140 · MAD-7138</span>
+  </div>
+</header>
+
+<section class="decided" id="decided">
+  <h2>Decisions so far</h2>
+  <ol>
+    <li><span class="k">Audience</span><span>The pricing page is B2C only. Schools get one short section that links to the existing For Schools page and its pilot request form. No school price is published.</span></li>
+    <li><span class="k">Tiers</span><span>Three paid individual plans. No free tier. Differences are tool availability and generation limits.</span></li>
+    <li><span class="k">Trial</span><span>A free trial replaces freemium. Proposed: 14 days of Everyday, no card required, then the account goes read-only until a plan is chosen.</span></li>
+    <li><span class="k">Everyday price</span><span>Match Teachmate: £6.99 a month or £59 a year. A percentage market-entry discount applies for the first year.</span></li>
+    <li><span class="k">Entry plan</span><span>The lowest paid plan (Starter) takes over the role the free tier had: capped generations, small media allowance, PDF export. Numbers in section 4.</span></li>
+    <li><span class="k">Locks</span><span>Weekly Lesson Plan is in every plan. Locked on Starter: Educational Videos, Video Solutions, Digital Twin, Pronunciation Assessment. Video tools are Complete only. Podcast and Presentation Generator are limited, not locked.</span></li>
+    <li><span class="k">Limits</span><span>Nothing is unlimited. Every plan has a hard monthly cap on every metered thing; higher plans simply have higher caps. No fair-use wording anywhere.</span></li>
+    <li><span class="k">Shipping</span><span>Stays local through a few team cycles. No waitlist CTAs yet.</span></li>
+  </ol>
+</section>
+
+<h2 id="market"><span class="num">1</span>What the UK market charges</h2>
+<p>Every UK reference price a teacher will compare us against sits between £4.49 and £10.99 a month for an individual, and annual plans cluster at £59 to £72. Above roughly £10 a month the buyer stops being the teacher and becomes the school.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Product</th><th>Free tier</th><th class="num">Individual price</th><th>How paid tiers are gated</th></tr></thead>
+<tbody>
+<tr class="hl"><td>Teachmate</td><td>About 10 of 160 tools, no exports, no generation limit on those tools</td><td class="num">£6.99/mo · £59.88 first year · £72/yr renewal</td><td>Tool access and export formats. Pro = all tools, unlimited generations, PDF, Office and Google export</td></tr>
+<tr><td>Chalkie</td><td>5 resources a week, 10 AI edits a week</td><td class="num">Pro £5.99/mo (£71.88/yr) · Max £10.99/mo (£131.88/yr)</td><td>Quotas: Pro 200 resources a month and 400 edits, Max 400 and 800, longer lesson series</td></tr>
+<tr><td>Twinkl</td><td>Limited resources, 30-day trial</td><td class="num">Core from £4.49/mo · Ultimate from £8.49/mo <span class="tag warn">tiers unverified</span></td><td>Resource tiers. AI tools including the Ari chatbot only on Ultimate</td></tr>
+<tr><td>Carousel Learning</td><td>4 quizzes a week</td><td class="num">Gold £70/yr</td><td>Quota plus features (private banks, flashcards, whole-class feedback)</td></tr>
+<tr><td>Tes Magazine</td><td>Resource marketplace free</td><td class="num">£4.90 to £7.90/mo</td><td>Paywall</td></tr>
+<tr><td>Teachit</td><td>3 PDF downloads a month</td><td class="num">Low tens of £ a year <span class="tag warn">unverified</span></td><td>Format: free is PDF, paid is editable Word and PowerPoint</td></tr>
+<tr><td>Oak National · Aila</td><td>Everything, fair-use limits</td><td class="num">£0, DfE-funded</td><td>None. Oak-format lesson plans, slides, quizzes, worksheets. KS1 to KS4. No marking, no audio, no video, no images</td></tr>
+<tr><td>Claude, ChatGPT Plus</td><td>Free tiers</td><td class="num">£15 to £18/mo inc VAT</td><td>Usage multipliers and models</td></tr>
+</tbody>
+</table>
+</div>
+<p class="cap">Observed 10 Sep 2026 from vendor pages. Twinkl and Teachit tier prices sit behind JavaScript checkouts and could not be confirmed.</p>
+
+<div class="finding"><div class="n">a</div><div><p><b>Aila sets the reference price for lesson planning at £0.</b> About 30,000 teachers use it, Oak received up to £2m of DfE money for it, and it states it exceeds the DfE's January 2026 AI safety standards. An EEF trial reports autumn 2026.</p><p class="so">So: with no free tier, planning alone will not make a teacher pay. The trial and the Starter plan have to lead with what Aila cannot do: marking, presentations, audio, video, images, exam-board alignment for IGCSE and A-level.</p></div></div>
+<div class="finding"><div class="n">b</div><div><p><b>UK products gate by tool access and export format, not by credits.</b> Teachmate, Twinkl and Teachit all do this. Only Chalkie and Carousel print quotas.</p><p class="so">So: a teacher reading "40 generations a month" is reading something slightly unfamiliar. It needs a cadence and a reason next to it, and PDF-only export on Starter is a gate UK teachers already understand.</p></div></div>
+<div class="finding"><div class="n">c</div><div><p><b>Charm pricing everywhere on the consumer side.</b> £4.49, £4.90, £5.99, £6.99, £8.49, £9.99, £10.99. Annual plans are sold as a per-month equivalent with the total underneath.</p><p class="so">So: £6.99 and £59 are exactly the shape teachers expect. The third tier should end in .99 too.</p></div></div>
+<div class="finding"><div class="n">d</div><div><p><b>Adoption is high, spend data is missing.</b> Teacher Tapp: 58% of teachers used AI for school work in the past week (Oct 2025). NEU: 76% use it day to day (Feb 2026). But only 24% had ever used a specialist AI brand and most brands are recognised by under 10% of teachers. No UK survey measures how many pay personally.</p><p class="so">So: the market is generic-tool users who have never paid for a specialist tool. The trial has to convert them from ChatGPT, not from Teachmate, which is why it should be the full Everyday experience rather than a cut-down one.</p></div></div>
+<div class="finding"><div class="n">e</div><div><p><b>Timing.</b> Self-pay peaks late August to September and again in January. Report writing spikes May to July, and about a third of teachers already use AI for reports.</p><p class="so">So: the launch discount should be live for January, and a report-writing tool is worth surfacing before May.</p></div></div>
+
+<h2 id="intl"><span class="num">2</span>International reference points</h2>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Product</th><th>Free tier</th><th class="num">Individual</th><th>Gating</th><th>Tiers</th></tr></thead>
+<tbody>
+<tr><td>MagicSchool</td><td>80+ tools, capped generations (number not published), limited history</td><td class="num">$12.99/mo · $99.96/yr (36% off)</td><td>Generation cap, history, editing</td><td>Free / Plus / Enterprise</td></tr>
+<tr><td>Brisk</td><td>20+ tools, daily cap, 14-day Pro trial on sign-up then Free forever</td><td class="num">$99.99/yr</td><td>Daily limit lifted, faster model, more tools</td><td>Free / Educator Pro / Schools</td></tr>
+<tr><td>Eduaide</td><td>15 generations a month</td><td class="num">$5.99/mo · $49.99/yr</td><td>Generation count</td><td>Free / Pro / School</td></tr>
+<tr><td>Diffit</td><td>90-day history only</td><td class="num">$14.99/mo · $149.99/yr</td><td>Exports, standards alignment, history</td><td>Free / Premium / Schools</td></tr>
+<tr><td>Twee</td><td>5 runs total</td><td class="num">Basic $6.50 · Pro $10.50/mo (annual)</td><td>Run counts, audio credits</td><td>Trial / Basic / Pro / Teams</td></tr>
+<tr><td>Almanack</td><td>Limited generations, basic exports</td><td class="num">$7.50/mo annual ($89.99/yr) <span class="tag warn">may be stale</span></td><td>Generation limit, exports, differentiation</td><td>Free / Pro / Teams / Schools</td></tr>
+<tr><td>Khanmigo, Canva Education, ChatGPT for Teachers</td><td>Free for teachers</td><td class="num">—</td><td>US-only or feature-limited</td><td>Free / District</td></tr>
+</tbody>
+</table>
+</div>
+<p class="cap">US list prices, USD. Only Kahoot confirmed GBP billing among the international tools checked.</p>
+
+<div class="finding"><div class="n">f</div><div><p><b>The dominant pattern is a hard count on Free and "unlimited" on paid.</b> Eduaide 15 a month, Brisk a daily cap, MagicSchool an undisclosed cap. History and export are the second and third levers. Model-quality gating is rare.</p><p class="so">So: we differ twice from the norm, no free tier and no "unlimited". The trial has to do the free tier's job in 14 days, Starter has to be cheap enough that "trial ended" does not mean "back to ChatGPT", and Pro's caps have to be high enough that a teacher never thinks about them.</p></div></div>
+<div class="finding"><div class="n">g</div><div><p><b>Trials convert better than freemium.</b> Published benchmarks: freemium 3 to 5% good and 6 to 8% great; free trial 8 to 12% good and 15 to 25% great; reverse trial around 15%. No-card trials get more starts, card-required trials convert a higher share of starters.</p><p class="so">So: the decision to skip a free tier is supported by the data. Recommend 14 days of Everyday with no card required at launch, since UK teachers are new to paying for specialist tools and the top of the funnel matters more than trial-to-paid right now. Revisit card-required once there is UK conversion data.</p></div></div>
+<div class="finding"><div class="n">h</div><div><p><b>Two individual tiers exist where the top one buys a quota, not "more unlimited".</b> Chalkie Complete doubles the resource quota. Twee Everyday removes text limits and doubles audio credits. Gamma and ElevenLabs sell tiers of monthly credits with rollover.</p><p class="so">So: every tier is defined by counts. Starter has small ones, Everyday comfortable ones, and Complete adds the video tools on top of the largest allowances.</p></div></div>
+
+<h2 id="usage"><span class="num">3</span>How Madlen teachers actually generate</h2>
+<p>PostHog, Turkish teacher product, server-side generation traces, internal users removed, chat counted separately. In-season months are stable; August is heavier because a smaller, keener group prepares for term.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Month</th><th class="num">Generating teachers</th><th class="num">p50</th><th class="num">p75</th><th class="num">p90</th><th class="num">p95</th><th class="num">p99</th><th class="num">≤ 15 a month</th><th class="num">&gt; 100 a month</th></tr></thead>
+<tbody>
+<tr><td>March</td><td class="num">1,865</td><td class="num">4</td><td class="num">10</td><td class="num">24</td><td class="num">41</td><td class="num">100</td><td class="num">~82%</td><td class="num">1.0%</td></tr>
+<tr><td>April</td><td class="num">1,892</td><td class="num">3</td><td class="num">9</td><td class="num">22</td><td class="num">37</td><td class="num">103</td><td class="num">~85%</td><td class="num">1.1%</td></tr>
+<tr><td>May</td><td class="num">1,270</td><td class="num">3</td><td class="num">8</td><td class="num">23</td><td class="num">36</td><td class="num">83</td><td class="num">~85%</td><td class="num">0.8%</td></tr>
+<tr class="hl"><td>August</td><td class="num">1,055</td><td class="num">7</td><td class="num">18</td><td class="num">38</td><td class="num">54</td><td class="num">116</td><td class="num">~70%</td><td class="num">1.6%</td></tr>
+</tbody>
+</table>
+</div>
+<p class="cap">One generation = one server trace, so image edits and question regenerations each count. Counting only primary outputs, August is p95 26 and p99 51. Chat is a separate dimension of similar size: p90 about 28 messages a month.</p>
+
+<div class="grid3">
+  <div class="box"><div class="kpi">3–4<small>median generations a month in season. Most teachers use the toolbox lightly.</small></div></div>
+  <div class="box"><div class="kpi">~100<small>p99 a month. One teacher in a hundred goes past it.</small></div></div>
+  <div class="box"><div class="kpi">$0.035<small>text-LLM cost per generation. Question generation is $0.08, marking $0.35, small pedagogy tools under $0.01.</small></div></div>
+</div>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Tool family, June to August</th><th class="num">Share of generations</th><th class="num">Text cost per run</th><th>Pricing implication</th></tr></thead>
+<tbody>
+<tr><td>Question and assignment generation</td><td class="num">35%</td><td class="num">$0.08</td><td>The workhorse. Lives in every plan, counted against the Starter cap</td></tr>
+<tr><td>Image Generator (Creative Studio), incl. edits</td><td class="num">17%</td><td class="num">not priced</td><td>Image cost is invisible in PostHog. Cap it separately on every plan</td></tr>
+<tr><td>Presentation Generator</td><td class="num">7%</td><td class="num">$0.01 + slide images</td><td>Capped on every plan: 5, 20, 50 a month</td></tr>
+<tr><td>Podcast Generator</td><td class="num">4%</td><td class="num">$0.01 + TTS</td><td>TTS is the real cost. Allowance rises by tier</td></tr>
+<tr><td>Some 40 small pedagogy tools (hooks, vocab, exit tickets, misconceptions…)</td><td class="num">~30%</td><td class="num">&lt; $0.01 each</td><td>Cheap and broad. In every plan, counted against the Starter cap</td></tr>
+<tr><td>Exam Paper Evaluation</td><td class="num">&lt; 1%</td><td class="num">$0.35</td><td>Ten times a normal tool, so its caps step up steeply: 10 papers on Starter, 50 on Everyday, 200 on Complete. The UK hook per Simon Hay</td></tr>
+<tr><td>Music (Juke Box)</td><td class="num">2%</td><td class="num">$0.03 + audio</td><td>Media allowance</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="finding"><div class="n">i</div><div><p><b>Starter at 40 generations a month covers about 95% of in-season teachers.</b> It is the honest light-user plan: p90 is 22 to 24, so almost nobody on Starter hits the cap in a normal month, and the ones who do in August are exactly the ones Everyday is for. At $0.035 a generation a maxed-out Starter costs about $1.40 in text against £3.99 inc VAT.</p></div></div>
+<div class="finding"><div class="n">j</div><div><p><b>Everyday at 150 generations a month is one and a half times the p99.</b> Fewer than one teacher in a hundred would ever touch it, yet it is a real number a teacher can read. A Everyday teacher who uses every one of the 150 costs about $5.25 in text tokens against £6.99 inc VAT (about $7.80 ex VAT). A typical Everyday teacher at the p75 costs under $0.50 a month. Complete at 400 is four times the p99 and, at $14 worst case against £12.99, still inside margin.</p></div></div>
+<div class="finding"><div class="n">k</div><div><p><b>Media is where cost is invisible and value is highest.</b> Podcasts, music, images and now video have no USD in PostHog. Keep media allowances small on Starter, meaningful on Everyday, generous on Complete, and read the provider bills after the first UK term.</p></div></div>
+
+<div class="note"><p><b>Caveat.</b> This is Turkish B2B usage where the school pays. UK teachers who have chosen to pay will be a smaller, keener cohort and will probably look more like the August column. Treat every number here as an opening position and re-derive after one full UK term.</p></div>
+
+<h2 id="plans"><span class="num">4</span>The three plans</h2>
+<p>Starter, Everyday and Complete, all paid, all for individual teachers, all behind one 14-day free trial of Everyday. Everyday is the plan we want people on. Starter is the honest light-user plan for the teacher who plans and sets questions a few times a week. Complete is for the teacher who uses video, audio and images as a matter of course, and it anchors Everyday as the sensible middle.</p>
+
+<div class="plans">
+  <div class="plan">
+    <div class="name">Starter</div>
+    <div class="price">£3.99 <small>/ month inc VAT</small></div>
+    <div class="sub">or £35 a year (£2.92 a month). Resets on the 1st.</div>
+    <ul>
+      <li>40 generations a month</li>
+      <li>2 podcasts and 8 images or tracks a month</li>
+      <li>5 presentations a month</li>
+      <li>10 exam papers or essays marked a month</li>
+      <li>100 assistant messages a month</li>
+      <li>Every planning and question tool, incl. Weekly Lesson Plan</li>
+      <li>PDF export, 90-day history</li>
+      <li class="lk">Locked with preview: Educational Videos, Video Solutions, Digital Twin, Pronunciation Assessment</li>
+    </ul>
+  </div>
+  <div class="plan hot">
+    <span class="pill">Most popular</span>
+    <div class="name">Everyday</div>
+    <div class="price">£6.99 <small>/ month inc VAT</small></div>
+    <div class="sub">or £59 a year (£4.92 a month). 14-day free trial. First-year launch discount, see below.</div>
+    <ul>
+      <li>150 generations a month</li>
+      <li>20 presentations a month</li>
+      <li>50 exam papers or essays marked a month</li>
+      <li>10 podcasts and 40 images or tracks a month</li>
+      <li>500 assistant messages a month</li>
+      <li>Digital Twin and Pronunciation Assessment unlocked</li>
+      <li>PowerPoint, Word, Google Docs and Slides export</li>
+      <li>Full history, saved classes, schemes of work</li>
+      <li>Priority queue</li>
+      <li class="lk">Locked with preview: Educational Videos, Video Solutions</li>
+    </ul>
+  </div>
+  <div class="plan">
+    <div class="name">Complete</div>
+    <div class="price">£12.99 <small>/ month inc VAT</small></div>
+    <div class="sub">or £109 a year (£9.08 a month).</div>
+    <ul>
+      <li>Everything in Pro</li>
+      <li>Educational Videos and Video Solutions: 8 videos a month</li>
+      <li>30 podcasts and 120 images or tracks a month</li>
+      <li>400 generations, 50 presentations, 1,000 assistant messages a month</li>
+      <li>200 papers marked a month, with batch upload of class sets</li>
+      <li>Early access to new tools</li>
+      <li>Two devices signed in at once</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Naming</h3>
+<p>Pro and Max were working names. Both are taken in this exact market: Chalkie sells Pro and Max, Teachmate sells Pro, Twinkl sells Ultimate and Premium. The research on tier names says value words beat generic intensifiers, and a name that says what the plan is for does the comparison table's job before the reader gets there.</p>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Option</th><th>Tier 1</th><th>Tier 2</th><th>Tier 3</th><th>Reads as</th></tr></thead>
+<tbody>
+<tr class="hl"><td><span style="color:var(--accent-deep);font-weight:600">Recommended</span></td><td>Starter</td><td>Everyday</td><td>Complete</td><td>"Everyday" is the plan for a normal teaching week. "Complete" is literally true: it is the only plan with every tool unlocked, video included, and the largest allowances. Plain English, no jargon, not used by any UK teacher-AI tool (Kapow Primary uses it for a curriculum bundle, a different market)</td></tr>
+<tr><td>Alternative</td><td>Starter</td><td>Everyday</td><td>Advanced</td><td>Safe and familiar. Slightly implies the tools are harder to use rather than more numerous</td></tr>
+<tr><td>Role-based</td><td>Starter</td><td>Teacher</td><td>Creator</td><td>Warm, but "Teacher" as a paid tier reads oddly when every buyer is one</td></tr>
+<tr><td>Scope-based</td><td>Starter</td><td>Classroom</td><td>Department</td><td>Familiar school words, but "Department" implies several users and collides with the school offer</td></tr>
+</tbody>
+</table>
+</div>
+<p>The rest of this document uses Starter, Everyday and Complete.</p>
+
+<h3 id="matrix">Gating matrix</h3>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Dimension</th><th>Starter</th><th>Everyday</th><th>Complete</th></tr></thead>
+<tbody>
+<tr><td>Free trial</td><td colspan="3">14 days of Everyday for every new account, no card required. After the trial the account is read-only (history visible, no new generations) until a plan is chosen.</td></tr>
+<tr><td>Generations a month (all reset on the 1st)</td><td>40</td><td>150</td><td>400</td></tr>
+<tr><td>Podcast Generator</td><td>2 a month</td><td>10 a month</td><td>30 a month</td></tr>
+<tr><td>Creative Studio and Juke Box (images, tracks)</td><td>8 a month</td><td>40 a month</td><td>120 a month</td></tr>
+<tr><td>Presentation Generator</td><td>5 a month</td><td>20 a month</td><td>50 a month</td></tr>
+<tr><td>Educational Videos, Video Solutions</td><td><span class="tag lock">Locked, preview</span></td><td><span class="tag lock">Locked, preview</span></td><td>8 videos a month</td></tr>
+<tr><td>Exam Paper Evaluation, Essay Evaluation</td><td>10 papers a month</td><td>50 papers a month</td><td>200 papers a month, batch upload</td></tr>
+<tr><td>Madlen Super Assistant</td><td>100 messages a month</td><td>500 a month</td><td>1,000 a month</td></tr>
+<tr><td>Digital Twin, Pronunciation Assessment</td><td><span class="tag lock">Locked, preview</span></td><td>Included</td><td>Included</td></tr>
+<tr><td>Planning tools (Daily, Weekly, PYP), questions, rubrics, worksheets, dialogues, AI Resistant Homework</td><td>Included</td><td>Included</td><td>Included</td></tr>
+<tr><td>Curriculum alignment: AQA, Edexcel, OCR, IB, Key Stages</td><td>Included</td><td>Included</td><td>Included</td></tr>
+<tr><td>Export</td><td>PDF</td><td>PDF, PowerPoint, Word, Google Docs and Slides</td><td>Same</td></tr>
+<tr><td>History and library</td><td>90 days</td><td>Full history, saved classes, schemes of work</td><td>Same</td></tr>
+<tr><td>Queue</td><td>Standard</td><td>Priority</td><td>Priority</td></tr>
+<tr><td>Refund</td><td colspan="3">14-day refund, cancel any time</td></tr>
+</tbody>
+</table>
+</div>
+<p>Two rules make this legible. Nothing is invisible: locked tools show a blurred preview and an upgrade prompt, so the user always sees what is one step away. And every limit is a number with a cadence, "2 podcasts a month, resets on the 1st", never the word "limited".</p>
+<p>Nothing is unlimited. Each plan is a set of monthly allowances and the next plan up simply has bigger ones. Everyday's 150 generations sit above the p99 of real usage, so the cap is real but almost never felt; Complete's 400 is for the teacher who runs whole departments' worth of material. Marking is the plan's real selling point in the UK, so its ladder is the steepest: 10, 50, 200 papers a month. It is also the one allowance that can outrun its price. At about $0.35 a paper, a teacher who marks all 50 on Everyday costs $17.50 against £6.99, and all 200 on Complete costs $70 against £12.99. That is acceptable only because a full class set is 30 papers and very few teachers mark more than two or three sets a month with the tool; in the Turkish data marking is under 1% of generations. Watch the marking cost per Complete subscriber from the first month, and if the p90 climbs past about 80 papers, either lower the cap or price a marking top-up.</p>
+
+<h3 id="price">Prices and the launch discount</h3>
+<div class="tablewrap">
+<table>
+<thead><tr><th>Plan</th><th class="num">Monthly inc VAT</th><th class="num">Annual</th><th class="num">Annual per month</th><th>Sits against</th></tr></thead>
+<tbody>
+<tr><td>Starter</td><td class="num">£3.99</td><td class="num">£35</td><td class="num">£2.92</td><td>Under Twinkl Core (£4.49) and Bedrock Home (£3.59). Cheapest specialist teacher tool on the UK market, which is the point of an entry plan when there is no free tier</td></tr>
+<tr><td>Pro</td><td class="num">£6.99</td><td class="num">£59</td><td class="num">£4.92</td><td>Teachmate £6.99 and £59.88 first year. Twinkl Core to Extra. Under Chalkie Pro annual (£71.88)</td></tr>
+<tr><td>Max</td><td class="num">£12.99</td><td class="num">£109</td><td class="num">£9.08</td><td>Above Chalkie Max (£10.99, £131.88/yr) monthly, below it annually. Under Claude or ChatGPT at £15 to £18. Video generation has no UK teacher-tool comparable</td></tr>
+</tbody>
+</table>
+</div>
+<p>The ladder is roughly 1 : 1.75 : 3.25 monthly (£3.99, £6.99, £12.99), so Everyday is a clear step up from Starter and Complete a clear step up again, inside the bands good-better-best pricing tends to use. If £12.99 feels high for a launch, £11.99 and £99 gives a round "£99 a year". Starter at £3.99 exists to catch the teacher whose trial has ended and who would otherwise leave; it is not meant to be the plan most people choose.</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>First-year discount</th><th class="num">Starter annual</th><th class="num">Everyday annual</th><th class="num">Everyday per month</th><th class="num">Complete annual</th><th>Reads as</th></tr></thead>
+<tbody>
+<tr><td>20% off</td><td class="num">£28</td><td class="num">£47</td><td class="num">£3.92</td><td class="num">£87</td><td>Modest. Same depth as Teachmate's own first-year offer (17%)</td></tr>
+<tr class="hl"><td>25% off</td><td class="num">£26</td><td class="num">£44</td><td class="num">£3.67</td><td class="num">£82</td><td>"A quarter off for founding teachers." Clear, Everyday still lands above Twinkl Core on a monthly basis</td></tr>
+<tr><td>30% off</td><td class="num">£25</td><td class="num">£41</td><td class="num">£3.42</td><td class="num">£76</td><td>Aggressive. Strong for January, risks anchoring renewal expectations low</td></tr>
+</tbody>
+</table>
+</div>
+<p>Apply the discount to annual plans only, for accounts created in the first twelve months, with the renewal price printed next to it ("then £59 a year"). Discounting the monthly plan too would make the annual plan pointless. Under the CMA's December 2025 guidance the renewal price has to be as visible as the offer price, which is also good manners.</p>
+
+<h2 id="rules"><span class="num">5</span>Rules of the road</h2>
+<div class="grid2">
+  <div class="box"><h4>Consumer prices include VAT</h4><p>The DMCC Act 2024 and CMA guidance require the total price including tax in any consumer offer, and the annual total must be as prominent as the per-month figure. Show "£4.92 a month, £59 billed yearly, inc VAT" with both numbers the same size.</p></div>
+  <div class="box"><h4>Price as if VAT applied, even before registration</h4><p>The UK entity does not have to register for VAT until £90,000 of UK turnover. Set £6.99 as the inc-VAT price from day one. Otherwise registration later means either a 20% headline rise or a 17% margin cut.</p></div>
+  <div class="box"><h4>Refund and cancellation</h4><p>Consumer Contracts Regulations give a 14-day cooling-off right. Teachmate sells it as "14-day refund if you have not used Pro tools". Match it and say "cancel any time".</p></div>
+  <div class="box"><h4>British English</h4><p>Marks not grades, marking not grading, year groups, schemes of work, Head of Department. Simon Hay's point: one American term on a pricing card and trust drops.</p></div>
+</div>
+
+<h2 id="page"><span class="num">6</span>Page structure</h2>
+<p>A UK-only page with a "Pricing" item in the UK navigation, placed before Contact. Schools appear once, as a band that sends them to the existing For Schools page and its pilot request form. No school price anywhere on this page.</p>
+
+<div class="wire">
+  <div class="blk"><b>Hero.</b> One line of value in British English, e.g. "Plan the week and mark the set, in an evening." Monthly / Yearly toggle, default Yearly, labelled "save 2 months".</div>
+  <div class="blk cards"><div>Starter · £2.92 a month<br>£35 billed yearly<br>Start free trial</div><div class="hot">Everyday · £4.92 a month<br>£59 billed yearly · Most popular<br>Start free trial</div><div>Complete · £9.08 a month<br>£109 billed yearly<br>Start free trial</div></div>
+  <div class="blk"><b>Trial line under the cards.</b> "Every plan starts with 14 days of Everyday, free. No card needed." One sentence, so the page never has to explain a free tier it does not have.</div>
+  <div class="blk"><b>Launch offer strip.</b> "Founding teachers: 25% off your first year on yearly plans, then £59." Renewal price same size as offer price.</div>
+  <div class="blk"><b>Trust strip.</b> Teacher count, "no pupil data required", UK GDPR, cancel any time, 14-day refund.</div>
+  <div class="blk"><b>Comparison table.</b> The gating matrix above, every cell a number. A short line beneath it: "All allowances reset on the 1st of the month."</div>
+  <div class="blk"><b>Schools band.</b> "Buying for a department or school? Pilots, invoices and DPIA support live on our schools page." One button to /uk/schools, which opens the existing pilot form.</div>
+  <div class="blk"><b>FAQ.</b> Can I try Madlen for free? (Yes: 14 days of Everyday, no card, then choose a plan.) What happens when the trial ends. Why not just use Aila. What happens when I reach my monthly allowance. What counts as a generation. VAT. Cancelling and refunds. Pupil data. Switching plans. Does my school pay less.</div>
+  <div class="blk"><b>Final CTA.</b> "Try Everyday free for 14 days. No card needed."</div>
+</div>
+
+<div class="box" style="margin-top:14px"><h4>Copy rules</h4><ul>
+    <li>Every plan sells a number. Everyday's headline is "150 generations, 50 papers marked, 20 presentations a month", not a promise of "unlimited". A concrete allowance is easier to trust and easier to defend than a fair-use policy.</li>
+    <li>Starter never says "limited". Numbers with cadence.</li>
+    <li>The trial is always "14 days of Everyday", never "free plan" or "free version", so nobody arrives expecting freemium.</li>
+    <li>Argue from the product, not competitors. The Aila FAQ is the one exception and stays respectful.</li>
+  </ul></div>
+
+<h2 id="open"><span class="num">7</span>Open items</h2>
+<ul class="plain">
+  <li><b>Top-tier price.</b> Complete at £12.99 and £109 is the proposal; £11.99 and £99 is the fallback.</li>
+  <li><b>Discount depth.</b> 25% off the first year on annual plans is the recommendation; 20% and 30% are tabled.</li>
+  <li><b>What happens at the cap.</b> Hard stop with an upgrade prompt is the simplest. The alternative is a small top-up pack (say 20 generations for £1.99), which Descript and ElevenLabs do and which keeps a Starter teacher from churning in a heavy month. Decide before the plan model in MAD-7140 is fixed.</li>
+  <li><b>Video and marking allowances.</b> 8 videos a month on Complete, and 10 / 50 / 200 marked papers across the tiers, are placeholders until per-video cost and UK marking volumes are known.</li>
+  <li><b>Real media cost per unit.</b> Podcasts, tracks, images and videos have no USD in PostHog. Needs the Gemini, ElevenLabs and image and video provider invoices for one month.</li>
+  <li><b>VAT registration at launch.</b> Decides whether £6.99 is booked as £6.99 or £5.83 plus VAT internally. Pricing is unaffected either way.</li>
+  <li><b>Trial mechanics.</b> No card at launch is the recommendation; card-required converts more starters but loses top of funnel. Either way MAD-7140 needs a trial state and a timed move to read-only, and a decision on whether trial history stays visible after expiry (recommended: yes, it is the strongest reason to come back and pay).</li>
+  <li><b>Starter price and caps.</b> £3.99 and £35 with 40 generations is a first proposal. The alternative is dropping Starter's caps to the old free-tier numbers (15 generations) at £2.99, which makes Everyday look even better but risks feeling mean for a paid plan.</li>
+  <li><b>Referral.</b> Ece's proposal (referred teacher gets the launch price, referrer gets 7 extra days of trial or Everyday) fits and can follow once prices settle.</li>
+  <li><b>Data gap.</b> No UK survey measures how many teachers pay for AI tools personally. One Teacher Tapp custom question would settle it.</li>
+</ul>
+
+<footer>
+  <p><b>Sources.</b> Vendor pages fetched 10 Sep 2026: teachmate.com/pricing, chalkie.ai/en-gb/pricing, carousel-learning.com, tes.com, labs.thenational.academy, magicschool.ai/pricing, briskteaching.com/plans, web.diffit.me/pricing, twee.com/price, almanack.ai. Market: Teacher Tapp AI Spy tracker (Jan 2025) and Oct 2025 update; NEU State of Education 2026; Chartered College "From novelty to normal" (May 2026); NASUWT pay scales 2025/26; gov.uk Generative AI in education (Aug 2025) and product safety standards (19 Jan 2026); ASA guidance on VAT in prices (Dec 2025); CMA price transparency guidance (Dec 2025); HBR "The Good-Better-Best Approach to Pricing" (2018); Lenny Rachitsky and OpenView freemium benchmarks. Internal: PostHog project Madlen Teacher, March to September 2026; Notion UK Setup (Simon Hay meeting 20 May 2026, UK tax workshop notes 12 Jun 2026); Slack #madlen-uk 8 to 10 Sep 2026.</p>
+</footer>
+</main>
+</div>
+</body>
+</html>
